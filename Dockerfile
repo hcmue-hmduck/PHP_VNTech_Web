@@ -17,13 +17,16 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libzip-dev \
-    libssl-dev
+    libssl-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mbstring exif pcntl bcmath gd zip
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install mbstring exif pcntl bcmath gd zip
 
 # Install MongoDB extension
 RUN pecl install mongodb && docker-php-ext-enable mongodb
