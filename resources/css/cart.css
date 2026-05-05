@@ -1,0 +1,13 @@
+/* Tùy chỉnh CSS cho Giỏ hàng VNTech */
+.cart-item-image {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cart-item-card:hover .cart-item-image {
+    transform: scale(1.1);
+}
+
+/* Hiệu ứng glow cho tổng tiền */
+.total-glow {
+    text-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
+}

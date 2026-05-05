@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@400;500;700&display=swap');
+
+.glow-text {
+    text-shadow: 0 0 20px rgba(0, 229, 91, 0.5);
+}
+
+/* Custom scrollbar for neon theme — auto-hide behavior */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+
+body:hover::-webkit-scrollbar-thumb {
+    background: #444646;
+}
+
+body:hover::-webkit-scrollbar-thumb:hover {
+    background: #00e55b;
+}
+
+/* Firefox — luôn mỏng, ẩn khi không hover */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+body:hover {
+    scrollbar-color: #444646 transparent;
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
