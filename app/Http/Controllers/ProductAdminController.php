@@ -8,7 +8,7 @@ class ProductAdminController extends Controller
 {
     public function viewProductAdmin()
     {
-        $products = Product::latest()->paginate(10);
+        $products = Product::with('variants')->latest()->paginate(10);
         return view('adminUI.productsAdmin', compact('products'));
     }
 }

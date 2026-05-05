@@ -102,12 +102,7 @@
                         <td class="px-6 py-4 w-40">
                             <div class="flex items-center gap-3">
                                 @php 
-                                    $stock = 0;
-                                    if(isset($product->variants) && is_array($product->variants)) {
-                                        foreach($product->variants as $variant) {
-                                            $stock += ($variant['stock'] ?? 0);
-                                        }
-                                    }
+                                    $stock = $product->variants->sum('so_luong_ton_kho');
                                 @endphp
                                 <div class="flex-1 h-1.5 bg-dark-bg/60 rounded-full overflow-hidden">
                                     <div 

@@ -30,6 +30,11 @@ class Product extends Model {
         'gia_niem_yet' => 'decimal:0',
         'luot_xem' => 'integer',
     ];
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class, 'ma_san_pham', 'ma_san_pham');
+    }
 }
 
 ?>
