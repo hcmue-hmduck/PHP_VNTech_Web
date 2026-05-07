@@ -7,8 +7,13 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller {
     public function viewCart(string $user_id) {
-        $cart = Cart::where('ma_nguoi_dung', $user_id)->firstOrFail();
-        $cartItems = CartItem::with('variant.product')->where('ma_gio_hang', $cart->_id)->get(); 
+        $cart = Cart::where('ma_nguoi_dung', $user_id)->first();
+        
+        if (!$cart) {
+            $cartItems = collect();
+        } else {
+            $cartItems = CartItem::with('variant.product')->where('ma_gio_hang', $cart->_id)->get(); 
+        }
         
         return view('homeUI.cart', compact('cartItems', 'cart'));
     }
