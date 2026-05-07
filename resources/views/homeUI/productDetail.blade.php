@@ -16,10 +16,17 @@
     .font-display {
         font-family: 'Space Grotesk', sans-serif;
     }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 </style>
 
     <main class="flex-1 pt-32 pb-24 px-12 max-w-[1440px] mx-auto w-full uppercase" 
-      x-data="productDetail({{ $variants->toJson() }})">
+      x-data="productDetail({{ $variants->toJson() }}, {{ json_encode($productDetail->hinh_anh ?? []) }})">
     
     <!-- Breadcrumbs -->
     <nav class="mb-8 flex items-center gap-2 text-gray-500 font-bold text-[10px] tracking-[0.2em]">
@@ -34,25 +41,55 @@
         <!-- Left: Gallery -->
         <div class="lg:col-span-7 space-y-6">
             <div class="glass-panel aspect-video rounded-none overflow-hidden relative group">
-                <img :src="images.hero" alt="{{ $productDetail->ten_san_pham }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <img :src="gallery[activeImageIndex]" alt="{{ $productDetail->ten_san_pham }}" class="w-full h-full object-cover">
                 <div class="absolute top-4 right-4 bg-lime-400 text-black px-3 py-1 font-black text-[10px] tracking-[0.2em] uppercase">
                     THẾ HỆ MỚI
                 </div>
+
+                <!-- Navigation Buttons -->
+                <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button @click="prevImage" class="w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                    <button @click="nextImage" class="w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all">
+                        <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                    </button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-4 gap-4">
-                <template x-for="(img, idx) in [images.thumb1, images.thumb2, images.thumb3, 'video']" :key="idx">
-                    <div class="glass-panel aspect-square flex items-center justify-center cursor-pointer overflow-hidden border-white/5 hover:border-lime-400 transition-all">
-                        <template x-if="img === 'video'">
-                            <div class="text-lime-400 flex flex-col items-center gap-2 opacity-60 hover:opacity-100">
-                                <i data-lucide="play-circle" class="w-10 h-10"></i>
-                            </div>
-                        </template>
-                        <template x-if="img !== 'video'">
-                            <img :src="img" class="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity">
-                        </template>
-                    </div>
-                </template>
+            <!-- Single Row Thumbnail Slider -->
+            <div class="relative group/thumbs">
+                <!-- Arrow Left -->
+                <button @click="$refs.thumbTrack.scrollBy({left: -$refs.thumbTrack.offsetWidth, behavior: 'smooth'})" 
+                        class="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all rounded-full opacity-0 group-hover/thumbs:opacity-100">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Track -->
+                <div x-ref="thumbTrack" class="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2">
+                    <template x-for="(img, idx) in gallery" :key="idx">
+                        <div @click="activeImageIndex = idx" 
+                             class="glass-panel basis-[calc(25%-12px)] flex-shrink-0 aspect-square flex items-center justify-center cursor-pointer overflow-hidden border-white/5 hover:border-lime-400 transition-all relative">
+                            <template x-if="img === 'video'">
+                                <div class="text-lime-400 flex flex-col items-center justify-center opacity-60 hover:opacity-100">
+                                    <i data-lucide="play-circle" class="w-8 h-8"></i>
+                                </div>
+                            </template>
+                            <template x-if="img !== 'video'">
+                                <img :src="img" class="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity"
+                                     :class="{'opacity-100': activeImageIndex === idx}">
+                                <div class="absolute inset-0 border-2 border-lime-400 transition-opacity pointer-events-none"
+                                     :class="activeImageIndex === idx ? 'opacity-100' : 'opacity-0'"></div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Arrow Right -->
+                <button @click="$refs.thumbTrack.scrollBy({left: $refs.thumbTrack.offsetWidth, behavior: 'smooth'})" 
+                        class="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all rounded-full opacity-0 group-hover/thumbs:opacity-100">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </button>
             </div>
         </div>
 
@@ -276,19 +313,23 @@
 @section('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('productDetail', (variantsData) => ({
+        Alpine.data('productDetail', (variantsData, galleryData) => ({
             variants: variantsData,
+            // Gộp ảnh đại diện vào đầu mảng gallery
+            gallery: ["{{ $productDetail->link_anh_dai_dien }}", ...galleryData],
+            activeImageIndex: 0,
             selectedIndex: 0,
             
             get currentVariant() {
                 return this.variants[this.selectedIndex] || {};
             },
             
-            images: {
-                hero: "{{ $productDetail->link_anh_dai_dien ?? 'https://via.placeholder.com/800' }}",
-                thumb1: "{{ $productDetail->link_anh_dai_dien ?? 'https://via.placeholder.com/800' }}",
-                thumb2: "{{ $productDetail->link_anh_dai_dien ?? 'https://via.placeholder.com/800' }}",
-                thumb3: "{{ $productDetail->link_anh_dai_dien ?? 'https://via.placeholder.com/800' }}"
+            nextImage() {
+                this.activeImageIndex = (this.activeImageIndex + 1) % this.gallery.length;
+            },
+            
+            prevImage() {
+                this.activeImageIndex = (this.activeImageIndex - 1 + this.gallery.length) % this.gallery.length;
             },
             
             formatPrice(price) {
@@ -298,10 +339,7 @@
             
             selectVariant(index) {
                 this.selectedIndex = index;
-                // Update hero image if variant has a specific image
-                if (this.currentVariant.link_anh_bien_the) {
-                    this.images.hero = this.currentVariant.link_anh_bien_the;
-                }
+                // Nếu biến thể có ảnh riêng, có thể thêm logic cập nhật activeImageIndex ở đây
             }
         }));
     });

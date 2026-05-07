@@ -3,7 +3,7 @@
 @section('title', 'Quản lý Sản phẩm - VNTech')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Dashboard Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div>
@@ -14,10 +14,10 @@
                 QUẢN LÝ SẢN PHẨM
             </h1>
         </div>
-        <button class="group flex items-center gap-3 bg-transparent border-2 border-neon-green text-neon-green px-6 py-3 font-bold uppercase tracking-widest hover:bg-neon-green hover:text-black transition-all duration-300">
+        <a href="{{ route('admin.products.create') }}" class="group flex items-center gap-3 bg-transparent border-2 border-neon-green text-neon-green px-6 py-3 font-bold uppercase tracking-widest hover:bg-neon-green hover:text-black transition-all duration-300">
             <i data-lucide="plus" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
             <span>THÊM SẢN PHẨM MỚI</span>
-        </button>
+        </a>
     </div>
 
     <!-- Filters Bar -->
@@ -134,9 +134,9 @@
                                 <button class="p-2 hover:text-neon-green hover:bg-neon-green/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
                                     <i data-lucide="eye" class="w-4 h-4"></i>
                                 </button>
-                                <button class="p-2 hover:text-blue-400 hover:bg-blue-400/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
+                                <a href="{{ route('admin.products.edit', $product) }}" class="p-2 hover:text-blue-400 hover:bg-blue-400/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
                                     <i data-lucide="pencil" class="w-4 h-4"></i>
-                                </button>
+                                </a>
                                 <button class="p-2 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $collection) {
-            $collection->unique('ma_san_pham');
+            $collection->uuid('ma_san_pham')->unique();
             $collection->string('ten_san_pham');
             $collection->string('slug')->unique();
 

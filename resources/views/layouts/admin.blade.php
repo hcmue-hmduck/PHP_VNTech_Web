@@ -89,8 +89,8 @@
                 <nav class="flex flex-col gap-2">
                     @php
                         $navItems = [
-                            ['name' => 'Dashboard', 'icon' => 'layout-dashboard', 'route' => 'viewAdminDashboard'],
-                            ['name' => 'Sản phẩm', 'icon' => 'package', 'route' => 'admin.products'],
+                            ['name' => 'Dashboard', 'icon' => 'layout-dashboard', 'route' => 'admin.dashboard.index', 'active' => 'admin.dashboard*'],
+                            ['name' => 'Sản phẩm', 'icon' => 'package', 'route' => 'admin.products.index', 'active' => 'admin.products*'],
                             ['name' => 'Hãng / Danh mục', 'icon' => 'layers', 'route' => 'admin.categories'],
                             ['name' => 'Đơn hàng', 'icon' => 'shopping-cart', 'route' => 'admin.orders'],
                             ['name' => 'Banner quảng cáo', 'icon' => 'image', 'route' => 'admin.banners'],
@@ -101,7 +101,7 @@
                     @foreach($navItems as $item)
                         @php $hasRoute = Route::has($item['route']); @endphp
                         <a href="{{ $hasRoute ? route($item['route']) : '#' }}" 
-                           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs($item['route']) ? 'bg-neon-green/10 border border-neon-green/20 text-neon-green' : 'hover:bg-surface-high/50 text-gray-400 hover:text-white' }}">
+                           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs($item['active'] ?? $item['route']) ? 'bg-neon-green/10 border border-neon-green/20 text-neon-green' : 'hover:bg-surface-high/50 text-gray-400 hover:text-white' }}">
                             <i data-lucide="{{ $item['icon'] }}" class="size-5 {{ request()->routeIs($item['route']) ? 'text-neon-green' : 'text-gray-500 group-hover:text-gray-300' }}"></i>
                             <span class="text-sm font-medium tracking-wide">{{ $item['name'] }}</span>
                         </a>
@@ -159,7 +159,7 @@
             </header>
 
             <!-- CONTENT AREA -->
-            <div class="p-12 space-y-8 max-w-7xl">
+            <div class="p-12 space-y-8 w-full">
                 @yield('content')
             </div>
         </main>

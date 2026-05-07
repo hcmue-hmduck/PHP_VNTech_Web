@@ -31,6 +31,12 @@ Route::post('/cart/remove-item', [CartController::class, 'removeItem'])->name('c
 Route::get('/product-detail/{slug}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
-    Route::get('/', [DashboardController::class, 'viewAdminDashboard'])->name('viewAdminDashboard');
-    Route::get('/products', [ProductAdminController::class, 'viewProductAdmin'])->name('admin.products');
+    Route::get('/', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
+    Route::get('/products', [ProductAdminController::class, 'viewProductAdmin'])->name('admin.products.index');
+    Route::get('/products/create', [ProductAdminController::class, 'viewCreateProductAdmin'])->name('admin.products.create');
+
+    Route::post('/products', [ProductAdminController::class, 'storeCreateProductAdmin'])->name('admin.products.store');
+    
+    Route::get('/products/{product}/edit', [ProductAdminController::class, 'viewEditProductAdmin'])->name('admin.products.edit');
+    Route::put('/products/{product}', [ProductAdminController::class, 'updateEditProductAdmin'])->name('admin.products.update');
 });
