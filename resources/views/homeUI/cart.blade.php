@@ -9,32 +9,33 @@
 @php
     $itemsForJs = $cartItems->map(function($item) {
         $variant = $item->variant;
-        $product = $variant ? $variant->product : null;
-        
-        $ram = '';
-        $ssd = '';
-        if ($variant && is_array($variant->thuoc_tinh)) {
-            $ram = collect($variant->thuoc_tinh)->firstWhere('ten', 'RAM')['gia_tri'] ?? 'RAM';
-            $ssd = collect($variant->thuoc_tinh)->firstWhere('ten', 'Ổ cứng')['gia_tri'] ?? 'SSD';
-        }
-
         return [
             'id' => $item->id,
-            'name' => $product ? $product->ten_san_pham : 'Sản phẩm đã ngừng kinh doanh',
-            'description' => $ram . ' / ' . $ssd,
-            'price' => $variant ? $variant->gia_ban : 0,
+            'ma_bien_the' => $item->ma_bien_the,
+            'name' => $variant->ten_bien_the,
+            'price' => $variant->gia_ban,
             'quantity' => $item->so_luong,
-            'image' => $variant && $variant->link_anh_bien_the ? $variant->link_anh_bien_the : ($product ? $product->link_anh_dai_dien : 'https://via.placeholder.com/200')
+            'image' => $variant->link_anh_bien_the,
+            'checked' => true
         ];
     })->toArray();
 @endphp
 
-<div class="min-h-screen bg-[#121414] font-sans selection:bg-lime-400 selection:text-black pt-32 pb-24 px-6 max-w-7xl mx-auto" 
-     x-data='cartComponent(@json($itemsForJs), {
-        updateUrl: "{{ route("cart.updateQuantity") }}",
-        removeUrl: "{{ route("cart.removeItem") }}",
-        csrfToken: "{{ csrf_token() }}"
-     })'>
+<form method="POST" action="{{ route('preparePayment') }}" class="min-h-screen bg-[#121414] font-sans selection:bg-lime-400 selection:text-black pt-32 pb-24 px-6 max-w-7xl mx-auto"
+        x-data='cartComponent(@json($itemsForJs), {
+          updateUrl: "{{ route("cart.updateQuantity") }}",
+          removeUrl: "{{ route("cart.removeItem") }}",
+          csrfToken: "{{ csrf_token() }}"
+      })'>
+     @csrf
+      <input type="hidden" name="cart_json" x-bind:value="JSON.stringify(cartItems.filter(i => i.checked).map(item => ({
+          ma_san_pham: item.id,
+          ma_bien_the: item.ma_bien_the,
+          ten_bien_the: item.name,
+          gia_ban: item.price,
+          so_luong: item.quantity,
+          link_anh_dai_dien: item.image
+      })))">
     
     <!-- Tiêu đề căn giữa, nằm ngoài grid -->
     <h1 class="font-['Space_Grotesk'] text-4xl md:text-5xl font-bold mb-10 text-white tracking-tight uppercase text-center">
@@ -48,28 +49,30 @@
             <div class="flex flex-col gap-4">
                 <template x-for="(item, index) in cartItems" :key="item.id">
                     <div class="bg-white/5 border border-white/10 p-4 md:p-6 rounded-xl flex flex-col md:flex-row items-center gap-6 group hover:border-lime-400/20 transition-all duration-300">
+                        <div class="flex-shrink-0 flex items-center justify-center">
+                            <input type="checkbox" x-model="item.checked" class="w-5 h-5 text-lime-400 rounded" />
+                        </div>
                         <div class="w-full md:w-32 h-48 md:h-32 rounded-lg overflow-hidden bg-gray-900 border border-white/5">
                             <img :src="item.image" :alt="item.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         </div>
                         
                         <div class="flex-grow text-center md:text-left">
                             <h3 class="font-['Space_Grotesk'] text-lg md:text-xl font-bold text-white mb-1" x-text="item.name"></h3>
-                            <p class="text-sm text-gray-400 font-light mb-3" x-text="item.description"></p>
                             <p class="text-lime-400 font-['Space_Grotesk'] font-bold text-lg drop-shadow-[0_0_8px_rgba(0,255,102,0.4)]" x-text="formatCurrency(item.price)"></p>
                         </div>
 
                         <div class="flex items-center gap-6">
                             <div class="flex items-center bg-black/40 border border-white/10 rounded-full h-11 px-1 overflow-hidden">
-                                <button @click="updateQuantity(item.id, -1)" class="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all">
+                                <button type="button" @click="updateQuantity(item.id, -1)" class="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all">
                                     <i data-lucide="minus" class="w-4 h-4"></i>
                                 </button>
                                 <span class="w-10 text-center font-bold text-white" x-text="item.quantity"></span>
-                                <button @click="updateQuantity(item.id, 1)" class="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all">
+                                <button type="button" @click="updateQuantity(item.id, 1)" class="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-full transition-all">
                                     <i data-lucide="plus" class="w-4 h-4"></i>
                                 </button>
                             </div>
                             
-                            <button @click="removeItem(item.id)" class="p-3 text-gray-500 hover:text-red-400 transition-colors bg-white/5 hover:bg-red-400/10 rounded-full">
+                            <button type="button" @click="removeItem(item.id)" class="p-3 text-gray-500 hover:text-red-400 transition-colors bg-white/5 hover:bg-red-400/10 rounded-full">
                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
                             </button>
                         </div>
@@ -94,7 +97,7 @@
                 <h2 class="font-['Space_Grotesk'] text-2xl font-bold text-white mb-6 tracking-tight uppercase">Tóm tắt đơn hàng</h2>
                 
                 <div class="space-y-4 mb-8">
-                    <template x-for="item in cartItems" :key="'summary-' + item.id">
+                    <template x-for="item in cartItems.filter(i => i.checked)" :key="'summary-' + item.id">
                         <div class="flex justify-between items-center text-sm font-light">
                             <span class="text-gray-400 uppercase tracking-wider line-clamp-1" x-text="item.name"></span>
                             <span class="text-white whitespace-nowrap" x-text="formatCurrency(item.price * item.quantity)"></span>
@@ -111,12 +114,11 @@
                         <span class="text-white font-['Space_Grotesk'] font-medium uppercase tracking-wider">Tổng cộng</span>
                         <div class="text-right">
                             <span class="block text-3xl font-['Space_Grotesk'] font-bold text-lime-400 drop-shadow-[0_0_15px_rgba(0,255,102,0.6)]" 
-                                  x-text="formatCurrency(total)"></span>
+                                  x-text="formatCurrency(cartItems.filter(i => i.checked).reduce((s, i) => s + (i.price * i.quantity), 0))"></span>
                         </div>
                     </div>
                 </div>
-
-                <button class="w-full h-16 bg-lime-400 text-black rounded-full font-['Space_Grotesk'] font-bold text-lg flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(0,255,102,0.3)] hover:shadow-[0_0_50px_rgba(0,255,102,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all uppercase">
+                <button type="submit" :disabled="cartItems.filter(i => i.checked).length === 0" class="w-full h-16 bg-lime-400 text-black rounded-full font-['Space_Grotesk'] font-bold text-lg flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(0,255,102,0.3)] hover:shadow-[0_0_50px_rgba(0,255,102,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all uppercase disabled:opacity-40 disabled:cursor-not-allowed">
                     <i data-lucide="lock" class="w-5 h-5"></i>
                     THANH TOÁN NGAY
                 </button>

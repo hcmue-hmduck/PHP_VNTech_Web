@@ -45,7 +45,22 @@
 @endpush
 
 @section('content')
-<main class="pt-32 pb-24 px-6 max-w-[1440px] mx-auto" x-data="{ paymentMethod: 'card' }">
+@php
+    $tongTien = collect($cartItems ?? [])->sum(fn ($item) => ($item['gia_ban'] ?? 0) * ($item['so_luong'] ?? 0));
+@endphp
+<form method="POST" action="{{ route('storeCreateOrder') }}" class="pt-32 pb-24 px-6 max-w-[1440px] mx-auto" x-data="{ paymentMethod: 'qr', cartItems: {{ json_encode($cartItems ?? []) }} }">
+    @csrf
+    <input type="hidden" name="ma_don_hang" value="">
+    <input type="hidden" name="ma_nguoi_dung" value="{{ auth()->id() ?? 'guest' }}">
+    <input type="hidden" name="tong_tien_hang" value="{{ $tongTien }}">
+    <input type="hidden" name="phi_van_chuyen" value="0">
+    <input type="hidden" name="gia_tri_giam_voucher" value="0">
+    <input type="hidden" name="tong_thanh_toan" value="{{ $tongTien }}">
+    <input type="hidden" name="phuong_thuc_thanh_toan" x-model="paymentMethod">
+    <input type="hidden" name="trang_thai" value="cho_xac_nhan">
+    <input type="hidden" name="cart_items" x-bind:value="JSON.stringify(cartItems)">
+
+<main>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Page Header -->
@@ -62,29 +77,34 @@
         <div class="lg:col-span-8 space-y-8">
             
             <!-- Shipping Info -->
-            <section class="glass-panel p-8 relative overflow-hidden group">
+            <section class="glass-panel p-8 relative overflow-hidden group shadow-[0_0_30px_rgba(0,0,0,0.12)]">
                 <div class="absolute top-0 left-0 w-1 h-full bg-lime-400"></div>
-                <div class="flex items-center gap-3 mb-8">
-                    <i data-lucide="truck" class="text-lime-400 w-6 h-6"></i>
-                    <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white uppercase tracking-wider">Thông Tin Giao Hàng</h2>
+                <div class="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
+                    <div class="w-10 h-10 rounded-full bg-lime-400/10 flex items-center justify-center">
+                        <i data-lucide="truck" class="text-lime-400 w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white uppercase tracking-wider leading-none">Thông Tin Giao Hàng</h2>
+                        <p class="text-[10px] text-white/35 uppercase tracking-[0.25em] mt-2">Nhập thông tin nhận hàng của bạn</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-1">
+                    <div class="space-y-2">
                         <label class="neo-label">Họ và Tên</label>
-                        <input class="neo-input" placeholder="NGUYEN VAN A" type="text">
+                        <input class="neo-input block w-full rounded-xl px-4 py-3 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-lime-400 focus:ring-0" placeholder="NGUYEN VAN A" type="text" name="ho_ten_nguoi_nhan" required>
                     </div>
-                    <div class="space-y-1">
+                    <div class="space-y-2">
                         <label class="neo-label">Số Điện Thoại</label>
-                        <input class="neo-input" placeholder="+84 000 000 000" type="text">
+                        <input class="neo-input block w-full rounded-xl px-4 py-3 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-lime-400 focus:ring-0" placeholder="+84 000 000 000" type="text" name="so_dien_thoai_nhan" required>
                     </div>
-                    <div class="md:col-span-2 space-y-1">
+                    <div class="md:col-span-2 space-y-2">
                         <label class="neo-label">Địa Chỉ Nhận Hàng</label>
-                        <input class="neo-input" placeholder="Số nhà, Tên đường, Quận/Huyện, Thành phố" type="text">
+                        <input class="neo-input block w-full rounded-xl px-4 py-3 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-lime-400 focus:ring-0" placeholder="Số nhà, Tên đường, Quận/Huyện, Thành phố" type="text" name="dia_chi_giao_hang" required>
                     </div>
-                    <div class="md:col-span-2 space-y-1">
+                    <div class="md:col-span-2 space-y-2">
                         <label class="neo-label">Ghi Chú Đơn Hàng</label>
-                        <textarea class="neo-input min-h-[100px] resize-none" placeholder="Yêu cầu cấu hình thêm hoặc lưu ý cho shipper..." rows="3"></textarea>
+                        <textarea class="neo-input block w-full rounded-xl px-4 py-3 text-sm bg-white/5 border-white/10 text-white placeholder:text-white/25 focus:border-lime-400 focus:ring-0 min-h-[120px] resize-none" placeholder="Yêu cầu cấu hình thêm hoặc lưu ý cho shipper..." rows="4" name="ghi_chu"></textarea>
                     </div>
                 </div>
             </section>
@@ -93,31 +113,26 @@
             <section class="glass-panel p-8 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1 h-full bg-lime-400"></div>
                 <div class="flex items-center gap-3 mb-8">
-                    <i data-lucide="wallet" class="text-lime-400 w-6 h-6"></i>
+                    <i data-lucide="scan-line" class="text-lime-400 w-6 h-6"></i>
                     <h2 class="font-['Space_Grotesk'] text-2xl font-semibold text-white uppercase tracking-wider">Phương Thức Thanh Toán</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Card -->
-                    <button @click="paymentMethod = 'card'"
-                            :class="paymentMethod === 'card' ? 'border-lime-400 bg-lime-400/5 text-lime-400' : 'border-white/10 text-white/60 hover:border-white/30'"
-                            class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group">
-                        <i data-lucide="credit-card" :class="paymentMethod === 'card' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
-                        <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Thẻ Tín Dụng</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- QR Scan -->
+                    <button type="button" @click="paymentMethod = 'qr'"
+                            :class="paymentMethod === 'qr' ? 'border-lime-400 bg-lime-400/5 text-lime-400 shadow-[0_0_20px_rgba(163,230,53,0.12)]' : 'border-white/10 text-white/60 hover:border-white/30'"
+                            class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group rounded-xl">
+                        <i data-lucide="scan-line" :class="paymentMethod === 'qr' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
+                        <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Quét mã QR</span>
+                        <span class="text-[9px] text-white/35 uppercase tracking-[0.2em]">Thanh toán nhanh bằng mã QR</span>
                     </button>
-                    <!-- Bank -->
-                    <button @click="paymentMethod = 'bank'"
-                            :class="paymentMethod === 'bank' ? 'border-lime-400 bg-lime-400/5 text-lime-400' : 'border-white/10 text-white/60 hover:border-white/30'"
-                            class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group">
-                        <i data-lucide="banknote" :class="paymentMethod === 'bank' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
-                        <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Chuyển Khoản</span>
-                    </button>
-                    <!-- Digital Wallet -->
-                    <button @click="paymentMethod = 'wallet'"
-                            :class="paymentMethod === 'wallet' ? 'border-lime-400 bg-lime-400/5 text-lime-400' : 'border-white/10 text-white/60 hover:border-white/30'"
-                            class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group">
-                        <i data-lucide="wallet-minimal" :class="paymentMethod === 'wallet' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
-                        <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Ví Điện Tử</span>
+                    <!-- COD -->
+                    <button type="button" @click="paymentMethod = 'cod'"
+                            :class="paymentMethod === 'cod' ? 'border-lime-400 bg-lime-400/5 text-lime-400 shadow-[0_0_20px_rgba(163,230,53,0.12)]' : 'border-white/10 text-white/60 hover:border-white/30'"
+                            class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group rounded-xl">
+                        <i data-lucide="hand-coins" :class="paymentMethod === 'cod' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
+                        <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Thanh toán khi nhận hàng</span>
+                        <span class="text-[9px] text-white/35 uppercase tracking-[0.2em]">COD / trả tiền cho shipper</span>
                     </button>
                 </div>
             </section>
@@ -137,21 +152,21 @@
                             @foreach($cartItems as $item)
                             <div class="flex gap-4">
                                 <div class="w-20 h-20 bg-gray-900 border border-white/10 flex-shrink-0 relative overflow-hidden group">
-                                    <img src="{{ $item->product->link_anh_dai_dien ?? 'https://via.placeholder.com/200' }}" 
+                                    <img src="{{ $item['link_anh_dai_dien'] ?? 'https://via.placeholder.com/200' }}" 
                                          alt="Product" 
                                          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                                 </div>
                                 <div class="flex flex-col justify-between py-1 flex-grow">
                                     <div>
                                         <h3 class="text-[11px] font-bold text-white uppercase tracking-tight line-clamp-1">
-                                            {{ $item->product->ten_san_pham }}
+                                            {{ $item['ten_bien_the'] ?? '' }}
                                         </h3>
                                         <p class="text-[9px] text-white/40 mt-1 uppercase tracking-widest font-['Space_Grotesk']">
-                                            SL: {{ $item->so_luong }} • {{ number_format($item->product->gia_ban, 0, ',', '.') }}đ
+                                            SL: {{ $item['so_luong'] ?? 0 }} • {{ number_format($item['gia_ban'] ?? 0, 0, ',', '.') }}đ
                                         </p>
                                     </div>
                                     <p class="text-lime-400 font-bold text-xs">
-                                        {{ number_format($item->product->gia_ban * $item->so_luong, 0, ',', '.') }}đ
+                                        {{ number_format((($item['gia_ban'] ?? 0) * ($item['so_luong'] ?? 0)), 0, ',', '.') }}đ
                                     </p>
                                 </div>
                             </div>
@@ -180,7 +195,7 @@
                     <div class="space-y-3 pt-6 border-t border-white/5">
                         <div class="flex justify-between items-center text-sm">
                             <span class="text-white/40 uppercase tracking-widest text-[10px]">Tạm tính</span>
-                            <span class="text-white font-['Space_Grotesk']">{{ number_format($cart->tong_tien ?? 40990000, 0, ',', '.') }}đ</span>
+                            <span class="text-white font-['Space_Grotesk']">{{ number_format($tongTien, 0, ',', '.') }}đ</span>
                         </div>
                         <div class="flex justify-between items-center text-sm">
                             <span class="text-white/40 uppercase tracking-widest text-[10px]">Phí vận hành</span>
@@ -189,12 +204,12 @@
                         <div class="flex justify-between items-end pt-8 mt-4 border-t border-white/10">
                             <span class="text-white font-bold uppercase tracking-widest text-xs">Tổng cộng</span>
                             <span class="text-4xl font-black text-lime-400 font-['Space_Grotesk'] tracking-tighter primary-glow">
-                                {{ number_format($cart->tong_tien ?? 40990000, 0, ',', '.') }}đ
+                                {{ number_format($tongTien, 0, ',', '.') }}đ
                             </span>
                         </div>
                     </div>
 
-                    <button class="w-full mt-10 py-5 bg-lime-400 text-black font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_25px_rgba(0,255,102,0.4)] hover:shadow-[0_0_40px_rgba(0,255,102,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer group">
+                    <button type="submit" class="w-full mt-10 py-5 bg-lime-400 text-black font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_25px_rgba(0,255,102,0.4)] hover:shadow-[0_0_40px_rgba(0,255,102,0.6)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer group">
                         Xác nhận giao dịch
                         <i data-lucide="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1"></i>
                     </button>
@@ -211,6 +226,7 @@
         </div>
     </div>
 </main>
+</form>
 @endsection
 
 @section('scripts')

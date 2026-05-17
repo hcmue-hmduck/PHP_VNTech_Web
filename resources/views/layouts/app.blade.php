@@ -75,11 +75,20 @@
                 <span class="absolute -top-1 -right-1 bg-lime-400 text-black text-[7px] font-bold px-1 py-0.5 rounded-full animate-pulse border border-black">AI</span>
             </button>
 
+            @php
+                $cartCount = 0;
+                if (auth()->check()) {
+                    $cart = \App\Models\Cart::where('ma_nguoi_dung', auth()->id())->first();
+                    if ($cart) {
+                        $cartCount = \App\Models\CartItem::where('ma_gio_hang', $cart->_id)->count();
+                    }
+                }
+            @endphp
             <!-- Shopping Cart & User Section -->
             <div class="flex items-center gap-4">
                 <a href="{{ auth()->check() ? route('viewCart', ['user_id' => auth()->id()]) : route('login') }}" class="hover:bg-white/5 p-2 rounded-full transition-all text-lime-400 relative inline-block">
                     <i data-lucide="shopping-cart" class="w-6 h-6"></i>
-                    <span class="absolute top-0 right-0 bg-white text-black text-[8px] font-bold px-1 rounded-full">3</span>
+                    <span class="absolute top-0 right-0 bg-white text-black text-[8px] font-bold px-1 rounded-full">{{ $cartCount }}</span>
                 </a>
                 
                 @guest
@@ -124,7 +133,7 @@
                             <i data-lucide="user-cog" class="w-4 h-4"></i> Hồ sơ cá nhân
                         </a>
                         
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 hover:bg-white/5 hover:text-lime-400 transition-all">
+                        <a href="{{ route('viewOrder', ['user_id' => auth()->id()]) }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 hover:bg-white/5 hover:text-lime-400 transition-all">
                             <i data-lucide="shopping-bag" class="w-4 h-4"></i> Lịch sử mua hàng
                         </a>
 

@@ -141,10 +141,12 @@
 
             <!-- CTA Buttons -->
             <div class="space-y-4">
-                <button class="w-full py-6 bg-lime-400 text-black font-black text-sm tracking-[0.3em] flex items-center justify-center gap-3 active:scale-95 transition-all">
+                <a :href="'{{ route('cart.addItem') }}?ma_bien_the=' + currentVariant.id" 
+                class="w-full py-6 bg-lime-400 text-black font-black text-sm tracking-[0.3em] flex items-center justify-center gap-3 active:scale-95 transition-all text-center">
                     <i data-lucide="shopping-cart" class="w-5 h-5 fill-black"></i>
                     THÊM VÀO GIỎ HÀNG
-                </button>
+                </a>
+
                 <button class="w-full py-6 border border-lime-400 text-lime-400 font-black text-sm tracking-[0.3em] hover:bg-lime-400/10 transition-all">
                     MUA NGAY
                 </button>

@@ -92,7 +92,7 @@
                             ['name' => 'Dashboard', 'icon' => 'layout-dashboard', 'route' => 'admin.dashboard.index', 'active' => 'admin.dashboard*'],
                             ['name' => 'Sản phẩm', 'icon' => 'package', 'route' => 'admin.products.index', 'active' => 'admin.products*'],
                             ['name' => 'Hãng / Danh mục', 'icon' => 'layers', 'route' => 'admin.categories'],
-                            ['name' => 'Đơn hàng', 'icon' => 'shopping-cart', 'route' => 'admin.orders'],
+                            ['name' => 'Đơn hàng', 'icon' => 'shopping-cart', 'route' => 'admin.order.index', 'active' => 'admin.order*'],
                             ['name' => 'Banner quảng cáo', 'icon' => 'image', 'route' => 'admin.banners'],
                             ['name' => 'Cấu hình hệ thống', 'icon' => 'settings', 'route' => 'admin.settings'],
                         ];

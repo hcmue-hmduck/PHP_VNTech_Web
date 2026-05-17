@@ -10,6 +10,8 @@ class ProductVariant extends Model {
 
     protected $fillable = [
         'ma_san_pham',
+        'ma_bien_the',
+        'ten_bien_the',
         'ma_sku',
         'gia_ban',
         'gia_niem_yet',
@@ -23,7 +25,6 @@ class ProductVariant extends Model {
         'gia_ban'          => 'decimal:0',
         'gia_niem_yet'     => 'decimal:0',
         'so_luong_ton_kho' => 'integer',
-        'thuoc_tinh'       => 'array',
     ];
 
     public function product()

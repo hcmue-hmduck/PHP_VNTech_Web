@@ -8,10 +8,6 @@ use MongoDB\Laravel\Eloquent\Model;
 class Order extends Model {
     use HasFactory;
 
-    protected $primaryKey = 'ma_don_hang';
-    public $incrementing = false;
-    protected $keyType = 'string';
-
     protected $fillable = [
         'ma_don_hang',
         'ma_nguoi_dung',

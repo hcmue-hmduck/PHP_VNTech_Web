@@ -61,23 +61,27 @@
 
     <div class="space-y-12">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <!-- Cột trái -->
-            <div class="lg:col-span-8 space-y-12">
+            <!-- Cột trái - Giờ là Full Width -->
+            <div class="lg:col-span-12 space-y-12">
                 <section class="glass-panel p-6 md:p-10 rounded-3xl border border-white/5 bg-surface/20 animate-section" style="animation-delay: 0.2s">
                     <div class="flex items-center gap-4 mb-10">
                         <i data-lucide="database" class="text-neon-green size-6"></i>
                         <h2 class="font-display text-2xl font-bold uppercase text-white">Thông tin cơ bản</h2>
                     </div>
-                    <div class="grid gap-8">
-                        <div class="group space-y-3">
-                            <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Tên sản phẩm</label>
-                            <input name="ten_san_pham" id="ten_san_pham" value="{{ old('ten_san_pham', $product->ten_san_pham ?? '') }}" required class="w-full bg-white/[0.03] border border-white/10 p-5 text-white text-lg font-display uppercase tracking-widest rounded-2xl" placeholder="Nhập tên thiết bị..." />
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="group space-y-3">
-                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Đường dẫn định danh</label>
-                                <input name="slug" id="slug" value="{{ old('slug', $product->slug ?? '') }}" required class="w-full bg-white/[0.03] border border-white/10 p-5 text-neon-green text-sm font-mono rounded-2xl" />
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                        <!-- Cột trái: Thông tin chữ, Giá & Trạng thái (Chiếm 8 phần) -->
+                        <div class="lg:col-span-8 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="group space-y-3">
+                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Tên sản phẩm</label>
+                                    <input name="ten_san_pham" id="ten_san_pham" value="{{ old('ten_san_pham', $product->ten_san_pham ?? '') }}" required class="w-full bg-white/[0.03] border border-white/10 p-5 text-white text-lg font-display uppercase tracking-widest rounded-2xl" placeholder="Nhập tên thiết bị..." />
+                                </div>
+                                <div class="group space-y-3">
+                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Slug</label>
+                                    <input name="slug" id="slug" value="{{ old('slug', $product->slug ?? '') }}" required class="w-full bg-white/[0.03] border border-white/10 p-5 text-neon-green text-sm font-mono rounded-2xl" />
+                                </div>
                             </div>
+
                             <div class="group space-y-3">
                                 <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Thương hiệu</label>
                                 <select name="ma_thuong_hieu" class="w-full bg-white/[0.03] border border-white/10 p-5 text-white rounded-2xl appearance-none">
@@ -85,11 +89,156 @@
                                     <option value="QuantumEdge" {{ old('ma_thuong_hieu', $product->ma_thuong_hieu ?? '') == 'QuantumEdge' ? 'selected' : '' }}>Quantum Edge</option>
                                 </select>
                             </div>
+
+                            <div class="group space-y-3">
+                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Mô tả ngắn</label>
+                                <input name="mo_ta_ngan" value="{{ old('mo_ta_ngan', $product->mo_ta_ngan ?? '') }}" class="w-full bg-white/[0.03] border border-white/10 p-5 text-white rounded-2xl" />
+                            </div>
+
+                            <!-- ĐƯA GIÁ VÀ TRẠNG THÁI SANG CỘT TRÁI -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-3">
+                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Giá niêm yết</label>
+                                    <div class="relative"><span class="absolute left-5 top-1/2 -translate-y-1/2 text-neon-green font-black text-xl">₫</span><input name="gia_thap_nhat" type="number" value="{{ old('gia_thap_nhat', $product->gia_thap_nhat ?? 0) }}" class="w-full bg-neon-green/5 border border-neon-green/20 p-5 pl-12 text-lg font-bold text-neon-green rounded-2xl" /></div>
+                                </div>
+                                <div class="space-y-3">
+                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Trạng thái</label>
+                                    <select name="trang_thai" class="w-full bg-white/[0.03] border border-white/10 p-5 text-white rounded-2xl">
+                                        <option value="active" {{ old('trang_thai', $product->trang_thai ?? '') == 'active' ? 'selected' : '' }}>Đang kinh doanh</option>
+                                        <option value="inactive" {{ old('trang_thai', $product->trang_thai ?? '') == 'inactive' ? 'selected' : '' }}>Tạm ngưng</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="group space-y-3">
-                            <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Mô tả ngắn</label>
-                            <input name="mo_ta_ngan" value="{{ old('mo_ta_ngan', $product->mo_ta_ngan ?? '') }}" class="w-full bg-white/[0.03] border border-white/10 p-5 text-white rounded-2xl" />
+
+                        <!-- Cột phải: Chỉ làm Quản lý Hình ảnh (Chiếm 4 phần) -->
+                        <div class="lg:col-span-4 space-y-6">
+                            
+                            <div class="space-y-6">
+                                <!-- Ảnh chính (To như cũ) -->
+                                <div class="group relative aspect-square bg-black/40 border-2 border-dashed border-white/10 rounded-3xl overflow-hidden flex flex-col items-center justify-center hover:border-neon-green/40 transition-all cursor-pointer">
+                                    @if(isset($product) && $product->link_anh_dai_dien)
+                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center"><img src="{{ $product->link_anh_dai_dien }}" class="w-full h-full object-cover"></div>
+                                        <div id="main-upload-ui" class="flex flex-col items-center hidden">
+                                            <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
+                                            <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Thay đổi ảnh</span>
+                                        </div>
+                                    @else
+                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center hidden"><img src="" class="w-full h-full object-cover"></div>
+                                        <div id="main-upload-ui" class="flex flex-col items-center">
+                                            <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
+                                            <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Ảnh đại diện chính</span>
+                                        </div>
+                                    @endif
+                                    <input type="file" name="link_anh_dai_dien" onchange="previewMain(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                                </div>
+
+                                <!-- Gallery -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Bộ sưu tập ảnh phụ</span>
+                                        <label class="cursor-pointer bg-white/5 hover:bg-neon-green hover:text-black px-3 py-1.5 rounded-lg border border-white/10 transition-all text-[9px] font-bold uppercase tracking-widest">
+                                            + Tải lên
+                                            <input type="file" name="hinh_anh[]" multiple onchange="previewGallery(this)" class="hidden" accept="image/*">
+                                        </label>
+                                    </div>
+                                    <div id="gallery-previews" class="grid grid-cols-4 gap-2">
+                                        @if(isset($product) && is_array($product->gallery))
+                                            @foreach($product->gallery as $img)
+                                                <div class="image-preview-slot"><img src="{{ $img }}"><div class="remove-img-btn" onclick="this.parentElement.remove()"><i data-lucide="x" class="size-3"></i></div></div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </section>
+
+                <!-- Quản lý Biến thể (Variants) - ĐƯỢC ƯU TIÊN ĐƯA LÊN TRÊN -->
+                <section class="glass-panel p-6 md:p-10 rounded-3xl border border-neon-green/30 bg-neon-green/5 animate-section mt-12" style="animation-delay: 0.25s">
+                    <div class="flex items-center justify-between mb-10">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="boxes" class="text-neon-green size-6"></i>
+                            <h2 class="font-display text-2xl font-bold uppercase text-white">Quản lý Biến thể</h2>
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="button" onclick="addVariantAttrRow()" class="px-4 py-2 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white/10 transition-all rounded-xl">+ Thêm thuộc tính</button>
+                            <button type="button" onclick="generateVariants()" class="px-6 py-3 bg-neon-green text-black text-[12px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all rounded-xl shadow-[0_0_20px_rgba(0,229,91,0.3)]">⚡ Tạo biến thể</button>
+                        </div>
+                    </div>
+
+                    <!-- Bước 1: Nhập các thuộc tính -->
+                    <div class="space-y-4 mb-8" id="variantAttrsBody">
+                        <div class="grid grid-cols-12 gap-4 items-center sortable-row">
+                            <div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div>
+                            <div class="col-span-3"><input class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30 attr-name" placeholder="Ví dụ: RAM" /></div>
+                            <div class="col-span-7"><input class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30 attr-values" placeholder="Các giá trị cách nhau bằng dấu phẩy. Ví dụ: 8GB, 16GB" /></div>
+                            <div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>
+                        </div>
+                    </div>
+
+                    <!-- Bước 2: Bảng danh sách biến thể sinh ra -->
+                    <div class="overflow-x-auto {{ isset($product_variant) && $product_variant->count() > 0 ? '' : 'hidden' }}" id="variantsTableContainer">
+                        <table class="w-full text-white text-sm">
+                            <thead>
+                                <tr class="text-[10px] uppercase tracking-wider text-gray-500 border-b border-white/5">
+                                    <th class="p-4 text-left">Thuộc tính</th>
+                                    <th class="p-4 text-left">Tên biến thể</th>
+                                    <th class="p-4 text-left">Ảnh</th>
+                                    <th class="p-4 text-left">Mã SKU</th>
+                                    <th class="p-4 text-left">Giá bán</th>
+                                    <th class="p-4 text-left">Giá niêm yết</th>
+                                    <th class="p-4 text-left">Kho</th>
+                                    <th class="p-4 text-left">Trạng thái</th>
+                                    <th class="p-4 text-left">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="variantsTableBody" class="divide-y divide-white/5">
+                                @if(isset($product_variant) && $product_variant->count() > 0)
+                                    @foreach($product_variant as $index => $variant)
+                                        @php
+                                            // Nối các giá trị thuộc tính lại để hiển thị (VD: "8GB / Xám")
+                                            $variantName = collect($variant->thuoc_tinh)->pluck('gia_tri')->join(' / ');
+                                            $attributesJson = json_encode($variant->thuoc_tinh);
+                                        @endphp
+                                        <tr class="hover:bg-white/[0.02] transition-all">
+                                            <td class="p-4">
+                                                <span class="font-bold text-white">{{ $variantName }}</span>
+                                                <input type="hidden" name="variants[{{ $index }}][thuoc_tinh]" value="{{ $attributesJson }}">
+                                            </td>
+                                            <td class="p-4">
+                                                <input name="variants[{{ $index }}][ten_bien_the]" value="{{ $variant->ten_bien_the ?? '' }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" placeholder="Tên biến thể..." />
+                                            </td>
+                                            <td class="p-4">
+                                                <div class="relative w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10 hover:border-neon-green/30 transition-all">
+                                                    @if($variant->link_anh_bien_the)
+                                                        <img id="preview-{{ $index }}" src="{{ $variant->link_anh_bien_the }}" class="absolute inset-0 w-full h-full object-cover">
+                                                        <i data-lucide="image" class="size-4 text-gray-500 hidden" id="icon-{{ $index }}"></i>
+                                                    @else
+                                                        <img id="preview-{{ $index }}" class="absolute inset-0 w-full h-full object-cover hidden">
+                                                        <i data-lucide="image" class="size-4 text-gray-500" id="icon-{{ $index }}"></i>
+                                                    @endif
+                                                    <input type="file" name="variants[{{ $index }}][link_anh_bien_the]" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" data-index="{{ $index }}" onchange="previewVariantImage(this, this.dataset.index)">
+                                                </div>
+                                            </td>
+                                            <td class="p-4"><input name="variants[{{ $index }}][ma_sku]" value="{{ $variant->ma_sku }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-gray-300 w-full" readonly /></td>
+                                            <td class="p-4"><input name="variants[{{ $index }}][gia_ban]" type="number" value="{{ $variant->gia_ban }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-neon-green w-full" /></td>
+                                            <td class="p-4"><input name="variants[{{ $index }}][gia_niem_yet]" type="number" value="{{ $variant->gia_niem_yet }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-gray-400 w-full" /></td>
+                                            <td class="p-4"><input name="variants[{{ $index }}][so_luong_ton_kho]" type="number" value="{{ $variant->so_luong_ton_kho }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" /></td>
+                                            <td class="p-4">
+                                                <select name="variants[{{ $index }}][trang_thai]" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full">
+                                                    <option value="active" {{ $variant->trang_thai == 'active' ? 'selected' : '' }}>Mở</option>
+                                                    <option value="inactive" {{ $variant->trang_thai == 'inactive' ? 'selected' : '' }}>Khóa</option>
+                                                </select>
+                                            </td>
+                                            <td class="p-4 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="trash-2" class="size-4"></i></button></td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                                <!-- Code JS sẽ tự động đổ thêm các dòng vào đây nếu nhấn Tạo -->
+                            </tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -113,8 +262,9 @@
                     </div>
                     <div class="space-y-4" id="techSpecsBody">
                         @foreach($techSpecs as $index => $spec)
-                        <div class="grid grid-cols-12 gap-4 items-center animate-fadeIn">
-                            <div class="col-span-4"><input name="thuoc_tinh_chung[{{ $index }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div>
+                        <div class="grid grid-cols-12 gap-4 items-center animate-fadeIn sortable-row">
+                            <div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div>
+                            <div class="col-span-3"><input name="thuoc_tinh_chung[{{ $index }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div>
                             <div class="col-span-7"><input name="thuoc_tinh_chung[{{ $index }}][gia_tri]" value="{{ $spec['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div>
                             <div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>
                         </div>
@@ -123,66 +273,6 @@
                 </section>
             </div>
 
-            <!-- Cột phải -->
-            <div class="lg:col-span-4 space-y-12">
-                <div class="sticky top-24 space-y-12">
-                    <section class="glass-panel p-8 rounded-3xl border border-white/5 bg-surface/30 animate-section" style="animation-delay: 0.5s">
-                        <div class="space-y-8">
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Giá niêm yết</label>
-                                <div class="relative"><span class="absolute left-5 top-1/2 -translate-y-1/2 text-neon-green font-black text-xl">₫</span><input name="gia_thap_nhat" type="number" value="{{ old('gia_thap_nhat', $product->gia_thap_nhat ?? 0) }}" class="w-full bg-neon-green/5 border border-neon-green/20 p-6 pl-12 text-3xl font-black text-neon-green rounded-2xl" /></div>
-                            </div>
-                            <div class="space-y-4">
-                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Trạng thái</label>
-                                <select name="trang_thai" class="w-full bg-white/5 border border-white/10 p-5 text-white rounded-2xl">
-                                    <option value="active" {{ old('trang_thai', $product->trang_thai ?? '') == 'active' ? 'selected' : '' }}>Đang kinh doanh</option>
-                                    <option value="inactive" {{ old('trang_thai', $product->trang_thai ?? '') == 'inactive' ? 'selected' : '' }}>Tạm ngưng</option>
-                                </select>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="glass-panel p-8 rounded-3xl border border-white/5 bg-surface/30 animate-section" style="animation-delay: 0.6s">
-                        <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8 text-center italic">Quản lý Hình ảnh</h2>
-                        <div class="space-y-8">
-                            <!-- Ảnh chính -->
-                            <div class="group relative aspect-square bg-black/40 border-2 border-dashed border-white/10 rounded-3xl overflow-hidden flex flex-col items-center justify-center hover:border-neon-green/40 transition-all cursor-pointer">
-                                @if(isset($product) && $product->link_anh_dai_dien)
-                                    <div id="main-preview" class="absolute inset-0 flex items-center justify-center"><img src="{{ $product->link_anh_dai_dien }}" class="w-full h-full object-cover"></div>
-                                    <div id="main-upload-ui" class="flex flex-col items-center hidden">
-                                        <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
-                                        <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Thay đổi ảnh đại diện</span>
-                                    </div>
-                                @else
-                                    <div id="main-preview" class="absolute inset-0 flex items-center justify-center hidden"><img src="" class="w-full h-full object-cover"></div>
-                                    <div id="main-upload-ui" class="flex flex-col items-center">
-                                        <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
-                                        <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Ảnh đại diện chính</span>
-                                    </div>
-                                @endif
-                                <input type="file" name="link_anh_dai_dien" onchange="previewMain(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
-                            </div>
-
-                            <!-- Gallery -->
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Bộ sưu tập ảnh phụ</span>
-                                    <label class="cursor-pointer bg-white/5 hover:bg-neon-green hover:text-black px-3 py-1.5 rounded-lg border border-white/10 transition-all text-[9px] font-bold uppercase tracking-widest">
-                                        + Tải lên
-                                        <input type="file" name="hinh_anh_phu[]" multiple onchange="previewGallery(this)" class="hidden" accept="image/*">
-                                    </label>
-                                </div>
-                                <div id="gallery-previews" class="grid grid-cols-4 gap-3">
-                                    @if(isset($product) && is_array($product->gallery))
-                                        @foreach($product->gallery as $img)
-                                            <div class="image-preview-slot"><img src="{{ $img }}"><div class="remove-img-btn" onclick="this.parentElement.remove()"><i data-lucide="x" class="size-3"></i></div></div>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
             </div>
         </div>
     </div>
@@ -264,13 +354,147 @@
     function addSpecRow() {
         const body = document.getElementById('techSpecsBody');
         const row = document.createElement('div');
-        row.className = 'grid grid-cols-12 gap-4 items-center';
-        row.innerHTML = `<div class="col-span-4"><input name="thuoc_tinh_chung[${specIndex}][ten]" class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div><div class="col-span-7"><input name="thuoc_tinh_chung[${specIndex}][gia_tri]" class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div><div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>`;
+        row.className = 'grid grid-cols-12 gap-4 items-center sortable-row mt-4';
+        row.innerHTML = `<div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div><div class="col-span-3"><input name="thuoc_tinh_chung[${specIndex}][ten]" class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div><div class="col-span-7"><input name="thuoc_tinh_chung[${specIndex}][gia_tri]" class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div><div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>`;
         body.appendChild(row); 
         lucide.createIcons(); 
         specIndex++;
     }
     
     function removeRow(btn) { btn.closest('.grid').remove(); }
+
+    function previewVariantImage(input, index) {
+        const preview = document.getElementById(`preview-${index}`);
+        const icon = document.getElementById(`icon-${index}`);
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                icon.classList.add('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    // Khởi tạo Sortable cho Thông số kỹ thuật
+    new Sortable(document.getElementById('techSpecsBody'), {
+        handle: '.handle',
+        animation: 150,
+        ghostClass: 'bg-white/5'
+    });
+
+    // Khởi tạo Sortable cho Thuộc tính biến thể
+    new Sortable(document.getElementById('variantAttrsBody'), {
+        handle: '.handle',
+        animation: 150,
+        ghostClass: 'bg-white/5'
+    });
+</script>
+<script>
+    // Biến đếm để quản lý name của input gửi lên Laravel
+    let variantIndex = 0;
+
+    // Hàm thêm dòng thuộc tính mới
+    function addVariantAttrRow() {
+        const body = document.getElementById('variantAttrsBody');
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-12 gap-4 items-center mt-4 sortable-row';
+        row.innerHTML = `
+            <div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div>
+            <div class="col-span-3"><input class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30 attr-name" placeholder="Ví dụ: Dung lượng" /></div>
+            <div class="col-span-7"><input class="w-full bg-white/[0.03] border border-white/5 p-4 text-white rounded-xl focus:border-neon-green/30 attr-values" placeholder="Ví dụ: 128GB, 256GB" /></div>
+            <div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>
+        `;
+        body.appendChild(row);
+        lucide.createIcons();
+    }
+
+    // Hàm tổ hợp (Tích Descartes)
+    function cartesianProduct(arr) {
+        return arr.reduce(function (a, b) {
+            var r = [];
+            a.forEach(function (a) { b.forEach(function (b) { r.push(a.concat([b])); }); });
+            return r;
+        }, [[]]);
+    }
+
+    // Hàm sinh ra các biến thể
+    function generateVariants() {
+        const attrNames = document.querySelectorAll('.attr-name');
+        const attrValues = document.querySelectorAll('.attr-values');
+        
+        let attributes = [];
+        for (let i = 0; i < attrNames.length; i++) {
+            let name = attrNames[i].value.trim();
+            let values = attrValues[i].value.split(',').map(v => v.trim()).filter(v => v !== '');
+            
+            if (name !== '' && values.length > 0) {
+                attributes.push({ name: name, values: values });
+            }
+        }
+
+        if (attributes.length === 0) {
+            alert('Vui lòng nhập ít nhất 1 thuộc tính và giá trị!');
+            return;
+        }
+
+        // Lấy danh sách các mảng giá trị để tổ hợp
+        let valueArrays = attributes.map(attr => attr.values.map(val => ({ name: attr.name, value: val })));
+        let combinations = cartesianProduct(valueArrays);
+
+        const tableContainer = document.getElementById('variantsTableContainer');
+        const tableBody = document.getElementById('variantsTableBody');
+        tableBody.innerHTML = '';
+        tableContainer.classList.remove('hidden');
+
+        const baseSku = document.getElementById('slug').value || 'SKU';
+        const productName = document.getElementById('ten_san_pham').value.trim();
+
+        combinations.forEach((combo, index) => {
+            let variantAttrs = combo.map(c => c.value).join(' / ');
+            let fullVariantName = productName ? `${productName} - ${variantAttrs}` : variantAttrs;
+            let skuSuffix = combo.map(c => c.value.replace(/\s+/g, '')).join('-');
+            let finalSku = `${baseSku}-${skuSuffix}`.toUpperCase();
+            
+            // Tạo chuỗi JSON cho thuộc tính để gửi lên Backend
+            let attributesJson = JSON.stringify(combo.map(c => ({ ten: c.name, gia_tri: c.value })));
+
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-white/[0.02] transition-all';
+            tr.innerHTML = `
+                <td class="p-4">
+                    <span class="font-bold text-white">${variantAttrs}</span>
+                    <input type="hidden" name="variants[${index}][thuoc_tinh]" value='${attributesJson}'>
+                </td>
+                <td class="p-4">
+                    <input name="variants[${index}][ten_bien_the]" value="${fullVariantName.toUpperCase()}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" />
+                </td>
+                <td class="p-4">
+                    <div class="relative w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10 hover:border-neon-green/30 transition-all">
+                        <img id="preview-${index}" class="absolute inset-0 w-full h-full object-cover hidden">
+                        <i data-lucide="image" class="size-4 text-gray-500" id="icon-${index}"></i>
+                        <input type="file" name="variants[${index}][link_anh_bien_the]" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onchange="previewVariantImage(this, ${index})">
+                    </div>
+                </td>
+                <td class="p-4"><input name="variants[${index}][ma_sku]" value="${finalSku}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-gray-300 w-full" /></td>
+                <td class="p-4"><input name="variants[${index}][gia_ban]" type="number" placeholder="0" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-neon-green w-full" /></td>
+                <td class="p-4"><input name="variants[${index}][gia_niem_yet]" type="number" placeholder="0" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-gray-400 w-full" /></td>
+                <td class="p-4"><input name="variants[${index}][so_luong_ton_kho]" type="number" value="10" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" /></td>
+                <td class="p-4">
+                    <select name="variants[${index}][trang_thai]" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full">
+                        <option value="active">Mở</option>
+                        <option value="inactive">Khóa</option>
+                    </select>
+                </td>
+                <td class="p-4 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="trash-2" class="size-4"></i></button></td>
+            `;
+            tableBody.appendChild(tr);
+        });
+        
+        lucide.createIcons();
+    }
 </script>
 @endsection

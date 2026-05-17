@@ -7,6 +7,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductAdminController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', [HomeController::class, 'viewHome']);
 
@@ -23,12 +25,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-
-Route::get('/cart/{user_id}', [CartController::class, 'viewCart'])->name('viewCart');
+Route::get('/cart/add-item', [CartController::class, 'addItem'])->name('cart.addItem');
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
 Route::post('/cart/remove-item', [CartController::class, 'removeItem'])->name('cart.removeItem');
+Route::get('/cart/{user_id}', [CartController::class, 'viewCart'])->name('viewCart');
 
 Route::get('/product-detail/{slug}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
+
+Route::get('/checkout', [PaymentController::class, 'viewPayment'])->name('viewPayment');
+Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('preparePayment');
+
+Route::post('/order/create', [OrderController::class, 'storeCreateOrder'])->name('storeCreateOrder');
+Route::get('/orders/{user_id}', [OrderController::class, 'viewOrder'])->name('viewOrder');
+Route::get('/orders/{user_id}/{ma_don_hang}', [OrderController::class, 'viewOrderDetail'])->name('viewOrderDetail');
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
@@ -39,4 +48,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     
     Route::get('/products/{product}/edit', [ProductAdminController::class, 'viewEditProductAdmin'])->name('admin.products.edit');
     Route::put('/products/{product}', [ProductAdminController::class, 'updateEditProductAdmin'])->name('admin.products.update');
+
+    Route::get('/order', [OrderController::class, 'viewAdminOrder'])->name('admin.order.index');
+    Route::get('/order/{ma_don_hang}', [OrderController::class, 'viewAdminOrderDetail'])->name('admin.order.view');
+    Route::post('/order/{ma_don_hang}/status', [OrderController::class, 'updateAdminOrderStatus'])->name('admin.order.updateStatus');
 });

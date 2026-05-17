@@ -105,6 +105,7 @@
         </div>
     </section>
 
+    @if(isset($flashSaleItems) && $flashSaleItems->count() > 0)
     <!-- Flash Sale Section -->
     <section class="py-20 bg-black/40" id="flash-sale-section" x-data="timer()">
         <div class="max-w-[1600px] mx-auto px-8 md:px-16">
@@ -153,6 +154,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     <!-- Product Grid Section -->
     <section class="py-20 px-8 md:px-16 max-w-[1600px] mx-auto flex flex-col md:flex-row gap-12" id="product-grid-section">
@@ -235,9 +237,6 @@
                                 <a href="{{ route('viewProductDetail', $product->slug) }}" class="flex-1 py-3 bg-lime-400 text-black font-bold text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
                                     XEM CHI TIẾT
                                 </a>
-                                <button class="p-2 border border-white/10 hover:border-lime-400 transition-all group/cart-btn">
-                                    <i data-lucide="shopping-cart" class="w-5 h-5 text-slate-500 group-hover/cart-btn:text-lime-400 transition-colors"></i>
-                                </button>
                             </div>
                         </div>
                     </div>

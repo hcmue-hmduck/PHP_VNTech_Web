@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller {
     public function viewCart(string $user_id) {
@@ -30,6 +32,36 @@ class CartController extends Controller {
         return response()->json(['status' => 'removed']);
     }
 
+    public function addItem(Request $request) {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $ma_bien_the = $request->input('ma_bien_the');
+
+        $user_id = Auth::id();
+        $card_id = Cart::where('ma_nguoi_dung', $user_id)->first();
+
+        if (!$card_id) {
+            $card_id = Cart::create([
+                'ma_nguoi_dung' => $user_id,
+            ]);
+        }
+
+        $cart_item = CartItem::where('ma_gio_hang', $card_id->_id)->where('ma_bien_the', $ma_bien_the)->first();
+        if ($cart_item) {
+            $cart_item->so_luong += 1;
+            $cart_item->save();
+            return response()->json(['status' => 'updated']);
+        }
+
+        CartItem::create([
+            'ma_gio_hang' => $card_id->_id,
+            'ma_bien_the' => $ma_bien_the,
+            'so_luong' => 1
+        ]);
+        return redirect()->back()->with('success', 'Đã thêm vào giỏ hàng!');
+    }
 }
 
 ?>

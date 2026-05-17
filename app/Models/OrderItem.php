@@ -11,12 +11,10 @@ class OrderItem extends Model {
     protected $fillable = [
         'ma_don_hang',
         'ma_bien_the',
-        'ten_san_pham',
         'ten_bien_the',
-        'hinh_anh',
+        'link_anh_dai_dien',
         'so_luong',
-        'gia_niem_yet',
-        'don_gia',
+        'gia_ban',
         'ma_bien_the_flash_sale',
         'so_tien_giam_flash_sale',
         'thanh_tien',
@@ -32,6 +30,6 @@ class OrderItem extends Model {
 
     public function variant()
     {
-        return $this->belongsTo(ProductVariant::class, 'ma_bien_the', 'ma_sku');
+        return $this->belongsTo(ProductVariant::class, 'ma_bien_the', 'ma_bien_the');
     }
 }
