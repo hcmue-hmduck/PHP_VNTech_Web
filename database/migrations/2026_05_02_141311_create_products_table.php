@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $collection) {
             $collection->uuid('ma_san_pham')->unique();
             $collection->string('ten_san_pham');
-            $collection->string('slug')->unique();
 
-            // $collection->string('ma_danh_muc')->index();
+            $collection->string('ma_danh_muc')->index();
             $collection->string('ma_thuong_hieu')->index();
 
             $collection->text('mo_ta_ngan')->nullable();
@@ -25,7 +24,8 @@ return new class extends Migration
             $collection->string('trang_thai')->default('active');
 
             $collection->array('hinh_anh')->nullable();
-            $collection->array('thuoc_tinh_chung')->nullable();
+            $collection->array('thong_so_ky_thuat_chung')->nullable();
+            $collection->array('thong_tin_them')->nullable();
 
             $collection->integer('luot_xem')->default(0);
             $collection->decimal('gia_thap_nhat', 15, 2)->default(0);

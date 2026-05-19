@@ -23,17 +23,16 @@ class ProductAdminController extends Controller
     public function storeCreateProductAdmin(Request $request) 
     {
         $data = $request->validate([
-            'ten_san_pham'      => 'required|string|max:255',
-            'slug'              => 'required|string|max:255|unique:products,slug',
-            'ma_thuong_hieu'    => 'required|string|max:100',
-            'mo_ta_ngan'        => 'nullable|string|max:500',
-            'mo_ta_chi_tiet'    => 'nullable|string',
-            'link_anh_dai_dien' => 'nullable', 
-            'trang_thai'        => 'required|in:active,inactive',
-            'gia_thap_nhat'     => 'required|numeric|min:0',
-            'hinh_anh'          => 'nullable|array',
-            'thuoc_tinh_chung'  => 'nullable|array',
-            'variants'          => 'nullable|array',
+            'ten_san_pham'              => 'required|string|max:255',
+            'ma_thuong_hieu'            => 'required|string|max:100',
+            'mo_ta_ngan'                => 'nullable|string|max:500',
+            'mo_ta_chi_tiet'            => 'nullable|string',
+            'link_anh_dai_dien'         => 'nullable', 
+            'trang_thai'                => 'required|in:active,inactive',
+            'gia_thap_nhat'             => 'required|numeric|min:0',
+            'hinh_anh'                  => 'nullable|array',
+            'thong_so_ky_thuat_chung'   => 'nullable|array',
+            'thong_tin_them'            => 'nullable|array',
         ]);
 
         unset($data['variants']);
@@ -71,17 +70,16 @@ class ProductAdminController extends Controller
 
         if ($request->has('variants')) {
             foreach ($request->variants as $index => $variant) {
-                $thuocTinhRaw = json_decode($variant['thuoc_tinh'] ?? '[]', true);
+                $thuocTinhRaw = $variant['thong_so_ky_thuat_rieng'] ?? [];
 
                 $product_variant = $product->variants()->create([
                     'ma_san_pham' => $product->ma_san_pham,
                     'ten_bien_the' => $variant['ten_bien_the'] ?? null,
-                    'ma_sku' => $variant['ma_sku'],
                     'gia_ban' => $variant['gia_ban'],
                     'gia_niem_yet' => $variant['gia_niem_yet'],
                     'so_luong_ton_kho' => $variant['so_luong_ton_kho'],
                     'trang_thai' => $variant['trang_thai'],
-                    'thuoc_tinh' => $thuocTinhRaw,
+                    'thong_so_ky_thuat_rieng' => $thuocTinhRaw,
                 ]);
                 $product_variant->ma_bien_the = $product_variant->_id;
                 $product_variant->save();
@@ -111,16 +109,16 @@ class ProductAdminController extends Controller
 
     public function updateEditProductAdmin(Request $request, Product $product) {
         $data = $request->validate([
-            'ten_san_pham'      => 'required|string|max:255',
-            'slug'              => 'required|string|max:255|unique:products,slug,' . $product->ma_san_pham . ',ma_san_pham',
-            'ma_thuong_hieu'    => 'required|string|max:100',
-            'mo_ta_ngan'        => 'nullable|string|max:500',
-            'mo_ta_chi_tiet'    => 'nullable|string',
-            'link_anh_dai_dien' => 'nullable|image|max:5120', 
-            'trang_thai'        => 'required|in:active,inactive',
-            'gia_thap_nhat'     => 'required|numeric|min:0',
-            'thuoc_tinh_chung'  => 'nullable|array',
-            'hinh_anh.*'        => 'nullable|image|max:5120'
+            'ten_san_pham'              => 'required|string|max:255',
+            'ma_thuong_hieu'            => 'required|string|max:100',
+            'mo_ta_ngan'                => 'nullable|string|max:500',
+            'mo_ta_chi_tiet'            => 'nullable|string',
+            'link_anh_dai_dien'         => 'nullable|image|max:5120', 
+            'trang_thai'                => 'required|in:active,inactive',
+            'gia_thap_nhat'             => 'required|numeric|min:0',
+            'thong_so_ky_thuat_chung'   => 'nullable|array',
+            'thong_tin_them'            => 'nullable|array',
+            'hinh_anh.*'                => 'nullable|image|max:5120'
         ]);
 
         if ($request->hasFile('link_anh_dai_dien')) {

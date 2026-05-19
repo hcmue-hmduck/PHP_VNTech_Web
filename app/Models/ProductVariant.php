@@ -12,12 +12,11 @@ class ProductVariant extends Model {
         'ma_san_pham',
         'ma_bien_the',
         'ten_bien_the',
-        'ma_sku',
+        'link_anh_bien_the',
         'gia_ban',
         'gia_niem_yet',
         'so_luong_ton_kho',
-        'thuoc_tinh',
-        'link_anh_bien_the',
+        'thong_so_ky_thuat_rieng',
         'trang_thai',
     ];
 

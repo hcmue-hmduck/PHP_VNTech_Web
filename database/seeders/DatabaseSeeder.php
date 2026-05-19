@@ -98,7 +98,7 @@ class DatabaseSeeder extends Seeder
             $product = Product::create([
                 'ma_san_pham' => $ma_sp,
                 'ten_san_pham' => $lap['name'],
-                'slug' => Str::slug($lap['name']),
+                'ma_danh_muc' => 'LAPTOP',
                 'ma_thuong_hieu' => $lap['brand'],
                 'mo_ta_ngan' => 'Laptop mạnh mẽ dành cho công việc và giải trí.',
                 'mo_ta_chi_tiet' => 'Đây là mô tả chi tiết cho sản phẩm ' . $lap['name'] . '. Hàng chính hãng VNTech.',
@@ -106,10 +106,11 @@ class DatabaseSeeder extends Seeder
                 'trang_thai' => 'active',
                 'gia_thap_nhat' => $lap['price'],
                 'luot_xem' => rand(100, 1000),
-                'thuoc_tinh_chung' => [
+                'thong_so_ky_thuat_chung' => [
                     ['ten' => 'Bảo hành', 'gia_tri' => '12 tháng'],
                     ['ten' => 'Tình trạng', 'gia_tri' => 'Mới 100%'],
-                ]
+                ],
+                'thong_tin_them' => []
             ]);
 
             // Tạo 2 Variants cho mỗi Product
@@ -121,12 +122,13 @@ class DatabaseSeeder extends Seeder
             foreach ($configs as $cfg) {
                 ProductVariant::create([
                     'ma_san_pham' => $ma_sp,
-                    'ma_sku' => $ma_sp . '-' . $cfg['ram'] . '-' . $cfg['ssd'],
+                    'ma_bien_the' => $ma_sp . '-' . $cfg['ram'] . '-' . $cfg['ssd'],
+                    'ten_bien_the' => $lap['name'] . ' ' . $cfg['ram'] . ' ' . $cfg['ssd'],
                     'gia_ban' => $lap['price'] + $cfg['price_plus'],
                     'gia_niem_yet' => $lap['price'] + $cfg['price_plus'] + 2000000,
                     'so_luong_ton_kho' => rand(5, 50),
                     'trang_thai' => 'active',
-                    'thuoc_tinh' => [
+                    'thong_so_ky_thuat_rieng' => [
                         ['ten' => 'RAM', 'gia_tri' => $cfg['ram']],
                         ['ten' => 'Ổ cứng', 'gia_tri' => $cfg['ssd']],
                         ['ten' => 'Màu sắc', 'gia_tri' => 'Silver'],

@@ -31,7 +31,7 @@ class FlashSaleItem extends Model {
 
     public function variant()
     {
-        return $this->belongsTo(ProductVariant::class, 'ma_bien_the', 'ma_sku');
+        return $this->belongsTo(ProductVariant::class, 'ma_bien_the', 'ma_bien_the');
     }
 
     /**

@@ -217,14 +217,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($products as $product)
                 <div class="bg-slate-900 border border-white/5 group hover:border-lime-400/30 transition-all flex flex-col hover:-translate-y-1">
-                    <a href="{{ route('viewProductDetail', $product->slug) }}" class="aspect-square bg-slate-950 overflow-hidden relative block">
+                    <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" class="aspect-square bg-slate-950 overflow-hidden relative block">
                         <img class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
                              src="{{ $product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
                              alt="{{ $product->ten_san_pham }}">
                     </a>
                     <div class="p-6 flex-1 flex flex-col justify-between">
                         <div>
-                            <a href="{{ route('viewProductDetail', $product->slug) }}" class="block group/title">
+                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" class="block group/title">
                                 <h5 class="font-bold uppercase text-sm mb-3 truncate text-center group-hover/title:text-lime-400 transition-colors">{{ $product->ten_san_pham }}</h5>
                             </a>
                             <p class="text-xs text-slate-500 text-center mb-3">{{ $product->mo_ta_ngan }}</p>
@@ -234,7 +234,7 @@
                                 <span class="text-lime-400 font-black text-2xl leading-none">{{ number_format($product->gia_thap_nhat, 0, ',', '.') }}₫</span>
                             </div>
                             <div class="flex gap-2">
-                                <a href="{{ route('viewProductDetail', $product->slug) }}" class="flex-1 py-3 bg-lime-400 text-black font-bold text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
+                                <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" class="flex-1 py-3 bg-lime-400 text-black font-bold text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
                                     XEM CHI TIẾT
                                 </a>
                             </div>

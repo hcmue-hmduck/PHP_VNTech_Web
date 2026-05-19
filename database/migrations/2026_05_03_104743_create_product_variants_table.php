@@ -12,18 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_variants', function (Blueprint $collection) {
-            $collection->string('ma_san_pham')->index(); // Link tới Product cha
-            $collection->string('ma_sku')->unique(); // SKU định danh duy nhất (Ví dụ: IP15-BLU-256)
-            
-            // Giá và Kho
+            $collection->string('ma_san_pham')->index(); 
+            $collection->string('ma_bien_the'); 
+    
             $collection->decimal('gia_ban', 15, 2);
-            $collection->decimal('gia_niem_yet', 15, 2)->nullable(); // Giá trước khi giảm
+            $collection->decimal('gia_niem_yet', 15, 2)->nullable();
             $collection->integer('so_luong_ton_kho')->default(0);
+            $collection->array('thong_so_ky_thuat_rieng');
             
-            // Thuộc tính (Dùng mảng hoặc object trong MongoDB rất linh hoạt)
-            $collection->array('thuoc_tinh'); // Ví dụ: ['color' => 'Xanh', 'size' => 'L']
-            
-            // Ảnh riêng cho biến thể (Nếu có)
             $collection->string('link_anh_bien_the')->nullable();
 
             $collection->string('trang_thai')->default('active');

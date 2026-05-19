@@ -13,7 +13,6 @@ class Product extends Model
     protected $fillable = [
         'ma_san_pham',
         'ten_san_pham',
-        'slug',
         'ma_danh_muc',
         'ma_thuong_hieu',
         'mo_ta_ngan',
@@ -21,8 +20,8 @@ class Product extends Model
         'link_anh_dai_dien',
         'trang_thai',
         'hinh_anh',
-        'thuoc_tinh_chung',
-        'variants',
+        'thong_so_ky_thuat_chung',
+        'thong_tin_them',
         'luot_xem',
         'gia_thap_nhat',
     ];

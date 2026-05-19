@@ -30,7 +30,7 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])-
 Route::post('/cart/remove-item', [CartController::class, 'removeItem'])->name('cart.removeItem');
 Route::get('/cart/{user_id}', [CartController::class, 'viewCart'])->name('viewCart');
 
-Route::get('/product-detail/{slug}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
+Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
 Route::get('/checkout', [PaymentController::class, 'viewPayment'])->name('viewPayment');
 Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('preparePayment');
