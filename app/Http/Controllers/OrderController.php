@@ -75,12 +75,12 @@ class OrderController extends Controller
         foreach ($cartItems as $item) {
             $orderItems = OrderItem::create([
                 'ma_don_hang' => $order->ma_don_hang,
-                'ma_bien_the' => $item['ma_bien_the'] ?? null,
-                'ma_san_pham' => $item['ma_san_pham'] ?? $item['id'] ?? null,
-                'ten_san_pham' => $item['ten_san_pham'] ?? $item['name'] ?? null,
-                'gia_ban' => $item['gia_ban'] ?? $item['price'] ?? 0,
-                'so_luong' => $item['so_luong'] ?? $item['quantity'] ?? 1,
-                'link_anh_dai_dien' => $item['link_anh_dai_dien'] ?? $item['image'] ?? null,
+                'ma_bien_the' => $item['ma_bien_the'],
+                'ten_bien_the' => $item['ten_bien_the'],
+                'gia_ban' => $item['gia_ban'],
+                'so_luong' => $item['so_luong'],
+                'link_anh_dai_dien' => $item['link_anh_dai_dien'],
+                'thanh_tien' => $item['gia_ban'] * $item['so_luong']
             ]);
             $orderItems->ma_chi_tiet_don_hang = $orderItems->_id;
             $orderItems->save();

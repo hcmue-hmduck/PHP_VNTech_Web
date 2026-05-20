@@ -9,8 +9,13 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductAdminController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\UserAddressController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
+
+Route::post('/momo/ipn', [PaymentController::class, 'momoIpn'])->name('momo.ipn');
+
+Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -31,6 +36,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/remove-item', [CartController::class, 'removeItem'])->name('cart.removeItem');
     Route::get('/cart', [CartController::class, 'viewCart'])->name('viewCart');
 
+    Route::post('/user-address', [UserAddressController::class, 'storeAddress'])->name('user-address.store');
+
     Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('viewPayment');
     Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('preparePayment');
 
@@ -42,11 +49,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/momo/return', [PaymentController::class, 'momoReturn'])->name('momo.return');
 });
 
-Route::post('/momo/ipn', [PaymentController::class, 'momoIpn'])->name('momo.ipn');
 
-Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
     Route::get('/products', [ProductAdminController::class, 'viewProductAdmin'])->name('admin.products.index');
     Route::get('/products/create', [ProductAdminController::class, 'viewCreateProductAdmin'])->name('admin.products.create');
