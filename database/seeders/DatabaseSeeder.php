@@ -71,26 +71,26 @@ class DatabaseSeeder extends Seeder
 
         // 3. Tạo Products & Variants (20 Laptop)
         $laptops = [
-            ['brand' => 'APPLE', 'name' => 'MacBook Air M2 2022', 'price' => 24000000],
-            ['brand' => 'APPLE', 'name' => 'MacBook Pro M3 Pro 14 inch', 'price' => 45000000],
-            ['brand' => 'DELL', 'name' => 'Dell XPS 13 9315', 'price' => 28000000],
-            ['brand' => 'DELL', 'name' => 'Dell Inspiron 16 5620', 'price' => 18500000],
-            ['brand' => 'ASUS', 'name' => 'ASUS ROG Zephyrus G14', 'price' => 35000000],
-            ['brand' => 'ASUS', 'name' => 'ASUS Vivobook 15 OLED', 'price' => 14000000],
-            ['brand' => 'HP', 'name' => 'HP Spectre x360 14', 'price' => 32000000],
-            ['brand' => 'HP', 'name' => 'HP Pavilion 15 eg2000', 'price' => 16000000],
-            ['brand' => 'MSI', 'name' => 'MSI Katana 15 B13V', 'price' => 22000000],
-            ['brand' => 'MSI', 'name' => 'MSI Modern 14 C13M', 'price' => 11000000],
-            ['brand' => 'LENOVO', 'name' => 'Lenovo Legion 5 Slim', 'price' => 29000000],
-            ['brand' => 'LENOVO', 'name' => 'Lenovo Yoga 7i Gen 8', 'price' => 21000000],
-            ['brand' => 'ACER', 'name' => 'Acer Nitro V ANV15', 'price' => 19000000],
-            ['brand' => 'ACER', 'name' => 'Acer Swift Go 14', 'price' => 17000000],
-            ['brand' => 'APPLE', 'name' => 'MacBook Pro 16 M3 Max', 'price' => 85000000],
-            ['brand' => 'DELL', 'name' => 'Dell Alienware m16 R2', 'price' => 48000000],
-            ['brand' => 'ASUS', 'name' => 'ASUS Zenbook 14 OLED', 'price' => 23000000],
-            ['brand' => 'HP', 'name' => 'HP Omen 16 2023', 'price' => 31000000],
-            ['brand' => 'MSI', 'name' => 'MSI Raider GE78 HX', 'price' => 75000000],
-            ['brand' => 'LENOVO', 'name' => 'Lenovo ThinkPad X1 Carbon Gen 11', 'price' => 38000000],
+            ['brand' => 'APPLE', 'name' => 'MacBook Air M2 2022', 'price' => 2400],
+            ['brand' => 'APPLE', 'name' => 'MacBook Pro M3 Pro 14 inch', 'price' => 4500],
+            ['brand' => 'DELL', 'name' => 'Dell XPS 13 9315', 'price' => 2800],
+            ['brand' => 'DELL', 'name' => 'Dell Inspiron 16 5620', 'price' => 1850],
+            ['brand' => 'ASUS', 'name' => 'ASUS ROG Zephyrus G14', 'price' => 3500],
+            ['brand' => 'ASUS', 'name' => 'ASUS Vivobook 15 OLED', 'price' => 1400],
+            ['brand' => 'HP', 'name' => 'HP Spectre x360 14', 'price' => 3200],
+            ['brand' => 'HP', 'name' => 'HP Pavilion 15 eg2000', 'price' => 1600],
+            ['brand' => 'MSI', 'name' => 'MSI Katana 15 B13V', 'price' => 2200],
+            ['brand' => 'MSI', 'name' => 'MSI Modern 14 C13M', 'price' => 1100],
+            ['brand' => 'LENOVO', 'name' => 'Lenovo Legion 5 Slim', 'price' => 2900],
+            ['brand' => 'LENOVO', 'name' => 'Lenovo Yoga 7i Gen 8', 'price' => 2100],
+            ['brand' => 'ACER', 'name' => 'Acer Nitro V ANV15', 'price' => 1900],
+            ['brand' => 'ACER', 'name' => 'Acer Swift Go 14', 'price' => 1700],
+            ['brand' => 'APPLE', 'name' => 'MacBook Pro 16 M3 Max', 'price' => 8500],
+            ['brand' => 'DELL', 'name' => 'Dell Alienware m16 R2', 'price' => 4800],
+            ['brand' => 'ASUS', 'name' => 'ASUS Zenbook 14 OLED', 'price' => 2300],
+            ['brand' => 'HP', 'name' => 'HP Omen 16 2023', 'price' => 3100],
+            ['brand' => 'MSI', 'name' => 'MSI Raider GE78 HX', 'price' => 7500],
+            ['brand' => 'LENOVO', 'name' => 'Lenovo ThinkPad X1 Carbon Gen 11', 'price' => 3800],
         ];
 
         foreach ($laptops as $index => $lap) {
@@ -142,7 +142,7 @@ class DatabaseSeeder extends Seeder
             // Tạo 2 Variants cho mỗi Product
             $configs = [
                 ['ram' => '8GB', 'ssd' => '256GB', 'price_plus' => 0],
-                ['ram' => '16GB', 'ssd' => '512GB', 'price_plus' => 3000000],
+                ['ram' => '16GB', 'ssd' => '512GB', 'price_plus' => 500],
             ];
 
             foreach ($configs as $cfg) {
@@ -150,7 +150,7 @@ class DatabaseSeeder extends Seeder
                     'ma_san_pham' => $product->ma_san_pham,
                     'ten_bien_the' => $lap['name'] . ' ' . $cfg['ram'] . ' ' . $cfg['ssd'],
                     'gia_ban' => $lap['price'] + $cfg['price_plus'],
-                    'gia_niem_yet' => $lap['price'] + $cfg['price_plus'] + 2000000,
+                    'gia_niem_yet' => $lap['price'] + $cfg['price_plus'] + 500,
                     'so_luong_ton_kho' => rand(5, 50),
                     'trang_thai' => 'active',
                     'thong_so_ky_thuat_rieng' => [

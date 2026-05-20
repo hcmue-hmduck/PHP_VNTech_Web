@@ -8,23 +8,27 @@ use App\Models\OrderItem;
 use App\Models\ProductVariant;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    public function viewAdminOrder() {
+    public function viewAdminOrder()
+    {
         $orders = Order::latest()->paginate(10);
         return view('adminUI.ordersAdmin', compact('orders'));
     }
 
-    public function viewAdminOrderDetail(Request $request) {
+    public function viewAdminOrderDetail(Request $request)
+    {
         $order = Order::where('ma_don_hang', $request->ma_don_hang)->first();
         $orderItems = OrderItem::where('ma_don_hang', $request->ma_don_hang)->with('variant.product')->get();
         return view('adminUI.orderDetailsAdmin', compact('order', 'orderItems'));
     }
 
-    public function updateAdminOrderStatus(Request $request) {
+    public function updateAdminOrderStatus(Request $request)
+    {
         $order = Order::where('ma_don_hang', $request->ma_don_hang)->first();
         if ($order) {
             $order->trang_thai = $request->trang_thai;
@@ -33,7 +37,9 @@ class OrderController extends Controller
         }
         return redirect()->back()->with('error', 'Không tìm thấy đơn hàng!');
     }
-    public function storeCreateOrder(Request $request) {
+    
+    public function storeCreateOrder(Request $request)
+    {
         $data = $request->validate([
             'ma_nguoi_dung' => 'required|string',
             'ho_ten_nguoi_nhan' => 'required|string',
@@ -45,10 +51,14 @@ class OrderController extends Controller
             'phi_van_chuyen' => 'required|numeric',
             'gia_tri_giam_voucher' => 'nullable|numeric',
             'tong_thanh_toan' => 'required|numeric',
-            'phuong_thuc_thanh_toan' => 'required|string',
-            'trang_thai' => 'required|string',
+            'phuong_thuc_thanh_toan' => 'required|in:momo,cod',
             'cart_items' => 'required|json',
         ]);
+
+        $paymentMethod = $data['phuong_thuc_thanh_toan'];
+        $data['trang_thai'] = $paymentMethod === 'cod'
+            ? OrderStatus::PENDING_CONFIRMATION->value
+            : OrderStatus::PENDING_PAYMENT->value;
 
         // Parse cart_items JSON
         $cartItems = json_decode($data['cart_items'], true);
@@ -77,20 +87,25 @@ class OrderController extends Controller
         }
 
         // Clear only the purchased items from user's cart
-        if (Auth::check()) {
-            $cart = Cart::where('ma_nguoi_dung', Auth::id())->first();
-            if ($cart) {
-                $purchasedVariantIds = collect($cartItems)->pluck('ma_bien_the')->filter()->toArray();
-                CartItem::where('ma_gio_hang', $cart->_id)
-                    ->whereIn('ma_bien_the', $purchasedVariantIds)
-                    ->delete();
-            }
+        $cart = Cart::where('ma_nguoi_dung', Auth::id())->first();
+        if ($cart) {
+            $purchasedVariantIds = collect($cartItems)->pluck('ma_bien_the')->filter()->toArray();
+            CartItem::where('ma_gio_hang', $cart->_id)
+                ->whereIn('ma_bien_the', $purchasedVariantIds)
+                ->delete();
+        }
+
+        session()->forget('cartItems');
+        
+        if ($paymentMethod === 'momo') {
+            return redirect()->route('momo.create', ['ma_don_hang' => $order->ma_don_hang]);
         }
 
         return redirect()->route('viewOrderDetail', ['ma_don_hang' => $order->ma_don_hang])->with('success', 'Tạo đơn hàng thành công!');
     }
 
-    public function viewOrderDetail(Request $request) {
+    public function viewOrderDetail(Request $request)
+    {
         $userId = Auth::user()->id;
         $order = Order::where('ma_don_hang', $request->ma_don_hang)
             ->where('ma_nguoi_dung', $userId)
@@ -100,7 +115,8 @@ class OrderController extends Controller
         return view('homeUI.orderDetail', compact('order', 'orders', 'orderItems'));
     }
 
-    public function viewOrder() {
+    public function viewOrder()
+    {
         $userId = Auth::user()->id;
         $orders = Order::where('ma_nguoi_dung', $userId)->latest()->get();
         return view('homeUI.orderDetail', compact('orders'));

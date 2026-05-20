@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @php
+    use App\OrderStatus;
+
     // Logic tự động lấy dữ liệu còn thiếu nếu không được truyền từ Controller
     if (!isset($orders) && isset($order)) {
         $orders = \App\Models\Order::where('ma_nguoi_dung', $order->ma_nguoi_dung)->latest()->get();
@@ -9,12 +11,22 @@
     $currentMaDonHang = $order->ma_don_hang ?? null;
 
     $tabsMap = [
-        'cho_xac_nhan' => 'CHỜ XÁC NHẬN',
-        'da_xac_nhan' => 'CHỜ XÁC NHẬN',
-        'dang_giao_hang' => 'ĐANG VẬN CHUYỂN',
-        'da_nhan_hang' => 'ĐÃ NHẬN HÀNG',
-        'da_huy' => 'ĐÃ HUỶ'
+        OrderStatus::PENDING_PAYMENT->value => 'CHỜ THANH TOÁN',
+        OrderStatus::PENDING_CONFIRMATION->value => 'CHỜ XÁC NHẬN',
+        OrderStatus::WAITING_PICKUP->value => 'CHỜ LẤY HÀNG',
+        OrderStatus::WAITING_DELIVERY->value => 'CHỜ GIAO HÀNG',
+        OrderStatus::DELIVERED->value => 'ĐÃ GIAO',
     ];
+
+    $statusBadgeClasses = [
+        OrderStatus::PENDING_PAYMENT->value => 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
+        OrderStatus::PENDING_CONFIRMATION->value => 'bg-blue-500/10 border-blue-500/30 text-blue-400',
+        OrderStatus::WAITING_PICKUP->value => 'bg-purple-500/10 border-purple-500/30 text-purple-400',
+        OrderStatus::WAITING_DELIVERY->value => 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
+        OrderStatus::DELIVERED->value => 'bg-neon-green/10 border-neon-green/30 text-neon-green',
+    ];
+
+    $defaultStatusText = 'CHỜ XÁC NHẬN';
 @endphp
 
 @section('title', isset($order) ? 'Chi tiết đơn hàng #' . $order->ma_don_hang : 'Lịch sử đơn hàng')
@@ -46,7 +58,7 @@
         foreach($orders as $o) {
             $ordersData[] = [
                 'ma_don_hang' => $o->ma_don_hang,
-                'status' => $tabsMap[$o->trang_thai] ?? 'CHỜ XÁC NHẬN'
+                'status' => $tabsMap[$o->trang_thai] ?? $defaultStatusText
             ];
         }
     }
@@ -70,7 +82,7 @@
         <!-- Tab Selector -->
         <div class="mb-12 border-b border-white/5 overflow-x-auto custom-scrollbar">
             <div class="flex justify-center gap-10 pb-4 min-w-max">
-                @foreach(['TẤT CẢ', 'CHỜ XÁC NHẬN', 'ĐANG VẬN CHUYỂN', 'CHỜ GIAO HÀNG', 'ĐÃ NHẬN HÀNG', 'ĐÃ HUỶ'] as $tab)
+                @foreach(['TẤT CẢ', 'CHỜ THANH TOÁN', 'CHỜ XÁC NHẬN', 'CHỜ LẤY HÀNG', 'CHỜ GIAO HÀNG', 'ĐÃ GIAO'] as $tab)
                 <button
                     @click="activeTab = '{{ $tab }}'"
                     class="whitespace-nowrap text-sm font-bold tracking-widest transition-all duration-300 uppercase relative"
@@ -99,7 +111,8 @@
                     @isset($orders)
                         @foreach($orders as $o)
                         @php
-                            $statusText = $tabsMap[$o->trang_thai] ?? 'CHỜ XÁC NHẬN';
+                            $statusText = $tabsMap[$o->trang_thai] ?? $defaultStatusText;
+                            $badgeClass = $statusBadgeClasses[$o->trang_thai] ?? $statusBadgeClasses[OrderStatus::PENDING_CONFIRMATION->value];
                             $isActive = $currentMaDonHang == $o->ma_don_hang;
                         @endphp
                         <a
@@ -111,10 +124,7 @@
                                 <h3 class="text-lg font-bold uppercase {{ $isActive ? 'text-neon-green' : 'text-gray-100' }}">
                                     #...{{ substr($o->ma_don_hang, -8) }}
                                 </h3>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ 
-                                    $o->trang_thai === 'dang_giao_hang' ? 'bg-neon-green/10 border-neon-green/30 text-neon-green' : 
-                                    ($o->trang_thai === 'da_nhan_hang' ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' : 'bg-red-500/10 border-red-500/30 text-red-500') 
-                                }}">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ $badgeClass }}">
                                     {{ $statusText }}
                                 </span>
                             </div>
@@ -130,7 +140,7 @@
         <!-- Detail Content -->
         @if(isset($order))
         <section 
-            x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $tabsMap[$order->trang_thai] ?? 'CHỜ XÁC NHẬN' }}'"
+            x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $tabsMap[$order->trang_thai] ?? $defaultStatusText }}'"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 transform translate-y-4"
             x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -142,7 +152,7 @@
                     <div class="flex items-center gap-3 mb-1">
                         <h2 class="text-2xl font-bold text-gray-100 uppercase">Chi tiết #{{ $order->ma_don_hang }}</h2>
                         <span class="px-3 py-1 bg-neon-green/10 border border-neon-green/30 text-neon-green text-[10px] font-bold rounded uppercase tracking-wider">
-                            {{ ($tabsMap[$order->trang_thai] ?? 'CHỜ XÁC NHẬN') }}
+                            {{ ($tabsMap[$order->trang_thai] ?? $defaultStatusText) }}
                         </span>
                     </div>
                     <p class="text-gray-400 text-sm">
@@ -158,15 +168,22 @@
                 <!-- Shipping Timeline -->
                 @php
                     $steps = [
-                        ['id' => 'cho_xac_nhan', 'status' => 'ĐÃ ĐẶT HÀNG', 'icon' => 'shopping-bag', 'note' => 'Đơn hàng đã ghi nhận'],
-                        ['id' => 'da_xac_nhan', 'status' => 'XÁC NHẬN', 'icon' => 'package-check', 'note' => 'VNTech đang chuẩn bị'],
-                        ['id' => 'dang_giao_hang', 'status' => 'VẬN CHUYỂN', 'icon' => 'truck', 'note' => 'Đang trên đường giao'],
-                        ['id' => 'da_nhan_hang', 'status' => 'THÀNH CÔNG', 'icon' => 'check', 'note' => 'Giao hàng hoàn tất'],
+                        ['id' => OrderStatus::PENDING_PAYMENT->value, 'status' => 'CHỜ THANH TOÁN', 'icon' => 'wallet', 'note' => 'Đơn hàng đang chờ thanh toán'],
+                        ['id' => OrderStatus::PENDING_CONFIRMATION->value, 'status' => 'CHỜ XÁC NHẬN', 'icon' => 'clipboard-check', 'note' => 'Đơn hàng đang chờ shop xác nhận'],
+                        ['id' => OrderStatus::WAITING_PICKUP->value, 'status' => 'CHỜ LẤY HÀNG', 'icon' => 'package-check', 'note' => 'Shop đang chuẩn bị và chờ đơn vị vận chuyển lấy hàng'],
+                        ['id' => OrderStatus::WAITING_DELIVERY->value, 'status' => 'CHỜ GIAO HÀNG', 'icon' => 'truck', 'note' => 'Đơn hàng đang trên đường giao đến bạn'],
+                        ['id' => OrderStatus::DELIVERED->value, 'status' => 'ĐÃ GIAO', 'icon' => 'badge-check', 'note' => 'Đơn hàng đã giao thành công'],
                     ];
                     $currentStatus = $order->trang_thai;
-                    $statusOrder = ['cho_xac_nhan', 'da_xac_nhan', 'dang_giao_hang', 'da_nhan_hang', 'da_huy'];
+                    $statusOrder = [
+                        OrderStatus::PENDING_PAYMENT->value,
+                        OrderStatus::PENDING_CONFIRMATION->value,
+                        OrderStatus::WAITING_PICKUP->value,
+                        OrderStatus::WAITING_DELIVERY->value,
+                        OrderStatus::DELIVERED->value,
+                    ];
                     $currentIndex = array_search($currentStatus, $statusOrder);
-                    if ($currentIndex === false || $currentStatus == 'da_huy') $currentIndex = -1;
+                    if ($currentIndex === false) $currentIndex = -1;
                     $progressWidth = ($currentIndex >= 0) ? ($currentIndex / (count($steps) - 1)) * 100 : 0;
                 @endphp
 

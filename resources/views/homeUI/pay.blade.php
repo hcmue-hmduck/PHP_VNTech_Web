@@ -48,7 +48,7 @@
 @php
     $tongTien = collect($cartItems ?? [])->sum(fn ($item) => ($item['gia_ban'] ?? 0) * ($item['so_luong'] ?? 0));
 @endphp
-<form method="POST" action="{{ route('storeCreateOrder') }}" class="pt-32 pb-24 px-6 max-w-[1440px] mx-auto" x-data="{ paymentMethod: 'qr', cartItems: {{ json_encode($cartItems ?? []) }} }">
+<form method="POST" action="{{ route('storeCreateOrder') }}" class="pt-32 pb-24 px-6 max-w-[1440px] mx-auto" x-data="{ paymentMethod: 'momo', cartItems: {{ json_encode($cartItems ?? []) }} }">
     @csrf
     <input type="hidden" name="ma_don_hang" value="">
     <input type="hidden" name="ma_nguoi_dung" value="{{ auth()->id() ?? 'guest' }}">
@@ -57,7 +57,6 @@
     <input type="hidden" name="gia_tri_giam_voucher" value="0">
     <input type="hidden" name="tong_thanh_toan" value="{{ $tongTien }}">
     <input type="hidden" name="phuong_thuc_thanh_toan" x-model="paymentMethod">
-    <input type="hidden" name="trang_thai" value="cho_xac_nhan">
     <input type="hidden" name="cart_items" x-bind:value="JSON.stringify(cartItems)">
 
     @if ($errors->any())
@@ -131,13 +130,13 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- QR Scan -->
-                    <button type="button" @click="paymentMethod = 'qr'"
-                            :class="paymentMethod === 'qr' ? 'border-lime-400 bg-lime-400/5 text-lime-400 shadow-[0_0_20px_rgba(163,230,53,0.12)]' : 'border-white/10 text-white/60 hover:border-white/30'"
+                    <!-- MoMo -->
+                    <button type="button" @click="paymentMethod = 'momo'"
+                            :class="paymentMethod === 'momo' ? 'border-lime-400 bg-lime-400/5 text-lime-400 shadow-[0_0_20px_rgba(163,230,53,0.12)]' : 'border-white/10 text-white/60 hover:border-white/30'"
                             class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group rounded-xl">
-                        <i data-lucide="scan-line" :class="paymentMethod === 'qr' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
-                        <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Quét mã QR</span>
-                        <span class="text-[9px] text-white/35 uppercase tracking-[0.2em]">Thanh toán nhanh bằng mã QR</span>
+                        <i data-lucide="wallet-cards" :class="paymentMethod === 'momo' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
+                        <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Thanh toán MoMo</span>
+                        <span class="text-[9px] text-white/35 uppercase tracking-[0.2em]">Ví MoMo / quét mã QR MoMo</span>
                     </button>
                     <!-- COD -->
                     <button type="button" @click="paymentMethod = 'cod'"
