@@ -26,6 +26,19 @@
         OrderStatus::DELIVERED->value => 'bg-neon-green/10 border-neon-green/30 text-neon-green',
     ];
 
+    $resolveOrderStatus = function ($order) {
+        $status = $order->trang_thai ?? null;
+        $paymentMethod = strtolower($order->phuong_thuc_thanh_toan ?? '');
+
+        if (in_array($status, [OrderStatus::PENDING_PAYMENT->value, OrderStatus::PENDING_CONFIRMATION->value, null], true)) {
+            return $paymentMethod === 'momo'
+                ? OrderStatus::PENDING_PAYMENT->value
+                : OrderStatus::PENDING_CONFIRMATION->value;
+        }
+
+        return $status;
+    };
+
     $defaultStatusText = 'CHỜ XÁC NHẬN';
 @endphp
 
@@ -58,7 +71,7 @@
         foreach($orders as $o) {
             $ordersData[] = [
                 'ma_don_hang' => $o->ma_don_hang,
-                'status' => $tabsMap[$o->trang_thai] ?? $defaultStatusText
+                'status' => $tabsMap[$resolveOrderStatus($o)] ?? $defaultStatusText
             ];
         }
     }
@@ -125,8 +138,9 @@
                     @isset($orders)
                         @foreach($orders as $o)
                         @php
-                            $statusText = $tabsMap[$o->trang_thai] ?? $defaultStatusText;
-                            $badgeClass = $statusBadgeClasses[$o->trang_thai] ?? $statusBadgeClasses[OrderStatus::PENDING_CONFIRMATION->value];
+                            $resolvedStatus = $resolveOrderStatus($o);
+                            $statusText = $tabsMap[$resolvedStatus] ?? $defaultStatusText;
+                            $badgeClass = $statusBadgeClasses[$resolvedStatus] ?? $statusBadgeClasses[OrderStatus::PENDING_CONFIRMATION->value];
                             $isActive = $currentMaDonHang == $o->ma_don_hang;
                         @endphp
                         <a
@@ -154,7 +168,7 @@
         <!-- Detail Content -->
         @if(isset($order))
         <section 
-            x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $tabsMap[$order->trang_thai] ?? $defaultStatusText }}'"
+            x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $tabsMap[$resolveOrderStatus($order)] ?? $defaultStatusText }}'"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 transform translate-y-4"
             x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -166,7 +180,7 @@
                     <div class="flex items-center gap-3 mb-1">
                         <h2 class="text-2xl font-bold text-gray-100 uppercase">Chi tiết #{{ $order->ma_don_hang }}</h2>
                         <span class="px-3 py-1 bg-neon-green/10 border border-neon-green/30 text-neon-green text-[10px] font-bold rounded uppercase tracking-wider">
-                            {{ ($tabsMap[$order->trang_thai] ?? $defaultStatusText) }}
+                            {{ ($tabsMap[$resolveOrderStatus($order)] ?? $defaultStatusText) }}
                         </span>
                     </div>
                     <p class="text-gray-400 text-sm">
@@ -181,21 +195,19 @@
             <div class="p-8 space-y-16">
                 <!-- Shipping Timeline -->
                 @php
+                    $currentStatus = $resolveOrderStatus($order);
+                    $isMomoOrder = strtolower($order->phuong_thuc_thanh_toan ?? '') === 'momo';
+                    $firstStep = $isMomoOrder
+                        ? ['id' => OrderStatus::PENDING_PAYMENT->value, 'status' => 'CHỜ THANH TOÁN', 'icon' => 'wallet', 'note' => 'Đơn hàng đang chờ thanh toán']
+                        : ['id' => OrderStatus::PENDING_CONFIRMATION->value, 'status' => 'CHỜ XÁC NHẬN', 'icon' => 'clipboard-check', 'note' => 'Đơn hàng đang chờ shop xác nhận'];
+
                     $steps = [
-                        ['id' => OrderStatus::PENDING_PAYMENT->value, 'status' => 'CHỜ THANH TOÁN', 'icon' => 'wallet', 'note' => 'Đơn hàng đang chờ thanh toán'],
-                        ['id' => OrderStatus::PENDING_CONFIRMATION->value, 'status' => 'CHỜ XÁC NHẬN', 'icon' => 'clipboard-check', 'note' => 'Đơn hàng đang chờ shop xác nhận'],
+                        $firstStep,
                         ['id' => OrderStatus::WAITING_PICKUP->value, 'status' => 'CHỜ LẤY HÀNG', 'icon' => 'package-check', 'note' => 'Shop đang chuẩn bị và chờ đơn vị vận chuyển lấy hàng'],
                         ['id' => OrderStatus::WAITING_DELIVERY->value, 'status' => 'CHỜ GIAO HÀNG', 'icon' => 'truck', 'note' => 'Đơn hàng đang trên đường giao đến bạn'],
                         ['id' => OrderStatus::DELIVERED->value, 'status' => 'ĐÃ GIAO', 'icon' => 'badge-check', 'note' => 'Đơn hàng đã giao thành công'],
                     ];
-                    $currentStatus = $order->trang_thai;
-                    $statusOrder = [
-                        OrderStatus::PENDING_PAYMENT->value,
-                        OrderStatus::PENDING_CONFIRMATION->value,
-                        OrderStatus::WAITING_PICKUP->value,
-                        OrderStatus::WAITING_DELIVERY->value,
-                        OrderStatus::DELIVERED->value,
-                    ];
+                    $statusOrder = array_column($steps, 'id');
                     $currentIndex = array_search($currentStatus, $statusOrder);
                     if ($currentIndex === false) $currentIndex = -1;
                     $progressWidth = ($currentIndex >= 0) ? ($currentIndex / (count($steps) - 1)) * 100 : 0;
