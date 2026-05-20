@@ -174,6 +174,7 @@
             x-transition:enter-end="opacity-100 transform translate-y-0"
             class="w-full bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl overflow-hidden animate-fadeInUp"
         >
+            @php $isMomoOrder = strtolower($order->phuong_thuc_thanh_toan ?? '') === 'momo'; @endphp
             <!-- Detail Header -->
             <div class="p-8 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
@@ -187,9 +188,17 @@
                         Ngày đặt hàng: <span class="text-gray-100 font-medium">{{ $order->created_at->format('d \T\h\á\n\g m, Y') }}</span>
                     </p>
                 </div>
+                @if($isMomoOrder && $order->trang_thai === OrderStatus::PENDING_PAYMENT->value)
+                <a href="{{ route('momo.create', ['ma_don_hang' => $order->ma_don_hang]) }}"
+                   class="flex items-center gap-2 bg-neon-green text-black px-8 py-3 font-bold text-sm tracking-widest uppercase hover:opacity-90 transition-all duration-300 shadow-[0_0_20px_rgba(0,255,102,0.3)]">
+                    <i data-lucide="wallet-cards" class="w-4 h-4"></i>
+                    Thanh toán MoMo
+                </a>
+                @else
                 <button class="bg-neon-green text-black px-8 py-3 font-bold text-sm tracking-widest uppercase hover:glow-sm transition-all duration-300">
                     Theo dõi đơn hàng
                 </button>
+                @endif
             </div>
 
             <div class="p-8 space-y-16">

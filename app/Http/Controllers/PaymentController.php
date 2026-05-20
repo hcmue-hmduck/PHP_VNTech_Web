@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use App\Models\UserAddress;
 
 class PaymentController extends Controller
@@ -64,11 +65,13 @@ class PaymentController extends Controller
         $requestType = 'captureWallet';
         $ipnUrl = config('services.momo.ipn_url');
         $returnUrl = config('services.momo.return_url');
-        $orderId = $maDonHang;
+        $orderId = $maDonHang . '_' . now()->format('YmdHisv');
         $amount = $order->tong_tien_hang;
-        $orderInfo = 'Thanh toán đơn hàng ' . $orderId;
-        $requestId = $orderId . '_' . time();
-        $extraData = '';
+        $orderInfo = 'Thanh toán đơn hàng';
+        $requestId = (string) Str::uuid();
+        $extraData = base64_encode(json_encode([
+            'ma_don_hang' => $maDonHang,
+        ], JSON_UNESCAPED_UNICODE));
         $lang = 'vi';
 
         $endpoint = config('services.momo.endpoint');
@@ -107,6 +110,15 @@ class PaymentController extends Controller
         if (isset($result['payUrl'])) {
             return redirect()->away($result['payUrl']);
         }
+
+        Log::error('MoMo create payment failed', [
+            'order_internal' => $maDonHang,
+            'order_external' => $orderId,
+            'result' => $result,
+        ]);
+
+        return redirect()->route('viewOrderDetail', ['ma_don_hang' => $maDonHang])
+            ->with('error', $result['message'] ?? 'Không thể tạo thanh toán MoMo, vui lòng thử lại.');
     }
 
     // GET momo/return
@@ -114,30 +126,53 @@ class PaymentController extends Controller
     {
         $resultCode = $request->query('resultCode');
         $orderId = $request->query('orderId');
+        $internalOrderId = $this->resolveInternalOrderId($request->query('extraData'), $orderId);
 
         if ($resultCode == 0 || $resultCode == 9000) {
-            return redirect()->route('viewOrder', ['ma_don_hang' => $orderId]);
+            return redirect()->route('viewOrderDetail', ['ma_don_hang' => $internalOrderId]);
         }
 
         $message = $request->query('message');
 
-        return view('homeUI.paymentFailed', compact('message', 'orderId', 'resultCode'));
+        return view('homeUI.paymentFailed', [
+            'message' => $message,
+            'orderId' => $internalOrderId,
+            'resultCode' => $resultCode,
+        ]);
     }
 
     // POST momo/ipn
     public function momoIpn(Request $request)
     {
-        
         $resultCode = $request->input('resultCode');
         $orderId = $request->input('orderId');
+        $internalOrderId = $this->resolveInternalOrderId($request->input('extraData'), $orderId);
 
-        if ($resultCode == 0 || $resultCode == 9000) {
-            Order::where('ma_don_hang', $orderId)->update([
+        if (($resultCode == 0 || $resultCode == 9000)) {
+            Order::where('ma_don_hang', $internalOrderId)->update([
                 'trang_thai' => OrderStatus::WAITING_PICKUP->value,
             ]);
         }
 
         return response()->json('');
     }
-    
+
+    private function resolveInternalOrderId(?string $extraData, ?string $externalOrderId): ?string
+    {
+        if (!empty($extraData)) {
+            $decodedBase64 = base64_decode($extraData, true);
+            if ($decodedBase64 !== false) {
+                $decodedJson = json_decode($decodedBase64, true);
+                if (json_last_error() === JSON_ERROR_NONE && !empty($decodedJson['ma_don_hang'])) {
+                    return $decodedJson['ma_don_hang'];
+                }
+            }
+        }
+
+        if (!empty($externalOrderId)) {
+            return explode('_', $externalOrderId)[0];
+        }
+
+        return null;
+    }
 }
