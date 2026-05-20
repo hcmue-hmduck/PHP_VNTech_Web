@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductAdminController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\UserAddressController;
 
 Route::get('/', [HomeController::class, 'viewHome']);
 
@@ -37,6 +38,8 @@ Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "vi
 
 Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('viewPayment');
 Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('preparePayment');
+
+Route::post('/user-address', [UserAddressController::class, 'storeAddress'])->name('user-address.store');
 
 Route::post('/order/create', [OrderController::class, 'storeCreateOrder'])->name('storeCreateOrder');
 Route::get('/orders', [OrderController::class, 'viewOrder'])->name('viewOrder');

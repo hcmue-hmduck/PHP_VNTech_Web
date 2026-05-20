@@ -9,6 +9,7 @@ class OrderItem extends Model {
     use HasFactory;
 
     protected $fillable = [
+        'ma_chi_tiet_don_hang',
         'ma_don_hang',
         'ma_bien_the',
         'ten_bien_the',

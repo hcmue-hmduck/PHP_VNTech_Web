@@ -18,8 +18,8 @@ return new class extends Migration
             $collection->string('ten_bien_the');
             $collection->string('hinh_anh');
             $collection->integer('so_luong');
-            $collection->decimal('gia_niem_yet', 15, 2); // Giá gốc (để hiển thị ~~gạch~~)
-            $collection->decimal('don_gia', 15, 2);       // Giá thực tế khách trả
+            $collection->decimal('gia_niem_yet', 15, 2);
+            $collection->decimal('don_gia', 15, 2);
             $collection->string('ma_bien_the_flash_sale')->nullable();
             $collection->decimal('so_tien_giam_flash_sale', 15, 2)->default(0);
             $collection->decimal('thanh_tien', 15, 2);

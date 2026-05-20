@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\ProductVariant;
+use App\Models\UserAddress;
 
 class PaymentController extends Controller
 {
     public function viewPayment($ma_bien_the = null)
     {
+        $user_id = Auth::id();
+        $user_address = UserAddress::where('ma_nguoi_dung', $user_id)->get();
         $cartItems = session('cartItems', []);
         if ($ma_bien_the) {
             $variant = ProductVariant::where('ma_bien_the', $ma_bien_the)->first();
@@ -26,7 +30,7 @@ class PaymentController extends Controller
                 ];
             }
         }
-        return view('homeUI.pay', compact('cartItems'));
+        return view('homeUI.pay', compact('user_address', 'cartItems'));
     }
 
     public function preparePayment(Request $request)
@@ -45,4 +49,6 @@ class PaymentController extends Controller
 
         return redirect()->route('viewPayment');
     }
+
+    
 }
