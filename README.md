@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=50&pause=1000&color=00e55b&center=true&vCenter=true&width=450&lines=PHP+VNTECH;E-COMMERCE+SYSTEM)](https://git.io/typing-svg)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=45&pause=1000&color=00e55b&center=true&vCenter=true&width=750&lines=VNTECH+SHOP;E-COMMERCE+SYSTEM;LARAVEL+12+%26+MONGODB)](https://git.io/typing-svg)
 
 <img src="https://img.shields.io/badge/version-1.0.0-lime?style=for-the-badge" alt="Version" />
 <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License" />
@@ -134,6 +134,6 @@ PHP_VNTech/
 
 <div align="center">
 
-Dự án **PHP_VNTech** được tối ưu hóa toàn diện về cơ sở dữ liệu NoSQL và thiết kế UI/UX hiện đại! 💻✨
+Dự án **PHP_VNTech** được tối ưu hóa toàn diện về cơ sở dữ liệu NoSQL và thiết kế UI/UX hiện đại!
 
 </div>
