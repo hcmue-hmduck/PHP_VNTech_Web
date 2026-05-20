@@ -11,7 +11,9 @@ class ProductAdminController extends Controller
 {
     public function viewProductAdmin()
     {
-        $products = Product::with('variants')->latest()->paginate(10);
+        $products = Product::with(['variants' => function ($query) {
+            $query->where('trang_thai', '!=', 'delete');
+        }])->latest()->paginate(10);
         return view('adminUI.productsAdmin', compact('products'));
     }
 
@@ -28,7 +30,7 @@ class ProductAdminController extends Controller
             'mo_ta_ngan'                => 'nullable|string|max:500',
             'mo_ta_chi_tiet'            => 'nullable|string',
             'link_anh_dai_dien'         => 'nullable', 
-            'trang_thai'                => 'required|in:active,inactive',
+            'trang_thai'                => 'required|in:active,inactive,delete',
             'gia_thap_nhat'             => 'required|numeric|min:0',
             'hinh_anh'                  => 'nullable|array',
             'thong_so_ky_thuat_chung'   => 'nullable|array',
@@ -103,7 +105,9 @@ class ProductAdminController extends Controller
     }
 
     public function viewEditProductAdmin(Product $product) {
-        $product_variant = ProductVariant::where('ma_san_pham', $product->ma_san_pham)->get();
+        $product_variant = ProductVariant::where('ma_san_pham', $product->ma_san_pham)
+            ->where('trang_thai', '!=', 'delete')
+            ->get();
         return view('adminUI.formProductsAdmin', compact('product', 'product_variant'));
     }
 
@@ -114,7 +118,7 @@ class ProductAdminController extends Controller
             'mo_ta_ngan'                => 'nullable|string|max:500',
             'mo_ta_chi_tiet'            => 'nullable|string',
             'link_anh_dai_dien'         => 'nullable|image|max:5120', 
-            'trang_thai'                => 'required|in:active,inactive',
+            'trang_thai'                => 'required|in:active,inactiv,delete',
             'gia_thap_nhat'             => 'required|numeric|min:0',
             'thong_so_ky_thuat_chung'   => 'nullable|array',
             'thong_tin_them'            => 'nullable|array',
@@ -147,11 +151,13 @@ class ProductAdminController extends Controller
         $product->update($data);
 
         if ($request->has('variants')) {
+            $allProductVariant = ProductVariant::where('ma_san_pham', $product->ma_san_pham)->get();
+            $keptMaBienThe = [];
             foreach ($request->variants as $index => $variantData) {
                 $thuocTinhRaw = $variantData['thong_so_ky_thuat_rieng'] ?? [];
 
                 if (!empty($variantData['ma_bien_the'])) {
-                    $product_variant = ProductVariant::where('ma_bien_the', $variantData['ma_bien_the'])->first();
+                    $product_variant = $allProductVariant->where('ma_bien_the', $variantData['ma_bien_the'])->first();
                     if ($product_variant) {
                         $product_variant->update([
                             'ten_bien_the' => $variantData['ten_bien_the'] ?? null,
@@ -161,6 +167,7 @@ class ProductAdminController extends Controller
                             'trang_thai' => $variantData['trang_thai'],
                             'thong_so_ky_thuat_rieng' => $thuocTinhRaw,
                         ]);
+                        $keptMaBienThe[] = $product_variant->ma_bien_the;
                     }
                 } else {
                     $product_variant = $product->variants()->create([
@@ -174,8 +181,9 @@ class ProductAdminController extends Controller
                     ]);
                     $product_variant->ma_bien_the = $product_variant->_id;
                     $product_variant->save();
+                    $keptMaBienThe[] = $product_variant->ma_bien_the;
                 }
-                
+
                 if (isset($product_variant) && $request->hasFile("variants.$index.link_anh_bien_the")) {
                     $file = $request->file("variants.$index.link_anh_bien_the");
                     try {
@@ -188,6 +196,16 @@ class ProductAdminController extends Controller
                     }
                 }
             }
+
+            // Any existing variants not present in the submitted form -> mark as deleted
+            foreach ($allProductVariant as $existingVariant) {
+                if (!in_array($existingVariant->ma_bien_the, $keptMaBienThe)) {
+                    ProductVariant::where('ma_bien_the', $existingVariant->ma_bien_the)->update(['trang_thai' => 'delete']);
+                }
+            }
+        }
+        else {
+            ProductVariant::where('ma_san_pham', $product->ma_san_pham)->update(['trang_thai' => 'delete']);
         }
 
 
