@@ -15,8 +15,8 @@ return new class extends Migration
             $collection->string('ho_ten');
             $collection->string('email')->unique(); 
             
-            $collection->string('so_dien_thoai')->unique()->nullable();
-            $collection->string('password');
+            $collection->string('so_dien_thoai')->nullable();
+            $collection->string('password')->nullable();
 
             $collection->string('vai_tro')->default('user')->index();
             

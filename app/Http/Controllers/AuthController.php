@@ -1,21 +1,29 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
-class AuthController extends Controller {
-    public function showLoginForm() {
+
+class AuthController extends Controller
+{
+    public function showLoginForm()
+    {
         return view('auth.login');
     }
 
-    public function showRegisterForm() {
+    public function showRegisterForm()
+    {
         return view('auth.register');
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
@@ -30,7 +38,8 @@ class AuthController extends Controller {
         ])->withInput($request->only('email'));
     }
 
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $request->validate([
             'ho_ten' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -47,10 +56,39 @@ class AuthController extends Controller {
         return redirect('/');
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        return redirect('/');
+    }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        $googleUser = Socialite::driver('google')->user();
+
+        $email = $googleUser->getEmail();
+        $name = $googleUser->getName();
+        $avatar = $googleUser->getAvatar();
+
+        $foundUser = User::where('email', $email)->first();
+
+        if (!$foundUser) {
+            $foundUser = User::create([
+                'ho_ten' => $name,
+                'email' => $email,
+                'vai_tro' => 'user',
+                'trang_thai' => 'active',
+            ]);
+        }
+
+        Auth::login($foundUser);
         return redirect('/');
     }
 }
