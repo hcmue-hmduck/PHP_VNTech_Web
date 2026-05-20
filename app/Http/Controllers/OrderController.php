@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProductVariant;
+use App\Models\Cart;
+use App\Models\CartItem;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -35,12 +39,12 @@ class OrderController extends Controller
             'ho_ten_nguoi_nhan' => 'required|string',
             'so_dien_thoai_nhan' => 'required|string',
             'dia_chi_giao_hang' => 'required|string',
-            'ghi_chu' => 'string',
-            'ma_voucher' => 'string',
+            'ghi_chu' => 'nullable|string',
+            'ma_voucher' => 'nullable|string',
             'tong_tien_hang' => 'required|numeric',
             'phi_van_chuyen' => 'required|numeric',
-            'gia_tri_giam_voucher' => 'numeric',
-            'tong_thanh_toan' => 'required|string',
+            'gia_tri_giam_voucher' => 'nullable|numeric',
+            'tong_thanh_toan' => 'required|numeric',
             'phuong_thuc_thanh_toan' => 'required|string',
             'trang_thai' => 'required|string',
             'cart_items' => 'required|json',
@@ -72,17 +76,33 @@ class OrderController extends Controller
             $orderItems->save();
         }
 
-        return redirect()->route('viewOrderDetail', ['user_id' => $order->ma_nguoi_dung, 'ma_don_hang' => $order->ma_don_hang])->with('success', 'Tạo đơn hàng thành công!');
+        // Clear only the purchased items from user's cart
+        if (Auth::check()) {
+            $cart = Cart::where('ma_nguoi_dung', Auth::id())->first();
+            if ($cart) {
+                $purchasedVariantIds = collect($cartItems)->pluck('ma_bien_the')->filter()->toArray();
+                CartItem::where('ma_gio_hang', $cart->_id)
+                    ->whereIn('ma_bien_the', $purchasedVariantIds)
+                    ->delete();
+            }
+        }
+
+        return redirect()->route('viewOrderDetail', ['ma_don_hang' => $order->ma_don_hang])->with('success', 'Tạo đơn hàng thành công!');
     }
 
     public function viewOrderDetail(Request $request) {
-        $order = Order::where('ma_don_hang', $request->ma_don_hang)->first();
+        $userId = Auth::user()->id;
+        $order = Order::where('ma_don_hang', $request->ma_don_hang)
+            ->where('ma_nguoi_dung', $userId)
+            ->firstOrFail();
+        $orders = Order::where('ma_nguoi_dung', $userId)->latest()->get();
         $orderItems = OrderItem::where('ma_don_hang', $request->ma_don_hang)->with('variant.product')->get();
-        return view('homeUI.orderDetail', compact('order', 'orderItems'));
+        return view('homeUI.orderDetail', compact('order', 'orders', 'orderItems'));
     }
 
-    public function viewOrder(Request $request) {
-        $orders = Order::where('ma_nguoi_dung', $request->user_id)->get();
+    public function viewOrder() {
+        $userId = Auth::user()->id;
+        $orders = Order::where('ma_nguoi_dung', $userId)->latest()->get();
         return view('homeUI.orderDetail', compact('orders'));
     }
 }

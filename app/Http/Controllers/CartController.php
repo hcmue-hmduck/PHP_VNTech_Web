@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller {
-    public function viewCart(string $user_id) {
+    public function viewCart() {
+        $user_id = Auth::user()->id;
         $cart = Cart::where('ma_nguoi_dung', $user_id)->first();
         
         if (!$cart) {

@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/cart/add-item', [CartController::class, 'addItem'])->name('cart.addItem');
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
 Route::post('/cart/remove-item', [CartController::class, 'removeItem'])->name('cart.removeItem');
-Route::get('/cart/{user_id}', [CartController::class, 'viewCart'])->name('viewCart');
+Route::get('/cart', [CartController::class, 'viewCart'])->name('viewCart');
 
 Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
@@ -39,8 +39,8 @@ Route::get('/checkout', [PaymentController::class, 'viewPayment'])->name('viewPa
 Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('preparePayment');
 
 Route::post('/order/create', [OrderController::class, 'storeCreateOrder'])->name('storeCreateOrder');
-Route::get('/orders/{user_id}', [OrderController::class, 'viewOrder'])->name('viewOrder');
-Route::get('/orders/{user_id}/{ma_don_hang}', [OrderController::class, 'viewOrderDetail'])->name('viewOrderDetail');
+Route::get('/orders', [OrderController::class, 'viewOrder'])->name('viewOrder');
+Route::get('/orders/{ma_don_hang}', [OrderController::class, 'viewOrderDetail'])->name('viewOrderDetail');
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');

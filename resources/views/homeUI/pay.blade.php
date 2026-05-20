@@ -60,6 +60,19 @@
     <input type="hidden" name="trang_thai" value="cho_xac_nhan">
     <input type="hidden" name="cart_items" x-bind:value="JSON.stringify(cartItems)">
 
+    @if ($errors->any())
+        <div class="mb-8 rounded-2xl border border-red-400/30 bg-red-500/10 p-5 text-red-100 shadow-[0_0_30px_rgba(248,113,113,0.12)]">
+            <p class="mb-3 font-['Space_Grotesk'] text-xs font-bold uppercase tracking-[0.2em] text-red-300">
+                Không thể tạo đơn hàng
+            </p>
+            <ul class="space-y-1 text-sm text-red-100/90">
+                @foreach ($errors->all() as $error)
+                    <li>• {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
 <main>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
