@@ -99,7 +99,7 @@
                 {{ $productDetail->ten_san_pham }}
             </h1>
             <p class="text-gray-400 font-bold tracking-[0.2em] text-sm mb-10">
-                HỆ THỐNG CHIẾN THUẬT HIỆU NĂNG CAO
+                {{ $productDetail->mo_ta_ngan }}
             </p>
 
             <div class="flex items-end gap-6 mb-12">
@@ -127,13 +127,18 @@
                 <div class="flex flex-wrap gap-3">
                     @foreach($variants as $idx => $variant)
                     @php
-                        $ram = collect($variant->thuoc_tinh)->firstWhere('ten', 'RAM')['gia_tri'] ?? '';
-                        $ssd = collect($variant->thuoc_tinh)->firstWhere('ten', 'Ổ cứng')['gia_tri'] ?? '';
+                        $thong_tin_bien_the = '';
+                        if (isset($variant->thong_so_ky_thuat_rieng) && is_array($variant->thong_so_ky_thuat_rieng)) {
+                            foreach($variant->thong_so_ky_thuat_rieng as $item) {
+                                $thong_tin_bien_the .= $item['gia_tri'] . '/';
+                            }
+                        } 
+                        $thong_tin_bien_the = rtrim($thong_tin_bien_the, '/');
                     @endphp
                     <button @click="selectVariant({{ $idx }})" 
                             :class="selectedIndex === {{ $idx }} ? 'border-lime-400 text-lime-400 shadow-[0_0_10px_rgba(163,230,53,0.2)]' : 'border-white/5 text-gray-400 hover:border-white/20'"
                             class="py-3 px-4 glass-panel text-[11px] font-black tracking-wider transition-all duration-300">
-                        {{ $ram }} / {{ $ssd }} — {{ number_format($variant->gia_ban, 0, ',', '.') }}₫
+                        {{ $thong_tin_bien_the }} — {{ number_format($variant->gia_ban, 0, ',', '.') }}₫
                     </button>
                     @endforeach
                 </div>
@@ -159,6 +164,38 @@
         <h2 class="font-display text-4xl font-black mb-12 flex items-center gap-6 text-white">
             <span class="w-1.5 h-10 bg-lime-400 block"></span>
             THÔNG SỐ KỸ THUẬT
+        </h2>
+        <div class="glass-panel overflow-hidden">
+            <table class="w-full text-left">
+                <tbody class="divide-y divide-white/5">
+                    @foreach($productDetail->thong_so_ky_thuat_chung ?? [] as $row)
+                    <tr class="hover:bg-white/5 transition-colors group">
+                        <td class="p-8 font-black text-[11px] tracking-[0.2em] text-gray-400 w-1/3 group-hover:text-lime-400 transition-colors uppercase">
+                            {{ $row['ten'] ?? '' }}
+                        </td>
+                        <td class="p-8 text-white font-medium text-sm normal-case">
+                            {{ $row['gia_tri'] ?? '' }}
+                        </td>
+                    </tr>
+                    @endforeach
+
+                    <!-- Thông số kỹ thuật riêng của biến thể đang chọn -->
+                    <template x-for="(spec, index) in currentVariant.thong_so_ky_thuat_rieng" :key="index">
+                        <tr class="hover:bg-white/5 transition-colors group">
+                            <td class="p-8 font-black text-[11px] tracking-[0.2em] text-gray-400 w-1/3 group-hover:text-lime-400 transition-colors uppercase" x-text="spec.ten"></td>
+                            <td class="p-8 text-white font-medium text-sm normal-case" x-text="spec.gia_tri"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Technical Specs -->
+    <section class="mt-40">
+        <h2 class="font-display text-4xl font-black mb-12 flex items-center gap-6 text-white">
+            <span class="w-1.5 h-10 bg-lime-400 block"></span>
+            THÔNG TIN THÊM
         </h2>
         <div class="glass-panel overflow-hidden">
             <table class="w-full text-left">

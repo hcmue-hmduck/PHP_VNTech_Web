@@ -94,24 +94,50 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($laptops as $index => $lap) {
-            $ma_sp = 'LAP-' . str_pad($index + 1, 3, '0', STR_PAD_LEFT);
+            $cpu = 'Intel Core i5';
+            $screen = '15.6" FHD (1920x1080) IPS';
+            $gpu = 'Intel Iris Xe Graphics';
+            $weight = '1.7 kg';
+
+            if ($lap['brand'] === 'APPLE') {
+                $cpu = str_contains($lap['name'], 'M2') ? 'Apple M2' : (str_contains($lap['name'], 'M3 Max') ? 'Apple M3 Max' : 'Apple M3 Pro');
+                $screen = str_contains($lap['name'], '16') ? '16.2" Liquid Retina XDR' : '14.2" Liquid Retina XDR';
+                if (str_contains($lap['name'], 'Air')) {
+                    $screen = '13.6" Liquid Retina';
+                }
+                $gpu = 'Apple Integrated GPU';
+                $weight = '1.24 kg';
+            } elseif (str_contains($lap['name'], 'Zephyrus') || str_contains($lap['name'], 'Nitro') || str_contains($lap['name'], 'Katana') || str_contains($lap['name'], 'Legion') || str_contains($lap['name'], 'Omen') || str_contains($lap['name'], 'Raider') || str_contains($lap['name'], 'Alienware')) {
+                $cpu = 'Intel Core i7-13700H';
+                $screen = '16" QHD+ (2560x1600) 165Hz';
+                $gpu = 'NVIDIA GeForce RTX 4060';
+                $weight = '2.3 kg';
+            }
+
             $product = Product::create([
-                'ma_san_pham' => $ma_sp,
                 'ten_san_pham' => $lap['name'],
                 'ma_danh_muc' => 'LAPTOP',
                 'ma_thuong_hieu' => $lap['brand'],
                 'mo_ta_ngan' => 'Laptop mạnh mẽ dành cho công việc và giải trí.',
                 'mo_ta_chi_tiet' => 'Đây là mô tả chi tiết cho sản phẩm ' . $lap['name'] . '. Hàng chính hãng VNTech.',
-                'link_anh_dai_dien' => 'https://picsum.photos/seed/' . $ma_sp . '/400/300',
+                'link_anh_dai_dien' => 'https://picsum.photos/seed/' . ($index + 1) . '/400/300',
                 'trang_thai' => 'active',
                 'gia_thap_nhat' => $lap['price'],
                 'luot_xem' => rand(100, 1000),
                 'thong_so_ky_thuat_chung' => [
+                    ['ten' => 'Màn hình', 'gia_tri' => $screen],
+                    ['ten' => 'CPU', 'gia_tri' => $cpu],
+                    ['ten' => 'Card đồ họa', 'gia_tri' => $gpu],
+                    ['ten' => 'Trọng lượng', 'gia_tri' => $weight],
+                ],
+                'thong_tin_them' => [
                     ['ten' => 'Bảo hành', 'gia_tri' => '12 tháng'],
                     ['ten' => 'Tình trạng', 'gia_tri' => 'Mới 100%'],
-                ],
-                'thong_tin_them' => []
+                    ['ten' => 'Phụ kiện', 'gia_tri' => 'Sạc, Sách hướng dẫn'],
+                ]
             ]);
+            $product->ma_san_pham = $product->_id;
+            $product->save();
 
             // Tạo 2 Variants cho mỗi Product
             $configs = [
@@ -120,9 +146,8 @@ class DatabaseSeeder extends Seeder
             ];
 
             foreach ($configs as $cfg) {
-                ProductVariant::create([
-                    'ma_san_pham' => $ma_sp,
-                    'ma_bien_the' => $ma_sp . '-' . $cfg['ram'] . '-' . $cfg['ssd'],
+                $variant = ProductVariant::create([
+                    'ma_san_pham' => $product->ma_san_pham,
                     'ten_bien_the' => $lap['name'] . ' ' . $cfg['ram'] . ' ' . $cfg['ssd'],
                     'gia_ban' => $lap['price'] + $cfg['price_plus'],
                     'gia_niem_yet' => $lap['price'] + $cfg['price_plus'] + 2000000,
@@ -133,8 +158,10 @@ class DatabaseSeeder extends Seeder
                         ['ten' => 'Ổ cứng', 'gia_tri' => $cfg['ssd']],
                         ['ten' => 'Màu sắc', 'gia_tri' => 'Silver'],
                     ],
-                    'link_anh_bien_the' => 'https://picsum.photos/seed/' . $ma_sp . $cfg['ram'] . '/400/300'
+                    'link_anh_bien_the' => 'https://picsum.photos/seed/' . $product->ma_san_pham . $cfg['ram'] . '/400/300'
                 ]);
+                $variant->ma_bien_the = $variant->_id;
+                $variant->save();
             }
         }
 
@@ -168,19 +195,22 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 5. Tạo 1 Flash Sale mẫu cho sản phẩm đầu tiên
-        FlashSaleItem::create([
-            'ma_bien_the' => 'LAP-001-16GB-512GB',
-            'gia_flash_sale' => 15000000,
-            'so_luong_gioi_han' => 5,
-            'so_luong_da_ban' => 0,
-            'bat_dau' => now(),
-            'ket_thuc' => now()->addHours(5),
-            'trang_thai' => 'active'
-        ]);
+        $firstVariant = ProductVariant::first();
+        if ($firstVariant) {
+            FlashSaleItem::create([
+                'ma_bien_the' => $firstVariant->ma_bien_the,
+                'gia_flash_sale' => 15000000,
+                'so_luong_gioi_han' => 5,
+                'so_luong_da_ban' => 0,
+                'bat_dau' => now(),
+                'ket_thuc' => now()->addHours(5),
+                'trang_thai' => 'active'
+            ]);
+        }
 
         // 6. Tạo Cart và CartItem cho User
         $userKhach = User::where('email', 'user1@gmail.com')->first();
-        if ($userKhach) {
+        if ($userKhach && $firstVariant) {
             $cart = Cart::create([
                 'ma_nguoi_dung' => $userKhach->_id,
                 'trang_thai' => 'active'
@@ -188,13 +218,14 @@ class DatabaseSeeder extends Seeder
 
             CartItem::create([
                 'ma_gio_hang' => $cart->_id,
-                'ma_bien_the' => 'LAP-001-16GB-512GB',
+                'ma_bien_the' => $firstVariant->ma_bien_the,
                 'so_luong' => 1,
             ]);
 
+            $anotherVariant = ProductVariant::skip(4)->first() ?: $firstVariant;
             CartItem::create([
                 'ma_gio_hang' => $cart->_id,
-                'ma_bien_the' => 'LAP-003-8GB-256GB', // Legion 5 Slim
+                'ma_bien_the' => $anotherVariant->ma_bien_the,
                 'so_luong' => 2,
             ]);
         }

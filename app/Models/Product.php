@@ -3,12 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use MongoDB\Laravel\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     protected $fillable = [
         'ma_san_pham',
@@ -35,6 +34,11 @@ class Product extends Model
         'gia_thap_nhat' => 'decimal:0',
         'luot_xem' => 'integer',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'ma_san_pham';
+    }
 
     public function variants()
     {

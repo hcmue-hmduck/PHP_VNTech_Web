@@ -102,7 +102,7 @@ class ProductAdminController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công!');
     }
 
-    public function viewEditProductAdmin(Request $request, Product $product) {
+    public function viewEditProductAdmin(Product $product) {
         $product_variant = ProductVariant::where('ma_san_pham', $product->ma_san_pham)->get();
         return view('adminUI.formProductsAdmin', compact('product', 'product_variant'));
     }
