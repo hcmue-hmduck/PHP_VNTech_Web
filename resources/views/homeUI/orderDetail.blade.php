@@ -62,9 +62,23 @@
         }
      }">
     <main class="pt-12 pb-20 px-6 max-w-7xl mx-auto">
+        <!-- Nút quay lại tách biệt, nằm trên và đẩy header xuống dưới -->
+        <div class="mb-6 flex justify-start animate-fadeInUp">
+            <a href="{{ url('/') }}" 
+               class="flex items-center gap-2 px-4 py-2 border border-white/5 bg-white/[0.02] hover:bg-neon-green/5 hover:border-neon-green/40 rounded-lg text-gray-400 hover:text-neon-green text-[11px] font-bold uppercase tracking-widest transition-all duration-300 group shadow-sm">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i>
+                <span>Trang chủ</span>
+            </a>
+        </div>
+
+        <!-- Tiêu đề chính căn giữa tự nhiên, không sợ bị đè chữ -->
         <header class="mb-12 text-center animate-fadeInUp">
-            <h1 class="font-space text-5xl font-bold text-gray-100 uppercase tracking-tight">Đơn hàng của tôi</h1>
-            <p class="text-gray-400 mt-2 uppercase tracking-wide text-sm">Quản lý và theo dõi lịch sử đơn đặt hàng của bạn.</p>
+            <h1 class="font-space text-5xl font-bold text-gray-100 uppercase tracking-tight">
+                Đơn hàng của tôi
+            </h1>
+            <p class="text-gray-400 mt-2 uppercase tracking-wide text-sm">
+                Quản lý và theo dõi lịch sử đơn đặt hàng của bạn.
+            </p>
         </header>
 
         <!-- Tab Selector -->
@@ -239,24 +253,6 @@
                                         {{ number_format($product->gia_ban, 0, ',', '.') }} VNĐ
                                     </span>
                                 </div>
-                                <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                                    @php
-                                        $allSpecs = array_merge(
-                                            (array)($variant->thuoc_tinh ?? []),
-                                            (array)($variant->thong_so_ky_thuat ?? [])
-                                        );
-                                    @endphp
-                                    @if($variant && !empty($allSpecs))
-                                        @foreach($allSpecs as $key => $val)
-                                            <span class="text-[10px] text-gray-500 uppercase font-bold">
-                                                {{ is_array($val) && isset($val['ten']) ? $val['ten'] : $key }}: 
-                                                <span class="text-gray-300">{{ is_array($val) ? ($val['gia_tri'] ?? implode(', ', $val)) : $val }}</span>
-                                            </span>
-                                        @endforeach
-                                    @else
-                                        <p class="text-xs text-gray-400 italic">Hệ sinh thái VNTech Protocol - Gear chuyên dụng</p>
-                                    @endif
-                                </div>
                                 <div class="mt-4 flex items-center gap-4 border-t border-white/5 pt-4">
                                     <span class="text-xs text-gray-500 uppercase font-bold">Số lượng: <span class="text-neon-green">{{ $product->so_luong }}</span></span>
                                 </div>
@@ -275,8 +271,8 @@
                         </h3>
                         <div class="space-y-2 text-sm text-gray-400">
                             <p class="text-gray-100 font-bold text-base">{{ $order->ho_ten_nguoi_nhan }}</p>
+                            <p>{{ $order->so_dien_thoai_nhan }}</p>
                             <p>{{ $order->dia_chi_giao_hang }}</p>
-                            <p>Phone: {{ $order->so_dien_thoai_nhan }}</p>
                         </div>
                     </div>
 

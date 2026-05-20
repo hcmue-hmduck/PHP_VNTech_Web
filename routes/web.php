@@ -11,7 +11,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserAddressController;
 
-Route::get('/', [HomeController::class, 'viewHome']);
+Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

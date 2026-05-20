@@ -77,6 +77,13 @@
         
         <!-- Page Header (Spans full width) -->
         <div class="lg:col-span-12 mb-4">
+            <div class="mb-6 flex justify-start animate-fadeInUp">
+                <a href="{{ url('/') }}" 
+                class="flex items-center gap-2 px-4 py-2 border border-white/5 bg-white/[0.02] hover:bg-neon-green/5 hover:border-neon-green/40 rounded-lg text-gray-400 hover:text-neon-green text-[11px] font-bold uppercase tracking-widest transition-all duration-300 group shadow-sm">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i>
+                    <span>Trang chủ</span>
+                </a>
+            </div>
             <h1 class="font-['Space_Grotesk'] text-5xl md:text-6xl font-bold uppercase tracking-tight text-white">
                 Thanh Toán
             </h1>
