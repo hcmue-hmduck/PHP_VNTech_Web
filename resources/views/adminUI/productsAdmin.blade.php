@@ -130,7 +130,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-2 opacity-30 group-hover:opacity-100 transition-opacity">
+                            <div class="flex items-center justify-end gap-2 transition-opacity">
                                 <button class="p-2 hover:text-neon-green hover:bg-neon-green/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
                                     <i data-lucide="eye" class="w-4 h-4"></i>
                                 </button>

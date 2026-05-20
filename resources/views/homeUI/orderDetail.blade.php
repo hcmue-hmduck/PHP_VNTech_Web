@@ -11,32 +11,23 @@
     $currentMaDonHang = $order->ma_don_hang ?? null;
 
     $tabsMap = [
-        OrderStatus::PENDING_PAYMENT->value => 'CHỜ THANH TOÁN',
+        OrderStatus::PENDING_PAYMENT->value    => 'CHỜ THANH TOÁN',
         OrderStatus::PENDING_CONFIRMATION->value => 'CHỜ XÁC NHẬN',
-        OrderStatus::WAITING_PICKUP->value => 'CHỜ LẤY HÀNG',
-        OrderStatus::WAITING_DELIVERY->value => 'CHỜ GIAO HÀNG',
-        OrderStatus::DELIVERED->value => 'ĐÃ GIAO',
+        OrderStatus::WAITING_PICKUP->value     => 'CHỜ LẤY HÀNG',
+        OrderStatus::WAITING_DELIVERY->value   => 'CHỜ GIAO HÀNG',
+        OrderStatus::DELIVERED->value          => 'ĐÃ GIAO',
     ];
 
     $statusBadgeClasses = [
-        OrderStatus::PENDING_PAYMENT->value => 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
+        OrderStatus::PENDING_PAYMENT->value    => 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
         OrderStatus::PENDING_CONFIRMATION->value => 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-        OrderStatus::WAITING_PICKUP->value => 'bg-purple-500/10 border-purple-500/30 text-purple-400',
-        OrderStatus::WAITING_DELIVERY->value => 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
-        OrderStatus::DELIVERED->value => 'bg-neon-green/10 border-neon-green/30 text-neon-green',
+        OrderStatus::WAITING_PICKUP->value     => 'bg-purple-500/10 border-purple-500/30 text-purple-400',
+        OrderStatus::WAITING_DELIVERY->value   => 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
+        OrderStatus::DELIVERED->value          => 'bg-neon-green/10 border-neon-green/30 text-neon-green',
     ];
 
     $resolveOrderStatus = function ($order) {
-        $status = $order->trang_thai ?? null;
-        $paymentMethod = strtolower($order->phuong_thuc_thanh_toan ?? '');
-
-        if (in_array($status, [OrderStatus::PENDING_PAYMENT->value, OrderStatus::PENDING_CONFIRMATION->value, null], true)) {
-            return $paymentMethod === 'momo'
-                ? OrderStatus::PENDING_PAYMENT->value
-                : OrderStatus::PENDING_CONFIRMATION->value;
-        }
-
-        return $status;
+        return $order->trang_thai ?? '';
     };
 
     $defaultStatusText = 'CHỜ XÁC NHẬN';
@@ -205,18 +196,16 @@
                 <!-- Shipping Timeline -->
                 @php
                     $currentStatus = $resolveOrderStatus($order);
-                    $isMomoOrder = strtolower($order->phuong_thuc_thanh_toan ?? '') === 'momo';
-                    $firstStep = $isMomoOrder
-                        ? ['id' => OrderStatus::PENDING_PAYMENT->value, 'status' => 'CHỜ THANH TOÁN', 'icon' => 'wallet', 'note' => 'Đơn hàng đang chờ thanh toán']
-                        : ['id' => OrderStatus::PENDING_CONFIRMATION->value, 'status' => 'CHỜ XÁC NHẬN', 'icon' => 'clipboard-check', 'note' => 'Đơn hàng đang chờ shop xác nhận'];
 
+                    // 4 bước cố định, map đúng với giá trị DB của Admin
                     $steps = [
-                        $firstStep,
-                        ['id' => OrderStatus::WAITING_PICKUP->value, 'status' => 'CHỜ LẤY HÀNG', 'icon' => 'package-check', 'note' => 'Shop đang chuẩn bị và chờ đơn vị vận chuyển lấy hàng'],
-                        ['id' => OrderStatus::WAITING_DELIVERY->value, 'status' => 'CHỜ GIAO HÀNG', 'icon' => 'truck', 'note' => 'Đơn hàng đang trên đường giao đến bạn'],
-                        ['id' => OrderStatus::DELIVERED->value, 'status' => 'ĐÃ GIAO', 'icon' => 'badge-check', 'note' => 'Đơn hàng đã giao thành công'],
+                        ['id' => OrderStatus::PENDING_CONFIRMATION->value, 'status' => 'CHỜ XÁC NHẬN',  'icon' => 'clipboard-check', 'note' => 'Đơn hàng đang chờ shop xác nhận'],
+                        ['id' => OrderStatus::WAITING_PICKUP->value,     'status' => 'CHỜ LẤY HÀNG',  'icon' => 'package-check',   'note' => 'Shop đang chuẩn bị, chờ đơn vị vận chuyển lấy hàng'],
+                        ['id' => OrderStatus::WAITING_DELIVERY->value,   'status' => 'CHỜ GIAO HÀNG', 'icon' => 'truck',            'note' => 'Đơn hàng đang trên đường giao đến bạn'],
+                        ['id' => OrderStatus::DELIVERED->value,          'status' => 'ĐÃ GIAO',        'icon' => 'badge-check',      'note' => 'Đơn hàng đã giao thành công'],
                     ];
                     $statusOrder = array_column($steps, 'id');
+                    // Nếu trạng thái không khớp bất kỳ bước nào (vd: cho_thanh_toan) → không tô
                     $currentIndex = array_search($currentStatus, $statusOrder);
                     if ($currentIndex === false) $currentIndex = -1;
                     $progressWidth = ($currentIndex >= 0) ? ($currentIndex / (count($steps) - 1)) * 100 : 0;

@@ -145,6 +145,53 @@ class ProductAdminController extends Controller
         }
 
         $product->update($data);
+
+        if ($request->has('variants')) {
+            foreach ($request->variants as $index => $variantData) {
+                $thuocTinhRaw = $variantData['thong_so_ky_thuat_rieng'] ?? [];
+
+                if (!empty($variantData['ma_bien_the'])) {
+                    $product_variant = ProductVariant::where('ma_bien_the', $variantData['ma_bien_the'])->first();
+                    if ($product_variant) {
+                        $product_variant->update([
+                            'ten_bien_the' => $variantData['ten_bien_the'] ?? null,
+                            'gia_ban' => $variantData['gia_ban'],
+                            'gia_niem_yet' => $variantData['gia_niem_yet'],
+                            'so_luong_ton_kho' => $variantData['so_luong_ton_kho'],
+                            'trang_thai' => $variantData['trang_thai'],
+                            'thong_so_ky_thuat_rieng' => $thuocTinhRaw,
+                        ]);
+                    }
+                } else {
+                    $product_variant = $product->variants()->create([
+                        'ma_san_pham' => $product->ma_san_pham,
+                        'ten_bien_the' => $variantData['ten_bien_the'] ?? null,
+                        'gia_ban' => $variantData['gia_ban'],
+                        'gia_niem_yet' => $variantData['gia_niem_yet'],
+                        'so_luong_ton_kho' => $variantData['so_luong_ton_kho'],
+                        'trang_thai' => $variantData['trang_thai'],
+                        'thong_so_ky_thuat_rieng' => $thuocTinhRaw,
+                    ]);
+                    $product_variant->ma_bien_the = $product_variant->_id;
+                    $product_variant->save();
+                }
+                
+                if (isset($product_variant) && $request->hasFile("variants.$index.link_anh_bien_the")) {
+                    $file = $request->file("variants.$index.link_anh_bien_the");
+                    try {
+                        $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                            'folder' => "vntech/products/" . $product->ma_san_pham . "/variants/" . $product_variant->ma_bien_the
+                        ]);
+                        $product_variant->update(['link_anh_bien_the' => $upload['secure_url']]);
+                    } catch (\Exception $e) {
+                        return back()->withErrors(['cloudinary' => 'Lỗi upload: ' . $e->getMessage()]);
+                    }
+                }
+            }
+        }
+
+
+
         return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
     }
 }

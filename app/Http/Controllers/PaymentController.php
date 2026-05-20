@@ -88,7 +88,7 @@ class PaymentController extends Controller
             . "&redirectUrl={$returnUrl}"
             . "&requestId={$requestId}"
             . "&requestType={$requestType}";
-        $signature = hash_hmac('sha256', $rawSignature, $secretKey);
+        $signature = hash_hmac('sha256', $rawSignature, (string) $secretKey);
 
         $payload = [
             "partnerCode" => $partnerCode,
@@ -111,11 +111,7 @@ class PaymentController extends Controller
             return redirect()->away($result['payUrl']);
         }
 
-        Log::error('MoMo create payment failed', [
-            'order_internal' => $maDonHang,
-            'order_external' => $orderId,
-            'result' => $result,
-        ]);
+        dd($result);
 
         return redirect()->route('viewOrderDetail', ['ma_don_hang' => $maDonHang])
             ->with('error', $result['message'] ?? 'Không thể tạo thanh toán MoMo, vui lòng thử lại.');

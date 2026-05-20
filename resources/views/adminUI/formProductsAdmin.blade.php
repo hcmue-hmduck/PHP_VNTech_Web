@@ -203,6 +203,7 @@
                                     @foreach($product_variant as $index => $variant)
                                         <tr class="hover:bg-white/[0.02] transition-all">
                                             <td class="p-4">
+                                                <input type="hidden" name="variants[{{ $index }}][ma_bien_the]" value="{{ $variant->ma_bien_the ?? '' }}" />
                                                 <input name="variants[{{ $index }}][ten_bien_the]" value="{{ $variant->ten_bien_the ?? '' }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" placeholder="Tên biến thể..." />
                                             </td>
                                             <td class="p-4">
@@ -288,8 +289,6 @@
                     <input type="hidden" name="mo_ta_chi_tiet" id="mo_ta_chi_tiet">
                 </section>
 
-
-            </div>
 
             </div>
         </div>

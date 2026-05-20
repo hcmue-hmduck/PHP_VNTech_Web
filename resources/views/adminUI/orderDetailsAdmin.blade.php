@@ -40,17 +40,22 @@
                 <label class="block text-right font-display text-[10px] font-bold uppercase tracking-[0.2em] text-neon-green mb-2">Trạng Thái Đơn Hàng</label>
                 <div class="glass-panel border border-white/10 hover:border-neon-green/30 shadow-[0_0_15px_rgba(0,229,91,0.02)] flex items-center gap-4 px-6 py-3 transition-all duration-300">
                     <div class="h-2.5 w-2.5 rounded-full {{ 
-                        $order->trang_thai === 'da_nhan_hang' ? 'bg-blue-500 shadow-[0_0_10px_#3b82f6]' : 
+                        $order->trang_thai === 'cho_thanh_toan' ? 'bg-yellow-500 shadow-[0_0_10px_#eab308]' :
+                        ($order->trang_thai === 'da_nhan_hang' ? 'bg-blue-500 shadow-[0_0_10px_#3b82f6]' : 
                         ($order->trang_thai === 'da_huy' ? 'bg-red-500 shadow-[0_0_10px_#ef4444]' : 
-                        'bg-neon-green shadow-[0_0_10px_#00e55b]')
+                        'bg-neon-green shadow-[0_0_10px_#00e55b]'))
                     }}"></div>
-                    <select name="trang_thai" onchange="document.getElementById('status-form').submit()" class="bg-transparent text-white font-display text-sm font-bold uppercase tracking-widest outline-none border-none cursor-pointer focus:ring-0 pr-8">
-                        <option value="cho_xac_nhan" {{ $order->trang_thai === 'cho_xac_nhan' ? 'selected' : '' }} class="bg-surface text-white">Chờ xác nhận</option>
-                        <option value="da_xac_nhan" {{ $order->trang_thai === 'da_xac_nhan' ? 'selected' : '' }} class="bg-surface text-white">Đã xác nhận</option>
-                        <option value="dang_giao_hang" {{ $order->trang_thai === 'dang_giao_hang' ? 'selected' : '' }} class="bg-surface text-white">Đang vận chuyển</option>
-                        <option value="da_nhan_hang" {{ $order->trang_thai === 'da_nhan_hang' ? 'selected' : '' }} class="bg-surface text-white">Đã hoàn thành</option>
-                        <option value="da_huy" {{ $order->trang_thai === 'da_huy' ? 'selected' : '' }} class="bg-surface text-white">Đã hủy</option>
-                    </select>
+                    @if($order->trang_thai === 'cho_thanh_toan')
+                        <span class="text-yellow-400 font-bold uppercase tracking-widest text-sm">Chờ thanh toán</span>
+                    @else
+                        <select name="trang_thai" onchange="document.getElementById('status-form').submit()" class="bg-transparent text-white font-display text-sm font-bold uppercase tracking-widest outline-none border-none cursor-pointer focus:ring-0 pr-8">
+                            @if($order->phuong_thuc_thanh_toan != 'momo') <option value="cho_xac_nhan" {{ $order->trang_thai === 'cho_xac_nhan' ? 'selected' : '' }} class="bg-surface text-white">Chờ xác nhận</option>@endif
+                            <option value="da_xac_nhan" {{ $order->trang_thai === 'da_xac_nhan' ? 'selected' : '' }} class="bg-surface text-white">Đã xác nhận</option>
+                            <option value="dang_giao_hang" {{ $order->trang_thai === 'dang_giao_hang' ? 'selected' : '' }} class="bg-surface text-white">Đang vận chuyển</option>
+                            <option value="da_nhan_hang" {{ $order->trang_thai === 'da_nhan_hang' ? 'selected' : '' }} class="bg-surface text-white">Đã hoàn thành</option>
+                            <option value="da_huy" {{ $order->trang_thai === 'da_huy' ? 'selected' : '' }} class="bg-surface text-white">Đã hủy</option>
+                        </select>
+                    @endif
                 </div>
             </form>
         </div>

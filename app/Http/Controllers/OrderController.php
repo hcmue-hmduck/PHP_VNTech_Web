@@ -95,7 +95,7 @@ class OrderController extends Controller
                 ->delete();
         }
 
-        session()->forget('cartItems');
+        $request->session()->forget('cartItems');
         
         if ($paymentMethod === 'momo') {
             return redirect()->route('momo.create', ['ma_don_hang' => $order->ma_don_hang]);
