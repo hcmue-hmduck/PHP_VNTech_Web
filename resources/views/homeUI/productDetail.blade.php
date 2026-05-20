@@ -152,9 +152,10 @@
                     THÊM VÀO GIỎ HÀNG
                 </a>
 
-                <button class="w-full py-6 border border-lime-400 text-lime-400 font-black text-sm tracking-[0.3em] hover:bg-lime-400/10 transition-all">
+                <a :href="'{{ route('viewPayment') }}/' +  currentVariant.id"
+                class="w-full py-6 border border-lime-400 text-lime-400 font-black text-sm tracking-[0.3em] hover:bg-lime-400/10 transition-all flex items-center justify-center active:scale-95 text-center">
                     MUA NGAY
-                </button>
+                </a>
             </div>
         </div>
     </section>

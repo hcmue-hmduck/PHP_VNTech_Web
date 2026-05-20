@@ -157,7 +157,6 @@
                 <section class="glass-panel p-8 border border-lime-400/20 shadow-[0_0_50px_rgba(0,255,102,0.05)]">
                     <h2 class="font-['Space_Grotesk'] text-xl font-bold text-white uppercase tracking-wider mb-8 pb-4 border-b border-white/5 flex justify-between items-center">
                         Tóm Tắt Đơn Hàng
-                        <span class="text-[10px] bg-lime-400/10 text-lime-400 px-2 py-1">ID: #9942</span>
                     </h2>
                     
                     <div class="space-y-6 mb-8">

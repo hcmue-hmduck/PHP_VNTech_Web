@@ -35,7 +35,7 @@ Route::get('/cart', [CartController::class, 'viewCart'])->name('viewCart');
 
 Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
-Route::get('/checkout', [PaymentController::class, 'viewPayment'])->name('viewPayment');
+Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('viewPayment');
 Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('preparePayment');
 
 Route::post('/order/create', [OrderController::class, 'storeCreateOrder'])->name('storeCreateOrder');
