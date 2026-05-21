@@ -7,9 +7,6 @@
     <!-- Dashboard Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div>
-            <p class="text-neon-green font-mono text-[10px] tracking-[0.3em] mb-2 uppercase">
-                SYSTEM_MODULE // PRODUCTS_V5.0
-            </p>
             <h1 class="text-4xl md:text-6xl font-display font-bold text-neon-green drop-shadow-[0_0_15px_rgba(0,229,91,0.3)]">
                 QUẢN LÝ SẢN PHẨM
             </h1>

@@ -67,6 +67,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::post('/order/{ma_don_hang}/status', [OrderController::class, 'updateAdminOrderStatus'])->name('admin.order.updateStatus');
 
     Route::get('/brands_categories', [Brands_CategoriesAdminController::class, 'viewBrandsCategories'])->name('admin.brandscategories.index');
+    
     Route::post('/brands_categories/brand', [Brands_CategoriesAdminController::class, 'storeCreateBrand'])->name('admin.brandscategories.brand.store');
+    Route::put('/brands_categories/brand/{brand}', [Brands_CategoriesAdminController::class, 'updateEditBrand'])->name('admin.brandscategories.brand.update');
+    
     Route::post('/brands_categories/category', [Brands_CategoriesAdminController::class, 'storeCreateCategory'])->name('admin.brandscategories.category.store');
+    Route::put('/brands_categories/category/{category}', [Brands_CategoriesAdminController::class, 'updateEditCategory'])->name('admin.brandscategories.category.update');
 });

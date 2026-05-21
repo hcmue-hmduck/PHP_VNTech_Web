@@ -28,7 +28,44 @@ class Brands_CategoriesAdminController extends Controller
         $brand->ma_thuong_hieu = $brand->_id;
         $brand->update();
 
+        if ($request->hasFile('logo_url')) {
+            $file = $request->file('logo_url');
+            try {
+                $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                    'folder' => "vntech/brands/" . ($brand->ma_thuong_hieu)
+                ]);
+                $brand->update(['logo_url' => $upload['secure_url']]);
+            } catch (\Exception $e) {
+                return back()->withErrors(['cloudinary' => 'Lỗi upload: ' . $e->getMessage()]);
+            }
+        }
         return redirect()->back()->with('success', 'Tạo brands thành công!');
+    }
+
+    public function updateEditBrand(Request $request, Brand $brand) {
+        $data = $request->validate([
+            'ma_thuong_hieu'  => 'nullable|string',
+            'ten_thuong_hieu' => 'required|string',
+            'mo_ta'           => 'nullable|string',
+            'logo_url'        => 'nullable|image|max:5120',
+            'trang_thai'      => 'required|in:active,inactive,delete',
+        ]);
+
+        $brand->update($data);
+
+        if ($request->hasFile('logo_url')) {
+            $file = $request->file('logo_url');
+            try {
+                $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                    'folder' => "vntech/brands/" . ($brand->ma_thuong_hieu)
+                ]);
+                $brand->update(['logo_url' => $upload['secure_url']]);
+            } catch (\Exception $e) {
+                return back()->withErrors(['cloudinary' => 'Lỗi upload: ' . $e->getMessage()]);
+            }
+        }
+        
+        return redirect()->back()->with('success', 'Cập nhật brands thành công!');
     }
 
     public function storeCreateCategory(Request $request) {
@@ -44,6 +81,44 @@ class Brands_CategoriesAdminController extends Controller
         $category->ma_danh_muc = $category->_id;
         $category->update();
 
+        if ($request->hasFile('logo_url')) {
+            try {
+                $file = $request->file('logo_url');
+                $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                    'folder' => "vntech/categories/" . ($category->ma_danh_muc)
+                ]);
+                $category->update(['logo_url' => $upload['secure_url']]);
+            } catch (\Exception $e) {
+                return back()->withErrors(['cloudinary' => 'Lỗi upload: ' . $e->getMessage()]);
+            }
+        }
+
         return redirect()->back()->with('success', 'Tạo category thành công!');
+    }
+
+    public function updateEditCategory(Request $request, Category $category) {
+        $data = $request->validate([
+            'ma_danh_muc'       => 'nullable|string',
+            'ma_danh_muc_cha'   => 'nullable|string',
+            'ten_danh_muc'      => 'required|string',
+            'logo_url'          => 'nullable|image|max:5120',
+            'trang_thai'        => 'required|in:active,inactive,delete',
+        ]);
+
+        $category->update($data);
+
+        if ($request->hasFile('logo_url')) {
+            try {
+                $file = $request->file('logo_url');
+                $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                    'folder' => "vntech/categories/" . ($category->ma_danh_muc)
+                ]);
+                $category->update(['logo_url' => $upload['secure_url']]);
+            } catch (\Exception $e) {
+                return back()->withErrors(['cloudinary' => 'Lỗi upload: ' . $e->getMessage()]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Cập nhật category thành công!');
     }
 }

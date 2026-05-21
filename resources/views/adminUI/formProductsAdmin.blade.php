@@ -81,12 +81,43 @@
                                 <input name="ten_san_pham" id="ten_san_pham" value="{{ old('ten_san_pham', $product->ten_san_pham ?? '') }}" required class="w-full bg-white/[0.03] border border-white/10 p-5 text-white text-lg font-display uppercase tracking-widest rounded-2xl" placeholder="Nhập tên thiết bị..." />
                             </div>
 
-                            <div class="group space-y-3">
-                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Thương hiệu</label>
-                                <select name="ma_thuong_hieu" class="w-full bg-white/[0.03] border border-white/10 p-5 text-white rounded-2xl appearance-none">
-                                    <option value="VNTech" {{ old('ma_thuong_hieu', $product->ma_thuong_hieu ?? '') == 'VNTech' ? 'selected' : '' }}>VNTech Original</option>
-                                    <option value="QuantumEdge" {{ old('ma_thuong_hieu', $product->ma_thuong_hieu ?? '') == 'QuantumEdge' ? 'selected' : '' }}>Quantum Edge</option>
-                                </select>
+                            <!-- Gộp hàng: Mặc định 1 cột trên Mobile, tự chia 2 cột từ màn hình MD trở lên -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                
+                                <!-- KHỐI CHỌN THƯƠNG HIỆU -->
+                                <div class="group space-y-3">
+                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Thương hiệu</label>
+                                    <div class="relative">
+                                        <select id="brand" name="ma_thuong_hieu" class="w-full bg-white/[0.03] border border-white/10 p-5 pr-12 text-white text-sm font-display uppercase tracking-widest rounded-2xl outline-none focus:border-neon-green/50 appearance-none cursor-pointer">
+                                            <option value="" class="bg-[#0d0f10] text-gray-400">Không có / Mặc định</option>
+                                            @foreach($brands as $brand)
+                                                <option value="{{ $brand->ma_thuong_hieu }}" class="bg-[#0d0f10] text-white"
+                                                    {{ old('ma_thuong_hieu', $product->ma_thuong_hieu ?? '') == $brand->ma_thuong_hieu ? 'selected' : '' }}>
+                                                    {{ $brand->ten_thuong_hieu }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gray-500 text-xs">▼</div>
+                                    </div>
+                                </div>
+
+                                <!-- KHỐI CHỌN DANH MỤC -->
+                                <div class="group space-y-3">
+                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Danh mục</label>
+                                    <div class="relative">
+                                        <select id="category" name="ma_danh_muc" class="w-full bg-white/[0.03] border border-white/10 p-5 pr-12 text-white text-sm font-display uppercase tracking-widest rounded-2xl outline-none focus:border-neon-green/50 appearance-none cursor-pointer">
+                                            <option value="" class="bg-[#0d0f10] text-gray-400">Không có / Mặc định</option>
+                                            @foreach($categories as $cat)
+                                                <option value="{{ $cat->ma_danh_muc }}" class="bg-[#0d0f10] text-white"
+                                                    {{ old('ma_danh_muc', $product->ma_danh_muc ?? '') == $cat->ma_danh_muc ? 'selected' : '' }}>
+                                                    {{ $cat->ten_danh_muc }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gray-500 text-xs">▼</div>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="group space-y-3">
@@ -102,10 +133,13 @@
                                 </div>
                                 <div class="space-y-3">
                                     <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Trạng thái</label>
-                                    <select name="trang_thai" class="w-full bg-white/[0.03] border border-white/10 p-5 text-white rounded-2xl">
-                                        <option value="active" {{ old('trang_thai', $product->trang_thai ?? '') == 'active' ? 'selected' : '' }}>Đang kinh doanh</option>
-                                        <option value="inactive" {{ old('trang_thai', $product->trang_thai ?? '') == 'inactive' ? 'selected' : '' }}>Tạm ngưng</option>
-                                    </select>
+                                    <div class="relative">
+                                        <select name="trang_thai" class="w-full bg-white/[0.03] border border-white/10 p-5 pr-12 text-white text-sm font-display uppercase tracking-widest rounded-2xl outline-none focus:border-neon-green/50 appearance-none cursor-pointer">
+                                            <option value="active" class="bg-[#0d0f10] text-neon-green" {{ old('trang_thai', $product->trang_thai ?? '') == 'active' ? 'selected' : '' }}>Đang kinh doanh</option>
+                                            <option value="inactive" class="bg-[#0d0f10] text-gray-400" {{ old('trang_thai', $product->trang_thai ?? '') == 'inactive' ? 'selected' : '' }}>Tạm ngưng</option>
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gray-500 text-xs">▼</div>
+                                    </div>
                                 </div>
                             </div>
 

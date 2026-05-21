@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Brand;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
@@ -14,18 +16,23 @@ class ProductAdminController extends Controller
         $products = Product::with(['variants' => function ($query) {
             $query->where('trang_thai', '!=', 'delete');
         }])->latest()->paginate(10);
-        return view('adminUI.productsAdmin', compact('products'));
+        $brands = Brand::latest()->get();
+        $categories = Category::latest()->get();
+        return view('adminUI.productsAdmin', compact('products', 'brands', 'categories'));
     }
 
     public function viewCreateProductAdmin() 
-    {
-        return view('adminUI.formProductsAdmin');
+    {   
+        $brands = Brand::latest()->get();
+        $categories = Category::latest()->get();
+        return view('adminUI.formProductsAdmin', compact('brands', 'categories'));
     }
 
     public function storeCreateProductAdmin(Request $request) 
     {
         $data = $request->validate([
             'ten_san_pham'              => 'required|string|max:255',
+            'ma_danh_muc'               => 'required|string|max:100',
             'ma_thuong_hieu'            => 'required|string|max:100',
             'mo_ta_ngan'                => 'nullable|string|max:500',
             'mo_ta_chi_tiet'            => 'nullable|string',
@@ -108,12 +115,15 @@ class ProductAdminController extends Controller
         $product_variant = ProductVariant::where('ma_san_pham', $product->ma_san_pham)
             ->where('trang_thai', '!=', 'delete')
             ->get();
-        return view('adminUI.formProductsAdmin', compact('product', 'product_variant'));
+        $brands = Brand::latest()->get();
+        $categories = Category::latest()->get();
+        return view('adminUI.formProductsAdmin', compact('product', 'product_variant', 'brands', 'categories'));
     }
 
     public function updateEditProductAdmin(Request $request, Product $product) {
         $data = $request->validate([
             'ten_san_pham'              => 'required|string|max:255',
+            'ma_danh_muc'               => 'required|string|max:100',
             'ma_thuong_hieu'            => 'required|string|max:100',
             'mo_ta_ngan'                => 'nullable|string|max:500',
             'mo_ta_chi_tiet'            => 'nullable|string',
@@ -210,6 +220,6 @@ class ProductAdminController extends Controller
 
 
 
-        return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
+        return redirect()->back()->with('success', 'Cập nhật sản phẩm thành công!');
     }
 }
