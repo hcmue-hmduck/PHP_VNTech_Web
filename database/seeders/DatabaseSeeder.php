@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Voucher;
@@ -26,17 +27,44 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Tạo Brands
         $brands = [
-            ['ma_thuong_hieu' => 'APPLE', 'ten_thuong_hieu' => 'Apple', 'slug' => 'apple', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg'],
-            ['ma_thuong_hieu' => 'DELL', 'ten_thuong_hieu' => 'Dell', 'slug' => 'dell', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg'],
-            ['ma_thuong_hieu' => 'ASUS', 'ten_thuong_hieu' => 'ASUS', 'slug' => 'asus', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/d/de/Asus_Logo.svg'],
-            ['ma_thuong_hieu' => 'HP', 'ten_thuong_hieu' => 'HP', 'slug' => 'hp', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg'],
-            ['ma_thuong_hieu' => 'MSI', 'ten_thuong_hieu' => 'MSI', 'slug' => 'msi', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/MSI_Logo.svg'],
-            ['ma_thuong_hieu' => 'LENOVO', 'ten_thuong_hieu' => 'Lenovo', 'slug' => 'lenovo', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Lenovo_logo_2015.svg'],
-            ['ma_thuong_hieu' => 'ACER', 'ten_thuong_hieu' => 'Acer', 'slug' => 'acer', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Acer_2011.svg'],
+            ['ma_thuong_hieu' => 'APPLE', 'ten_thuong_hieu' => 'Apple', 'slug' => 'apple', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg', 'trang_thai' => 'active'],
+            ['ma_thuong_hieu' => 'DELL', 'ten_thuong_hieu' => 'Dell', 'slug' => 'dell', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg', 'trang_thai' => 'active'],
+            ['ma_thuong_hieu' => 'ASUS', 'ten_thuong_hieu' => 'ASUS', 'slug' => 'asus', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/d/de/Asus_Logo.svg', 'trang_thai' => 'active'],
+            ['ma_thuong_hieu' => 'HP', 'ten_thuong_hieu' => 'HP', 'slug' => 'hp', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg', 'trang_thai' => 'active'],
+            ['ma_thuong_hieu' => 'MSI', 'ten_thuong_hieu' => 'MSI', 'slug' => 'msi', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/MSI_Logo.svg', 'trang_thai' => 'active'],
+            ['ma_thuong_hieu' => 'LENOVO', 'ten_thuong_hieu' => 'Lenovo', 'slug' => 'lenovo', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Lenovo_logo_2015.svg', 'trang_thai' => 'active'],
+            ['ma_thuong_hieu' => 'ACER', 'ten_thuong_hieu' => 'Acer', 'slug' => 'acer', 'logo_url' => 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Acer_2011.svg', 'trang_thai' => 'active'],
         ];
 
         foreach ($brands as $brand) {
             Brand::create($brand);
+        }
+
+        // 2. Seed categories (inlined from CategorySeeder)
+        $categories = [
+            ['ten_danh_muc' => 'CPU', 'ma_danh_muc_cha' => null, 'trang_thai' => 'active'],
+            ['ten_danh_muc' => 'VGA', 'ma_danh_muc_cha' => null, 'trang_thai' => 'active'],
+            ['ten_danh_muc' => 'Mainboard', 'ma_danh_muc_cha' => null, 'trang_thai' => 'active'],
+            ['ten_danh_muc' => 'RAM', 'ma_danh_muc_cha' => null, 'trang_thai' => 'active'],
+            ['ten_danh_muc' => 'Laptop', 'ma_danh_muc_cha' => null, 'trang_thai' => 'active'],
+            ['ten_danh_muc' => 'Peripherals', 'ma_danh_muc_cha' => null, 'trang_thai' => 'active'],
+        ];
+
+        foreach ($categories as $data) {
+            $exists = Category::where('ten_danh_muc', $data['ten_danh_muc'])->first();
+            if ($exists) continue;
+
+            $cat = Category::create([
+                'ten_danh_muc' => $data['ten_danh_muc'],
+                'ma_danh_muc_cha' => $data['ma_danh_muc_cha'] ?? null,
+                'logo_url' => null,
+                'trang_thai' => $data['trang_thai'] ?? 'active',
+            ]);
+
+            if (empty($cat->ma_danh_muc)) {
+                $cat->ma_danh_muc = $cat->_id ?? $cat->id ?? null;
+                $cat->save();
+            }
         }
 
         // 2. Tạo Users (Password: 123456)

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('brands', function (Blueprint $collection) {
-            $collection->string('ma_thuong_hieu')->unique();
-            $collection->string('ten_thuong_hieu')->index();
-            $collection->text('mo_ta')->nullable(); 
+        Schema::create('categories', function (Blueprint $collection) {
+            $collection->string('ma_danh_muc')->unique();
+            $collection->string('ma_danh_muc_cha');
+            $collection->string('ten_danh_muc')->index(); 
             $collection->string('logo_url')->nullable();
             $collection->string('trang_thai')->default('active');
             $collection->timestamps();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('brands');
+        Schema::dropIfExists('categories');
     }
 };

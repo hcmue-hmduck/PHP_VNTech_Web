@@ -4,26 +4,28 @@
 
 @section('content')
 @php
+    use App\OrderStatus;
+
     $orders = $orders ?? collect();
-    $totalOrders = method_exists($orders, 'count') ? $orders->count() : count($orders);
-    $completedOrders = method_exists($orders, 'filter')
-        ? $orders->filter(fn ($order) => in_array(($order->trang_thai ?? ''), ['hoan_tat', 'completed', 'paid'], true))->count()
-        : 0;
-    $pendingOrders = method_exists($orders, 'filter')
-        ? $orders->filter(fn ($order) => in_array(($order->trang_thai ?? ''), ['cho_xac_nhan', 'dang_xu_ly', 'pending'], true))->count()
-        : 0;
-    $totalRevenue = method_exists($orders, 'sum')
-        ? $orders->sum(fn ($order) => (float) ($order->tong_thanh_toan ?? $order->tong_tien_hang ?? 0))
-        : 0;
+    $totalOrders = $orders->count();
+    $completedOrders = $orders->filter(fn ($order) => in_array(($order->trang_thai ?? ''), [OrderStatus::DELIVERED->value], true))->count();
+    $pendingOrders = $orders->filter(fn ($order) => in_array(($order->trang_thai ?? ''), [OrderStatus::PENDING_CONFIRMATION->value, OrderStatus::PENDING_PAYMENT->value, OrderStatus::WAITING_PICKUP->value], true))->count();
+    $totalRevenue = $orders->sum(fn ($order) => (float) ($order->tong_thanh_toan ?? $order->tong_tien_hang ?? 0));
+
+    $statusOptions = [
+        OrderStatus::PENDING_PAYMENT,
+        OrderStatus::PENDING_CONFIRMATION,
+        OrderStatus::WAITING_PICKUP,
+        OrderStatus::WAITING_DELIVERY,
+        OrderStatus::DELIVERED,
+        OrderStatus::CANCELLED,
+    ];
 @endphp
 
 <div class="w-full">
     <!-- Dashboard Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
         <div>
-            <p class="text-neon-green font-mono text-[10px] tracking-[0.3em] mb-2 uppercase">
-                SYSTEM_MODULE // ORDERS_V5.0
-            </p>
             <h1 class="text-4xl md:text-6xl font-display font-bold text-neon-green drop-shadow-[0_0_15px_rgba(0,229,91,0.3)]">
                 QUẢN LÝ ĐƠN HÀNG
             </h1>
@@ -104,9 +106,9 @@
             <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Status</label>
             <select class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer">
                 <option>TẤT CẢ TRẠNG THÁI</option>
-                <option>CHỜ DUYỆT</option>
-                <option>ĐANG XỬ LÝ</option>
-                <option>HOÀN TẤT</option>
+                @foreach($statusOptions as $statusOption)
+                    <option value="{{ $statusOption->value }}">{{ str_replace('_', ' ', ucwords($statusOption->value, '_')) }}</option>
+                @endforeach
             </select>
         </div>
 
@@ -114,7 +116,7 @@
             <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Payment</label>
             <select class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer">
                 <option>TẤT CẢ PHƯƠNG THỨC</option>
-                <option>QR</option>
+                <option>MoMo</option>
                 <option>COD</option>
             </select>
         </div>
@@ -141,9 +143,9 @@
                 <tbody class="divide-y divide-white/5">
                     @forelse($orders as $order)
                         @php
-                            $status = strtolower($order->trang_thai ?? 'cho_xac_nhan');
-                            $payment = strtolower($order->phuong_thuc_thanh_toan ?? 'qr');
-                            $amount = $order->tong_thanh_toan ?? $order->tong_tien_hang ?? 0;
+                            $status = strtolower($order->trang_thai);
+                            $payment = strtolower($order->phuong_thuc_thanh_toan);
+                            $amount = $order->tong_thanh_toan;
                         @endphp
                         <tr class="group hover:bg-white/[0.02] transition-colors">
                             <td class="px-6 py-4 text-neon-green font-mono text-sm">{{ $order->ma_don_hang ?? '#-' }}</td>
@@ -153,27 +155,42 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase border bg-white/5 text-gray-400 border-gray-700">
-                                    {{ $payment === 'cod' ? 'COD' : 'QR' }}
+                                    {{ $payment }}
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm font-mono font-bold text-neon-green">{{ number_format((float) $amount, 0, ',', '.') }}₫</div>
                             </td>
                             <td class="px-6 py-4">
-                                @if(in_array($status, ['hoan_tat', 'completed', 'paid'], true))
-                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-neon-green border border-neon-green/50 bg-neon-green/5">
-                                        <div class="w-1 h-1 rounded-full bg-neon-green animate-pulse"></div>
-                                        Hoàn tất
+                                @if($status === OrderStatus::DELIVERED->value)
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-emerald-300 border border-emerald-500/40 bg-emerald-500/10">
+                                        <div class="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div>
+                                        Hoàn thành
                                     </div>
-                                @elseif(in_array($status, ['dang_xu_ly', 'processing'], true))
-                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-blue-400 border border-blue-500/20 bg-blue-500/10">
-                                        <div class="w-1 h-1 rounded-full bg-blue-400 animate-pulse"></div>
-                                        Đang xử lý
+                                @elseif($status === OrderStatus::WAITING_DELIVERY->value)
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-sky-300 border border-sky-500/30 bg-sky-500/10">
+                                        <div class="w-1 h-1 rounded-full bg-sky-400 animate-pulse"></div>
+                                        Đang giao hàng
+                                    </div>
+                                @elseif($status === OrderStatus::WAITING_PICKUP->value)
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-indigo-300 border border-indigo-500/30 bg-indigo-500/10">
+                                        <div class="w-1 h-1 rounded-full bg-indigo-400 animate-pulse"></div>
+                                        Đã xác nhận
+                                    </div>
+                                @elseif($status === OrderStatus::PENDING_PAYMENT->value)
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-amber-300 border border-amber-500/30 bg-amber-500/10">
+                                        <div class="w-1 h-1 rounded-full bg-amber-400 animate-pulse"></div>
+                                        Chờ thanh toán
+                                    </div>
+                                @elseif($status === OrderStatus::CANCELLED->value)
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-rose-300 border border-rose-500/30 bg-rose-500/10">
+                                        <div class="w-1 h-1 rounded-full bg-rose-400 animate-pulse"></div>
+                                        Đã huỷ
                                     </div>
                                 @else
-                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-gray-400 border border-gray-700 bg-white/5">
-                                        <div class="w-1 h-1 rounded-full bg-gray-500"></div>
-                                        Chờ duyệt
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase text-slate-400 border border-slate-700 bg-slate-950/40">
+                                        <div class="w-1 h-1 rounded-full bg-slate-500"></div>
+                                        Chờ xác nhận
                                     </div>
                                 @endif
                             </td>

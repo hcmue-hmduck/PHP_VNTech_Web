@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductAdminController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserAddressController;
+use App\Http\Controllers\Brands_CategoriesAdminController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
 
@@ -64,4 +65,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/order', [OrderController::class, 'viewAdminOrder'])->name('admin.order.index');
     Route::get('/order/{ma_don_hang}', [OrderController::class, 'viewAdminOrderDetail'])->name('admin.order.view');
     Route::post('/order/{ma_don_hang}/status', [OrderController::class, 'updateAdminOrderStatus'])->name('admin.order.updateStatus');
+
+    Route::get('/brands_categories', [Brands_CategoriesAdminController::class, 'viewBrandsCategories'])->name('admin.brandscategories.index');
+    Route::post('/brands_categories/brand', [Brands_CategoriesAdminController::class, 'storeCreateBrand'])->name('admin.brandscategories.brand.store');
+    Route::post('/brands_categories/category', [Brands_CategoriesAdminController::class, 'storeCreateCategory'])->name('admin.brandscategories.category.store');
 });

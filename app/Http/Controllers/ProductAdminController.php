@@ -118,7 +118,7 @@ class ProductAdminController extends Controller
             'mo_ta_ngan'                => 'nullable|string|max:500',
             'mo_ta_chi_tiet'            => 'nullable|string',
             'link_anh_dai_dien'         => 'nullable|image|max:5120', 
-            'trang_thai'                => 'required|in:active,inactiv,delete',
+            'trang_thai'                => 'required|in:active,inactive,delete',
             'gia_thap_nhat'             => 'required|numeric|min:0',
             'thong_so_ky_thuat_chung'   => 'nullable|array',
             'thong_tin_them'            => 'nullable|array',

@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use MongoDB\Laravel\Eloquent\Model;
 
-class Brand extends Model {
+class Category extends Model
+{
     use HasFactory;
 
     protected $fillable = [
-        'ma_thuong_hieu',
-        'ten_thuong_hieu',
-        'mo_ta',
+        'ma_danh_muc',
+        'ma_danh_muc_cha',
+        'ten_danh_muc',
         'logo_url',
         'trang_thai',
     ];
