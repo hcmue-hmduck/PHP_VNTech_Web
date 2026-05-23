@@ -46,11 +46,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                     
                     <div class="md:col-span-4 flex flex-col items-center justify-center text-center self-center h-full py-2">
-                        <label for="brandLogoInput" class="cursor-pointer group flex flex-col items-center gap-3">
-                            <div class="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 bg-black/40 flex items-center justify-center group-hover:border-neon-green/40 transition-all duration-300 relative shadow-inner">
-                                <img id="brandLogoPreview" src="" alt="preview" class="hidden w-full h-full object-cover" />
-                                <span id="brandLogoPlaceholder" class="text-neon-green font-display font-bold text-2xl">A</span>
-                            </div>
+                                <label for="brandLogoInput" class="cursor-pointer group flex flex-col items-center gap-3">
+                                    <div class="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 bg-white flex items-center justify-center group-hover:border-neon-green/40 transition-all duration-300 relative shadow-inner">
+                                        <img id="brandLogoPreview" src="" alt="preview" class="hidden max-w-full max-h-full object-contain mx-auto" />
+                                        <span id="brandLogoPlaceholder" class="text-neon-green font-display font-bold text-2xl">A</span>
+                                    </div>
                             <div class="text-xs text-gray-400 group-hover:text-neon-green transition-colors">Logo</div>
                         </label>
                         <input id="brandLogoInput" name="logo_url" type="file" accept="image/*" class="hidden" />
@@ -135,7 +135,7 @@
                     <div class="md:col-span-4 flex flex-col items-center justify-center text-center self-center h-full py-2">
                         <label for="categoryLogoInput" class="cursor-pointer group flex flex-col items-center gap-3">
                             <div class="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 bg-black/40 flex items-center justify-center group-hover:border-neon-green/40 transition-all duration-300 relative shadow-inner">
-                                <img id="categoryLogoPreview" src="" alt="preview" class="hidden w-full h-full object-cover" />
+                                <img id="categoryLogoPreview" src="" alt="preview" class="hidden max-w-full max-h-full object-contain" />
                                 <span id="categoryLogoPlaceholder" class="text-neon-green font-display font-bold text-2xl">C</span>
                             </div>
                             <div class="text-xs text-gray-400 group-hover:text-neon-green transition-colors">Logo</div>
@@ -275,9 +275,9 @@
                             @endphp
                             <tr class="group hover:bg-white/[0.02] transition-colors">
                                 <td class="px-6 py-4">
-                                    <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10 bg-black/40 flex items-center justify-center group-hover:border-neon-green/40 transition-all">
+                                    <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10 bg-white flex items-center justify-center group-hover:border-neon-green/40 transition-all">
                                         @if(!empty($brand->logo_url))
-                                            <img src="{{ $brand->logo_url }}" alt="{{ $brand->ten_thuong_hieu }}" class="w-full h-full object-cover" />
+                                            <img src="{{ $brand->logo_url }}" alt="{{ $brand->ten_thuong_hieu }}" class="max-w-full max-h-full object-contain mx-auto" />
                                         @else
                                             <span class="text-neon-green font-display font-bold text-lg">{{ $brandInitial }}</span>
                                         @endif
@@ -362,9 +362,9 @@
                             @endphp
                             <tr class="group hover:bg-white/[0.02] transition-colors">
                                 <td class="px-6 py-4">
-                                    <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10 bg-black/40 flex items-center justify-center group-hover:border-neon-green/40 transition-all">
+                                        <div class="w-12 h-12 rounded-xl overflow-hidden border border-white/10 bg-white flex items-center justify-center group-hover:border-neon-green/40 transition-all">
                                         @if(!empty($category->logo_url))
-                                            <img src="{{ $category->logo_url }}" alt="{{ $category->ten_danh_muc }}" class="w-full h-full object-cover" />
+                                            <img src="{{ $category->logo_url }}" alt="{{ $category->ten_danh_muc }}" class="max-w-full max-h-full object-contain mx-auto" />
                                         @else
                                             <span class="text-neon-green font-display font-bold text-lg">{{ $categoryInitial }}</span>
                                         @endif

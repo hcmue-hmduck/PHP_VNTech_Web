@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\FlashSaleItem;
+use App\Models\Brand;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller {
@@ -11,9 +13,12 @@ class HomeController extends Controller {
     }
 
     public function viewHome() {
-        $products = Product::latest()->take(20)->get();
+        $products = Product::latest()->get();
+        $brands = Brand::latest()->get();
+        $categories = Category::latest()->get();
+
         $flashSaleItems = FlashSaleItem::active()->with('variant.product')->get();
-        return view('homeUI.home', compact('products', 'flashSaleItems'));
+        return view('homeUI.home', compact('brands', 'categories', 'products', 'flashSaleItems'));
     }
 }
 ?>

@@ -3,6 +3,7 @@
 @section('title', 'Trung tâm Chỉ huy - VNTech')
 
 @section('content')
+
 <!-- STATS CARDS -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <!-- Doanh thu -->
@@ -13,7 +14,7 @@
             <i data-lucide="trending-up" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
         </div>
         <div class="z-10">
-            <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">18,990,000đ</h3>
+            <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ format_vnd($total_sales) }}</h3>
         </div>
         <div class="mt-auto z-10">
             <div class="flex items-baseline gap-2">
@@ -27,11 +28,11 @@
     <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
         <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
         <div class="flex justify-between items-start z-10">
-            <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Vũ khí (SP)</p>
+            <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Tổng sản phẩm</p>
             <i data-lucide="swords" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
         </div>
         <div class="z-10">
-            <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">62</h3>
+            <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $products->count() }}</h3>
             <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Inventory units active</p>
         </div>
         <div class="mt-auto z-10">
@@ -55,7 +56,7 @@
             <i data-lucide="list-ordered" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
         </div>
         <div class="z-10">
-            <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">2</h3>
+            <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $orders->count() }}</h3>
             <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Active operations</p>
         </div>
         <div class="mt-auto z-10">

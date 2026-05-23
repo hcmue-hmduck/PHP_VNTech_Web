@@ -162,17 +162,17 @@
         <aside class="w-full md:w-80 bg-slate-900 border border-white/5 p-8 h-fit sticky top-24" id="sidebar-filters">
             <div class="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
                 <i data-lucide="filter" class="text-lime-400 w-6 h-6"></i>
-                <h3 class="font-bold uppercase tracking-[0.2em] text-base text-lime-400">Trạm Lọc</h3>
+                <h3 class="font-bold uppercase tracking-[0.2em] text-base text-lime-400">Lọc Dữ liệu</h3>
             </div>
             
             <div class="space-y-8">
                 <div>
                     <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">Danh mục</h4>
                     <ul class="space-y-3">
-                        @foreach(['Laptops', 'Components', 'Peripherals'] as $idx => $cat)
+                        @foreach($categories as $idx => $cat)
                         <li class="flex items-center gap-3 group cursor-pointer">
                             <div class="w-4 h-4 border {{ $idx === 0 ? 'bg-lime-400 border-lime-400' : 'border-white/20' }} transition-all"></div>
-                            <span class="text-xs uppercase tracking-tight group-hover:text-lime-400">{{ $cat }}</span>
+                            <span class="text-xs uppercase tracking-tight group-hover:text-lime-400">{{ $cat->ten_danh_muc }}</span>
                         </li>
                         @endforeach
                     </ul>
@@ -188,13 +188,32 @@
                 </div>
 
                 <div>
-                    <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">Thương hiệu</h4>
-                    <div class="grid grid-cols-1 gap-2">
-                        @foreach(['Razer', 'ASUS ROG', 'MSI', 'Alienware'] as $brand)
-                        <button class="text-left py-2 px-3 bg-white/5 text-[10px] uppercase border border-white/5 hover:border-lime-400 transition-all font-bold tracking-wider">{{ $brand }}</button>
-                        @endforeach
-                    </div>
+                <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">
+                    Thương hiệu
+                </h4>
+
+                <div class="grid grid-cols-1 gap-3">
+                    @foreach($brands as $brand)
+                        <button
+                            class="group flex items-center gap-3 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 transition-all duration-300 hover:border-lime-400 hover:bg-lime-400/10"
+                        >
+                            <div class="w-10 h-10 flex items-center justify-center bg-white rounded-md p-1">
+                                <img
+                                    src="{{ $brand->logo_url }}"
+                                    alt="{{ $brand->ten_thuong_hieu }}"
+                                    class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                >
+                            </div>
+
+                            <div class="flex flex-col text-left">
+                                <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+                                    {{ $brand->ten_thuong_hieu }}
+                                </span>
+                            </div>
+                        </button>
+                    @endforeach
                 </div>
+            </div>
                 
                 <button class="w-full py-4 border border-lime-400 text-lime-400 text-xs font-bold uppercase tracking-widest hover:bg-lime-400/10 transition-all flex items-center justify-center gap-2">
                     <i data-lucide="trash-2" class="w-4 h-4"></i> Xóa Bộ Lọc
@@ -203,52 +222,93 @@
         </aside>
 
         <!-- Main Grid -->
-        <div class="flex-1">
-            <div class="flex justify-between items-center mb-8">
-                <span class="text-xs text-slate-500 uppercase tracking-widest">Showing {{ count($products) }} High-Performance Models</span>
+        <div class="flex-1 space-y-12">
+
+            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight text-white">
+                        Sản phẩm
+                    </h2>
+                    <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">
+                        Showing {{ count($products) }} High-Performance Models
+                    </p>
+                </div>
+
                 <div class="flex items-center gap-2">
                     <span class="text-xs uppercase text-slate-500 font-bold">Sort:</span>
                     <div class="flex items-center gap-1 text-xs text-lime-400 font-bold uppercase cursor-pointer">
-                        Newest First <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        Newest First
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($products as $product)
-                <div class="bg-slate-900 border border-white/5 group hover:border-lime-400/30 transition-all flex flex-col hover:-translate-y-1">
-                    <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" class="aspect-square bg-slate-950 overflow-hidden relative block">
-                        <img class="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
-                             src="{{ $product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
-                             alt="{{ $product->ten_san_pham }}">
-                    </a>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <div>
-                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" class="block group/title">
-                                <h5 class="font-bold uppercase text-sm mb-3 truncate text-center group-hover/title:text-lime-400 transition-colors">{{ $product->ten_san_pham }}</h5>
-                            </a>
-                            <p class="text-xs text-slate-500 text-center mb-3">{{ $product->mo_ta_ngan }}</p>
-                        </div>
-                        <div class="pt-4 space-y-3">
-                            <div class="flex items-baseline gap-3 justify-center">
-                                <span class="text-lime-400 font-black text-2xl leading-none">{{ number_format($product->gia_thap_nhat, 0, ',', '.') }}₫</span>
+            @foreach($categories as $category)
+                @php
+                    $categoryProducts = $products->where('ma_danh_muc', $category->ma_danh_muc);
+                @endphp
+
+                @if($categoryProducts->count() > 0)
+                    <section class="category-section mb-14" data-category="{{ $category->ma_danh_muc }}">
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h3 class="text-lg font-black uppercase tracking-widest text-white">
+                                    {{ $category->ten_danh_muc }}
+                                </h3>
+                                <div class="mt-2 h-[2px] w-16 bg-lime-400"></div>
                             </div>
-                            <div class="flex gap-2">
-                                <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" class="flex-1 py-3 bg-lime-400 text-black font-bold text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
-                                    XEM CHI TIẾT
-                                </a>
-                            </div>
+
+                            <span class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold">
+                                {{ $categoryProducts->count() }} sản phẩm
+                            </span>
                         </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            
-            <div class="mt-12 flex justify-center">
-                <button class="px-10 py-5 bg-white/5 border border-white/10 uppercase tracking-[0.3em] font-bold text-[10px] hover:bg-white/10 transition-all">
-                    Load More Units
-                </button>
-            </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 product-list">
+                            @foreach($categoryProducts as $product)
+                                <div class="product-item group bg-slate-900/80 border border-white/10 rounded-2xl overflow-hidden hover:border-lime-400/50 hover:-translate-y-1 transition-all duration-300 flex flex-col">
+
+                                    <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}"
+                                    class="aspect-square bg-slate-950 overflow-hidden relative block">
+                                        <img
+                                            class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
+                                            src="{{ $product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
+                                            alt="{{ $product->ten_san_pham }}"
+                                        >
+                                    </a>
+
+                                    <div class="p-5 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <h5 class="font-black uppercase text-sm text-white text-center line-clamp-1 group-hover:text-lime-400 transition-colors">
+                                                {{ $product->ten_san_pham }}
+                                            </h5>
+
+                                            <p class="text-xs text-slate-500 text-center mt-3 line-clamp-2">
+                                                {{ $product->mo_ta_ngan }}
+                                            </p>
+                                        </div>
+
+                                        <div class="pt-5 space-y-4">
+                                            <div class="text-center">
+                                                <span class="text-lime-400 font-black text-2xl">
+                                                    {{ number_format($product->gia_thap_nhat, 0, ',', '.') }}₫
+                                                </span>
+                                            </div>
+
+                                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}"
+                                            class="block w-full rounded-xl py-3 bg-lime-400 text-black font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
+                                                Xem chi tiết
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="pagination mt-8 flex justify-center gap-2"></div>
+                    </section>
+                @endif
+            @endforeach
+
         </div>
     </section>
 
@@ -276,6 +336,6 @@
 <!-- Scripts for Lucide Icons & Timer -->
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    @vite(['resources/js/home.js'])
+@vite(['resources/js/home.js'])
 
 @endsection

@@ -31,8 +31,8 @@
     .text-neon-green { color: #00e55b; }
     .bg-neon-green { background-color: #00e55b; }
     
-    .image-preview-slot { position: relative; aspect-ratio: 1/1; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-    .image-preview-slot img { width: 100%; height: 100%; object-fit: cover; }
+    .image-preview-slot { position: relative; aspect-ratio: 1/1; background: white; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .image-preview-slot img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
     .remove-img-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; border-radius: 50%; padding: 2px; cursor: pointer; }
 </style>
 
@@ -169,13 +169,13 @@
                                 <!-- Ảnh chính (To như cũ) -->
                                 <div class="group relative aspect-square bg-black/40 border-2 border-dashed border-white/10 rounded-3xl overflow-hidden flex flex-col items-center justify-center hover:border-neon-green/40 transition-all cursor-pointer">
                                     @if(isset($product) && $product->link_anh_dai_dien)
-                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center"><img src="{{ $product->link_anh_dai_dien }}" class="w-full h-full object-cover"></div>
+                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center bg-white"><img src="{{ $product->link_anh_dai_dien }}" class="max-w-full max-h-full object-contain"></div>
                                         <div id="main-upload-ui" class="flex flex-col items-center hidden">
                                             <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
                                             <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Thay đổi ảnh</span>
                                         </div>
                                     @else
-                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center hidden"><img src="" class="w-full h-full object-cover"></div>
+                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center hidden bg-white"><img src="" class="max-w-full max-h-full object-contain"></div>
                                         <div id="main-upload-ui" class="flex flex-col items-center">
                                             <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
                                             <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Ảnh đại diện chính</span>
@@ -220,65 +220,82 @@
 
                     <!-- Bảng danh sách biến thể sinh ra -->
                     <div class="overflow-x-auto {{ isset($product_variant) && $product_variant->count() > 0 ? '' : 'hidden' }}" id="variantsTableContainer">
-                        <table class="w-full text-white text-sm">
+                        <table class="w-full text-white text-sm table-fixed min-w-[1000px]">
                             <thead>
                                 <tr class="text-[10px] uppercase tracking-wider text-gray-500 border-b border-white/5">
-                                    <th class="p-4 text-left">Tên biến thể</th>
-                                    <th class="p-4 text-left">Ảnh</th>
-                                    <th class="p-4 text-left">Giá bán</th>
-                                    <th class="p-4 text-left">Giá niêm yết</th>
-                                    <th class="p-4 text-left">Kho</th>
-                                    <th class="p-4 text-left">Trạng thái</th>
-                                    <th class="p-4 text-center">Hành động</th>
+                                    <th class="p-4 text-center w-[10%]">Ảnh đại diện</th>
+                                    <th class="p-4 text-left w-[39%]">Tên biến thể</th>
+                                    <th class="p-4 text-left w-[10%]">Giá bán (VNĐ)</th>
+                                    <th class="p-4 text-left w-[10%]">Giá niêm yết (VNĐ)</th>
+                                    <th class="p-4 text-center w-[8%]">Kho</th>
+                                    <th class="p-4 text-center w-[8%]">Trạng thái</th>
+                                    <th class="p-4 text-center w-[8%]">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody id="variantsTableBody" class="divide-y divide-white/5">
                                 @if(isset($product_variant) && $product_variant->count() > 0)
                                     @foreach($product_variant as $index => $variant)
                                         <tr class="hover:bg-white/[0.02] transition-all">
-                                            <td class="p-4">
-                                                <input type="hidden" name="variants[{{ $index }}][ma_bien_the]" value="{{ $variant->ma_bien_the ?? '' }}" />
-                                                <input name="variants[{{ $index }}][ten_bien_the]" value="{{ $variant->ten_bien_the ?? '' }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" placeholder="Tên biến thể..." />
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="relative w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10 hover:border-neon-green/30 transition-all">
+                                            
+                                            <td class="p-4 align-middle text-center">
+                                                <div class="relative w-24 h-24 mx-auto bg-white rounded-xl overflow-hidden flex items-center justify-center border-2 border-dashed border-white/10 hover:border-neon-green/50 transition-all cursor-pointer">
                                                     @if($variant->link_anh_bien_the)
-                                                        <img id="preview-{{ $index }}" src="{{ $variant->link_anh_bien_the }}" class="absolute inset-0 w-full h-full object-cover">
-                                                        <i data-lucide="image" class="size-4 text-gray-500 hidden" id="icon-{{ $index }}"></i>
+                                                        <img id="preview-{{ $index }}" src="{{ $variant->link_anh_bien_the }}" class="absolute inset-0 w-full h-full object-contain p-1">
+                                                        <i data-lucide="image" class="size-6 text-gray-500 hidden" id="icon-{{ $index }}"></i>
                                                     @else
-                                                        <img id="preview-{{ $index }}" class="absolute inset-0 w-full h-full object-cover hidden">
-                                                        <i data-lucide="image" class="size-4 text-gray-500" id="icon-{{ $index }}"></i>
+                                                        <img id="preview-{{ $index }}" class="absolute inset-0 w-full h-full object-contain hidden p-1">
+                                                        <i data-lucide="image" class="size-6 text-gray-500" id="icon-{{ $index }}"></i>
                                                     @endif
-                                                    <input type="file" name="variants[{{ $index }}][link_anh_bien_the]" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" data-index="{{ $index }}" onchange="previewVariantImage(this, this.dataset.index)">
+                                                    <input type="file" name="variants[{{ $index }}][link_anh_bien_the]" class="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" data-index="{{ $index }}" onchange="previewVariantImage(this, this.dataset.index)">
                                                 </div>
                                             </td>
-                                            <td class="p-4"><input name="variants[{{ $index }}][gia_ban]" type="number" value="{{ $variant->gia_ban }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-neon-green w-full" /></td>
-                                            <td class="p-4"><input name="variants[{{ $index }}][gia_niem_yet]" type="number" value="{{ $variant->gia_niem_yet }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-gray-400 w-full" /></td>
-                                            <td class="p-4"><input name="variants[{{ $index }}][so_luong_ton_kho]" type="number" value="{{ $variant->so_luong_ton_kho }}" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" /></td>
-                                            <td class="p-4">
-                                                <select name="variants[{{ $index }}][trang_thai]" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full">
-                                                    <option value="active" {{ $variant->trang_thai == 'active' ? 'selected' : '' }}>Mở</option>
-                                                    <option value="inactive" {{ $variant->trang_thai == 'inactive' ? 'selected' : '' }}>Khóa</option>
-                                                </select>
+
+                                            <td class="p-4 align-middle">
+                                                <input type="hidden" name="variants[{{ $index }}][ma_bien_the]" value="{{ $variant->ma_bien_the ?? '' }}" />
+                                                <input name="variants[{{ $index }}][ten_bien_the]" value="{{ $variant->ten_bien_the ?? '' }}" maxlength="120" class="bg-white/[0.03] border border-white/5 p-3 rounded-xl text-sm font-bold text-white w-full focus:border-neon-green/50" placeholder="VD: Màu xanh - 128GB" />
                                             </td>
-                                            <td class="p-4 text-center">
-                                                <button type="button" data-index="{{ $index }}" onclick="toggleVariantSpecs(this.dataset.index)" class="mr-2 text-gray-400 hover:text-neon-green transition-all"><i data-lucide="list" class="size-4"></i></button>
-                                                <button type="button" data-index="{{ $index }}" onclick="this.closest('tr').remove(); document.getElementById('variant-specs-' + this.dataset.index)?.remove();" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="trash-2" class="size-4"></i></button>
+
+                                            <td class="p-4 align-middle">
+                                                <div class="relative">
+                                                    <input name="variants[{{ $index }}][gia_ban]" type="number" value="{{ $variant->gia_ban }}" class="bg-neon-green/5 border border-neon-green/20 p-3 rounded-xl text-sm font-bold text-neon-green w-full focus:border-neon-green/50" placeholder="0" />
+                                                </div>
+                                            </td>
+                                            <td class="p-4 align-middle">
+                                                <div class="relative">
+                                                    <input name="variants[{{ $index }}][gia_niem_yet]" type="number" value="{{ $variant->gia_niem_yet }}" class="bg-white/[0.03] border border-white/5 p-3 rounded-xl text-sm text-gray-300 w-full focus:border-neon-green/50" placeholder="0" />
+                                                </div>
+                                            </td>
+                                            <td class="p-4 align-middle text-center">
+                                                <input name="variants[{{ $index }}][so_luong_ton_kho]" type="number" value="{{ $variant->so_luong_ton_kho }}" class="bg-white/[0.03] border border-white/5 p-3 rounded-xl text-sm text-center text-white w-full focus:border-neon-green/50" placeholder="0" />
+                                            </td>
+                                            <td class="p-4 align-middle text-center">
+                                                <input type="hidden" name="variants[{{ $index }}][trang_thai]" value="inactive">
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" name="variants[{{ $index }}][trang_thai]" value="active" class="sr-only peer" {{ $variant->trang_thai == 'active' ? 'checked' : '' }}>
+                                                    <div class="w-11 h-6 bg-gray-700 rounded-full peer-checked:bg-neon-green transition-colors"></div>
+                                                    <div class="absolute left-1 top-0.5 w-5 h-5 bg-white rounded-full transform transition-transform peer-checked:translate-x-5 shadow-sm"></div>
+                                                </label>
+                                            </td>
+                                            <td class="p-4 align-middle text-center">
+                                                <div class="flex items-center justify-center gap-3">
+                                                    <button type="button" data-index="{{ $index }}" onclick="toggleVariantSpecs(this.dataset.index)" class="text-gray-400 hover:text-neon-green transition-all" title="Thông số riêng"><i data-lucide="list-plus" class="size-5"></i></button>
+                                                    <button type="button" data-index="{{ $index }}" onclick="this.closest('tr').remove(); document.getElementById('variant-specs-' + this.dataset.index)?.remove();" class="text-gray-500 hover:text-red-500 transition-all" title="Xóa"><i data-lucide="trash-2" class="size-5"></i></button>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr class="variant-specs-row" id="variant-specs-{{ $index }}" style="display: none;">
-                                            <td colspan="7" class="p-4 bg-white/[0.02]">
-                                                <div class="flex items-center justify-between mb-4">
-                                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest text-left">Thông số kỹ thuật riêng</span>
-                                                    <button type="button" data-index="{{ $index }}" onclick="addVariantSpecRow(this.dataset.index)" class="px-3 py-1.5 bg-white/5 border border-white/10 hover:bg-neon-green hover:text-black rounded-lg text-[10px] font-bold uppercase transition-all">+ Thêm thông số</button>
+                                            <td colspan="7" class="p-4 bg-white/[0.01] border-b border-white/5">
+                                                <div class="flex items-center justify-between mb-4 px-4">
+                                                    <span class="text-[10px] font-black text-neon-green uppercase tracking-widest text-left"><i data-lucide="corner-down-right" class="inline-block size-3 mr-1"></i> Thông số kỹ thuật riêng</span>
+                                                    <button type="button" data-index="{{ $index }}" onclick="addVariantSpecRow(this.dataset.index)" class="px-3 py-1.5 bg-neon-green/10 text-neon-green border border-neon-green/20 hover:bg-neon-green hover:text-black rounded-lg text-[10px] font-bold uppercase transition-all">+ Thêm thông số</button>
                                                 </div>
-                                                <div class="space-y-3 text-left" id="variantSpecsBody-{{ $index }}">
+                                                <div class="space-y-2 text-left px-4" id="variantSpecsBody-{{ $index }}">
                                                     @if(isset($variant->thong_so_ky_thuat_rieng) && is_array($variant->thong_so_ky_thuat_rieng))
                                                         @foreach($variant->thong_so_ky_thuat_rieng as $sIndex => $spec)
                                                             <div class="grid grid-cols-12 gap-3 items-center">
-                                                                <div class="col-span-4"><input name="variants[{{ $index }}][thong_so_ky_thuat_rieng][{{ $sIndex }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-xs text-white rounded-lg" placeholder="Tên thông số" /></div>
-                                                                <div class="col-span-7"><input name="variants[{{ $index }}][thong_so_ky_thuat_rieng][{{ $sIndex }}][gia_tri]" value="{{ $spec['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-xs text-white rounded-lg" placeholder="Giá trị" /></div>
-                                                                <div class="col-span-1 text-center"><button type="button" onclick="this.closest('.grid').remove()" class="text-gray-600 hover:text-red-500"><i data-lucide="x" class="size-4"></i></button></div>
+                                                                <div class="col-span-4"><input name="variants[{{ $index }}][thong_so_ky_thuat_rieng][{{ $sIndex }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-xs text-white rounded-lg" placeholder="Tên thông số (VD: Màu sắc)" /></div>
+                                                                <div class="col-span-7"><input name="variants[{{ $index }}][thong_so_ky_thuat_rieng][{{ $sIndex }}][gia_tri]" value="{{ $spec['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-xs text-white rounded-lg" placeholder="Giá trị (VD: Đen nhám)" /></div>
+                                                                <div class="col-span-1 text-center"><button type="button" onclick="this.closest('.grid').remove()" class="text-gray-500 hover:text-red-500"><i data-lucide="x" class="size-4"></i></button></div>
                                                             </div>
                                                         @endforeach
                                                     @endif
@@ -287,7 +304,6 @@
                                         </tr>
                                     @endforeach
                                 @endif
-                                <!-- Code JS sẽ tự động đổ thêm các dòng vào đây nếu nhấn Tạo -->
                             </tbody>
                         </table>
                     </div>
@@ -487,23 +503,26 @@
         tr.className = 'hover:bg-white/[0.02] transition-all';
         tr.innerHTML = `
             <td class="p-4">
-                <input name="variants[${index}][ten_bien_the]" value="" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" placeholder="Tên biến thể..." />
+                <input name="variants[${index}][ten_bien_the]" value="" maxlength="120" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-sm text-white w-full" placeholder="Tên biến thể..." />
             </td>
             <td class="p-4">
-                <div class="relative w-12 h-12 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10 hover:border-neon-green/30 transition-all">
-                    <img id="preview-${index}" class="absolute inset-0 w-full h-full object-cover hidden">
+                <div class="relative w-16 h-16 bg-white rounded-lg overflow-hidden flex items-center justify-center border border-white/10 hover:border-neon-green/30 transition-all">
+                    <img id="preview-${index}" class="absolute inset-0 max-w-full max-h-full object-contain hidden">
                     <i data-lucide="image" class="size-4 text-gray-500" id="icon-${index}"></i>
                     <input type="file" name="variants[${index}][link_anh_bien_the]" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" onchange="previewVariantImage(this, ${index})">
                 </div>
             </td>
-            <td class="p-4"><input name="variants[${index}][gia_ban]" type="number" placeholder="0" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-neon-green w-full" /></td>
-            <td class="p-4"><input name="variants[${index}][gia_niem_yet]" type="number" placeholder="0" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-gray-400 w-full" /></td>
-            <td class="p-4"><input name="variants[${index}][so_luong_ton_kho]" type="number" value="10" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full" /></td>
+            <td class="p-4"><input name="variants[${index}][gia_ban]" type="number" placeholder="0" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-[11px] text-neon-green w-full" /></td>
+            <td class="p-4"><input name="variants[${index}][gia_niem_yet]" type="number" placeholder="0" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-[11px] text-gray-400 w-full" /></td>
+            <td class="p-4"><input name="variants[${index}][so_luong_ton_kho]" type="number" value="10" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-[11px] text-white w-full" /></td>
             <td class="p-4">
-                <select name="variants[${index}][trang_thai]" class="bg-white/[0.03] border border-white/5 p-2 rounded-lg text-xs text-white w-full">
-                    <option value="active">Mở</option>
-                    <option value="inactive">Khóa</option>
-                </select>
+                <input type="hidden" name="variants[${index}][trang_thai]" value="inactive">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="variants[${index}][trang_thai]" value="active" class="sr-only peer">
+                    <div class="w-10 h-5 bg-gray-700 rounded-full peer-checked:bg-neon-green transition-colors relative">
+                        <span class="absolute left-0 top-0 w-5 h-5 bg-white rounded-full transform peer-checked:translate-x-5 transition-transform"></span>
+                    </div>
+                </label>
             </td>
             <td class="p-4 text-center">
                 <button type="button" onclick="toggleVariantSpecs(${index})" class="mr-2 text-gray-400 hover:text-neon-green transition-all"><i data-lucide="list" class="size-4"></i></button>
