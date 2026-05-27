@@ -16,9 +16,13 @@ class ProductAdminController extends Controller
         $products = Product::with(['variants' => function ($query) {
             $query->where('trang_thai', '!=', 'delete');
         }])->latest()->paginate(10);
+        $totalProducts = $products->count();
+        $activeProducts = $products->where('trang_thai', 'active')->count();
+        // $lowStockProducts = Product::where('stock_quantity', '<', 5)->count();
+        // $inventoryValue = Product::sum(DB::raw('import_price * stock_quantity'));
         $brands = Brand::latest()->get();
         $categories = Category::latest()->get();
-        return view('adminUI.productsAdmin', compact('products', 'brands', 'categories'));
+        return view('adminUI.productsAdmin', compact('products', 'totalProducts', 'activeProducts', 'brands', 'categories'));
     }
 
     public function viewCreateProductAdmin() 
@@ -44,17 +48,17 @@ class ProductAdminController extends Controller
             'thong_tin_them'            => 'nullable|array',
         ]);
 
-        unset($data['variants']);
-
         $product = Product::create($data);
         $product->ma_san_pham = $product->_id;
         $product->save();
+
+        $filePath = $product->ten_san_pham . ' - ' . $product->ma_san_pham;
 
         if ($request->hasFile('link_anh_dai_dien')) {
             $file = $request->file('link_anh_dai_dien');
             try {
                 $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
-                    'folder' => "vntech/products/" . ($product->ma_san_pham)
+                    'folder' => "vntech/products/" . ($filePath)
                 ]);
                 $product->update(['link_anh_dai_dien' => $upload['secure_url']]);
             } catch (\Exception $e) {
@@ -67,7 +71,7 @@ class ProductAdminController extends Controller
             foreach ($request->file('hinh_anh') as $file) {
                 try {
                     $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
-                        'folder' => "vntech/products/" . ($product->ma_san_pham) . "/gallery"
+                        'folder' => "vntech/products/" . ($filePath) . "/gallery"
                     ]);
                     $galleryImages[] = $upload['secure_url'];
                 } catch (\Exception $e) {
@@ -93,12 +97,12 @@ class ProductAdminController extends Controller
                 $product_variant->ma_bien_the = $product_variant->_id;
                 $product_variant->save();
 
-                
+                $fileVariantPath = $product_variant->ten_bien_the . ' - ' . $product_variant->ma_bien_the;
                 if ($request->hasFile("variants.$index.link_anh_bien_the")) {
                     $file = $request->file("variants.$index.link_anh_bien_the");
                     try {
                         $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
-                            'folder' => "vntech/products/" . $product->ma_san_pham . "/variants/" . $product_variant->ma_bien_the
+                            'folder' => "vntech/products/" . $filePath . "/variants/" . $fileVariantPath
                         ]);
                         $product_variant->update(['link_anh_bien_the' => $upload['secure_url']]);
                     } catch (\Exception $e) {
@@ -135,11 +139,13 @@ class ProductAdminController extends Controller
             'hinh_anh.*'                => 'nullable|image|max:5120'
         ]);
 
+        $filePath = $product->ten_san_pham . ' - ' . $product->ma_san_pham;
+
         if ($request->hasFile('link_anh_dai_dien')) {
             $file = $request->file('link_anh_dai_dien');
             try {
                 $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
-                    'folder' => "vntech/products/{$product->ma_san_pham}"
+                    'folder' => "vntech/products/{$filePath}"
                 ]);
                 $data['link_anh_dai_dien'] = $upload['secure_url'];
             } catch (\Exception $e) {
@@ -151,7 +157,7 @@ class ProductAdminController extends Controller
             $gallery = [];
             foreach ($request->file('hinh_anh') as $file) {
                 $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
-                    'folder' => "vntech/products/{$product->ma_san_pham}/gallery"
+                    'folder' => "vntech/products/{$filePath}/gallery"
                 ]);
                 $gallery[] = $upload['secure_url'];
             }
@@ -196,9 +202,10 @@ class ProductAdminController extends Controller
 
                 if (isset($product_variant) && $request->hasFile("variants.$index.link_anh_bien_the")) {
                     $file = $request->file("variants.$index.link_anh_bien_the");
+                    $fileVariantPath = $product_variant->ten_bien_the . ' - ' . $product_variant->ma_bien_the;
                     try {
                         $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
-                            'folder' => "vntech/products/" . $product->ma_san_pham . "/variants/" . $product_variant->ma_bien_the
+                            'folder' => "vntech/products/" . $filePath . "/variants/" . $fileVariantPath
                         ]);
                         $product_variant->update(['link_anh_bien_the' => $upload['secure_url']]);
                     } catch (\Exception $e) {

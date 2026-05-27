@@ -3,6 +3,7 @@
 @section('title', 'Quản lý Sản phẩm - VNTech')
 
 @section('content')
+
 <div class="w-full">
     <!-- Dashboard Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
@@ -15,6 +16,56 @@
             <i data-lucide="plus" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
             <span>THÊM SẢN PHẨM MỚI</span>
         </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
+            <div class="flex justify-between items-start z-10">
+                <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Tổng sản phẩm</p>
+                <i data-lucide="badge-check" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="z-10">
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $totalProducts }}</h3>
+                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Đang quản lý</p>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
+            <div class="flex justify-between items-start z-10">
+                <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Đang mở bán</p>
+                <i data-lucide="trending-up" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="z-10">
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $activeProducts }}</h3>
+                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Active</p>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
+            <div class="flex justify-between items-start z-10">
+                <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Cảnh báo tồn kho</p>
+                <i data-lucide="layers-3" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="z-10">
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $products->count() }}</h3>
+                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Đang quản lý</p>
+            </div>
+        </div>
+
+        <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
+            <div class="flex justify-between items-start z-10">
+                <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Tổng giá trị</p>
+                <i data-lucide="folder-tree" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <div class="z-10">
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $products->count() }}</h3>
+                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Active</p>
+            </div>
+        </div>
     </div>
 
     <!-- Filters Bar -->
@@ -84,11 +135,11 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="text-sm font-semibold group-hover:text-neon-green transition-colors line-clamp-1">{{ $product->ten_san_pham }}</div>
-                            <div class="text-[9px] font-mono text-gray-500 mt-1 uppercase tracking-wider">SKU: {{ $product->ma_san_pham }}</div>
+                            <div class="text-[9px] font-mono text-gray-500 mt-1 uppercase tracking-wider">Mã SP: {{ $product->ma_san_pham }}</div>
                         </td>
                         <td class="px-6 py-4">
                             @php 
-                                $displayPrice = $product->gia_thap_nhat ?? $product->gia_ban ?? 0;
+                                $displayPrice = $product->gia_thap_nhat;
                                 $originalPrice = $product->gia_niem_yet ?? 0;
                             @endphp
                             <div class="text-sm font-mono font-bold text-neon-green">{{ number_format($displayPrice, 0, ',', '.') }}₫</div>
@@ -119,11 +170,11 @@
                         <td class="px-6 py-4">
                             @php 
                                 $status = strtolower($product->trang_thai ?? '');
-                                $isActive = ($status === 'active' || $status === '1'); 
+                                $isActive = ($status === 'active'); 
                             @endphp
                             <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase {{ $isActive ? 'text-neon-green border border-neon-green/50 bg-neon-green/5' : 'text-gray-500 border border-gray-700 bg-white/5' }}">
                                 <div class="w-1 h-1 rounded-full {{ $isActive ? 'bg-neon-green animate-pulse' : 'bg-gray-700' }}"></div>
-                                {{ $isActive ? 'Active' : 'Inactive' }}
+                                {{ $isActive ? 'active' : 'inactive' }}
                             </div>
                         </td>
                         <td class="px-6 py-4 text-right">

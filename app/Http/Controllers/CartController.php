@@ -22,15 +22,13 @@ class CartController extends Controller {
     }
 
     public function updateQuantity(Request $request) {
-    // Tìm và cập nhật số lượng trong MongoDB
         CartItem::where('_id', $request->id)->update(['so_luong' => (int)$request->quantity]);
-        return response()->json(['status' => 'updated']);
+        return redirect()->back()->with('success', 'Cập nhật thành công');
     }
 
     public function removeItem(Request $request) {
-        // Xóa sản phẩm khỏi giỏ hàng trong MongoDB
         CartItem::where('_id', $request->id)->delete();
-        return response()->json(['status' => 'removed']);
+        return redirect()->back()->with('success', 'Cập nhật thành công');
     }
 
     public function addItem(Request $request) {
@@ -53,7 +51,7 @@ class CartController extends Controller {
         if ($cart_item) {
             $cart_item->so_luong += 1;
             $cart_item->save();
-            return response()->json(['status' => 'updated']);
+            return redirect()->back()->with('success', 'Đã thêm vào giỏ hàng!');
         }
 
         CartItem::create([

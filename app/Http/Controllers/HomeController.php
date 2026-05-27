@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller {
     public function index() {
-        $products = Product::latest()->take(8)->get();
+        $products = Product::where('trang_thai', 'active')->latest()->take(8)->get();
         return view('home', compact('products'));
     }
 
     public function viewHome() {
-        $products = Product::latest()->get();
+        $products = Product::where('trang_thai', 'active')->latest()->get();
         $brands = Brand::latest()->get();
         $categories = Category::latest()->get();
 

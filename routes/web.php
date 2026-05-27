@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserAddressController;
 use App\Http\Controllers\Brands_CategoriesAdminController;
+use App\Http\Controllers\FlashSalesController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
 
@@ -73,4 +74,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     
     Route::post('/brands_categories/category', [Brands_CategoriesAdminController::class, 'storeCreateCategory'])->name('admin.brandscategories.category.store');
     Route::put('/brands_categories/category/{category}', [Brands_CategoriesAdminController::class, 'updateEditCategory'])->name('admin.brandscategories.category.update');
+
+    Route::get('/flash-sales', [FlashSalesController::class, 'viewFlashSalesAdmin'])->name('admin.flashsales.index');
+
+    Route::get('/flash-sales/create', [FlashSalesController::class, 'viewCreateFlashSalesAdmin'])->name('admin.flashsales.create');
+    Route::post('/flash-sales', [FlashSalesController::class, 'storeCreateFlashSalesAdmin'])->name('admin.flashsales.store');
+
+    Route::get('/flash-sales/{flash_sales}/edit', [FlashSalesController::class, 'viewEditFlashSalesAdmin'])->name('admin.flashsales.edit');
+    Route::put('/flash-sales/{flash_sales}', [FlashSalesController::class, 'updateEditFlashSalesAdmin'])->name('admin.flashsales.update');
 });

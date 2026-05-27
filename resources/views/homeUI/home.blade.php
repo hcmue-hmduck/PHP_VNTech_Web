@@ -227,10 +227,10 @@
             <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
                     <h2 class="text-2xl font-black uppercase tracking-tight text-white">
-                        Sản phẩm
+                        Danh sách Sản phẩm
                     </h2>
                     <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">
-                        Showing {{ count($products) }} High-Performance Models
+                        Có tất cả {{ count($products) }} sản phẩm
                     </p>
                 </div>
 

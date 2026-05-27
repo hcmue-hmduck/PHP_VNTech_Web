@@ -10,13 +10,12 @@ class FlashSaleItem extends Model {
     use HasFactory;
 
     protected $fillable = [
+        'ma_flash_sales',
         'ma_bien_the',
         'gia_flash_sale',
         'so_luong_gioi_han',
         'so_luong_da_ban',
         'gioi_han_moi_nguoi',
-        'bat_dau',
-        'ket_thuc',
         'trang_thai',
     ];
 
@@ -25,8 +24,6 @@ class FlashSaleItem extends Model {
         'so_luong_gioi_han' => 'integer',
         'so_luong_da_ban'   => 'integer',
         'gioi_han_moi_nguoi'=> 'integer',
-        'bat_dau'           => 'datetime',
-        'ket_thuc'          => 'datetime',
     ];
 
     public function variant()

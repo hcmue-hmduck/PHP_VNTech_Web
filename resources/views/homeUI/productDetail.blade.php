@@ -32,8 +32,6 @@
     <nav class="mb-8 flex items-center gap-2 text-gray-500 font-bold text-[10px] tracking-[0.2em]">
         <a href="/" class="hover:text-lime-400 transition-colors">TRANG CHỦ</a>
         <i data-lucide="chevron-right" class="w-3 h-3"></i>
-        <a href="#" class="hover:text-lime-400 transition-colors">LAPTOP</a>
-        <i data-lucide="chevron-right" class="w-3 h-3"></i>
         <span class="text-lime-400">{{ $productDetail->ten_san_pham }}</span>
     </nav>
 
@@ -202,11 +200,7 @@
             <table class="w-full text-left">
                 <tbody class="divide-y divide-white/5">
                     @php
-                        $specs = $productDetail->thuoc_tinh_chung ?? [
-                            ['ten' => 'Thương hiệu', 'gia_tri' => $productDetail->ma_thuong_hieu ?? 'N/A'],
-                            ['ten' => 'Bảo hành', 'gia_tri' => '12 tháng'],
-                            ['ten' => 'Tình trạng', 'gia_tri' => 'Mới 100%'],
-                        ];
+                        $specs = $productDetail->thong_tin_them;
                     @endphp
                     @foreach($specs as $row)
                     <tr class="hover:bg-white/5 transition-colors group">
@@ -224,43 +218,29 @@
     </section>
 
     <!-- Bento Product Description -->
-    <section class="mt-40">
-        <h2 class="font-display text-4xl font-black mb-12 flex items-center gap-6 text-white">
-            <span class="w-1.5 h-10 bg-lime-400 block"></span>
-            MÔ TẢ SẢN PHẨM
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 text-white">
-            <div class="md:col-span-8 glass-panel p-12 flex flex-col justify-center">
-                <h3 class="font-display text-4xl text-lime-400 font-black italic tracking-tighter mb-8 italic">
-                    THIẾT KẾ ĐỂ THỐNG TRỊ
-                </h3>
-                <div class="space-y-6 text-gray-400 font-medium normal-case leading-relaxed text-lg">
-                    {!! $productDetail->mo_ta_chi_tiet ?? '<p>Thông tin mô tả sản phẩm đang được cập nhật...</p>' !!}
+    @if ($productDetail->mo_ta_chi_tiet)
+        <section class="mt-40">
+            <!-- Tiêu đề Section -->
+            <h2 class="font-display text-4xl font-black mb-12 flex items-center gap-6 text-white">
+                <span class="w-1.5 h-10 bg-lime-400 block"></span>
+                MÔ TẢ SẢN PHẨM
+            </h2>
+            
+            <div class="space-y-8">
+                <!-- Khung chứa nội dung từ Editor -->
+                <div class="glass-panel p-8 md:p-12 overflow-hidden">
+                    <div class="prose prose-lg prose-invert max-w-none 
+                                prose-headings:font-display prose-headings:text-lime-400 prose-headings:font-black 
+                                prose-p:text-gray-300 prose-p:leading-relaxed 
+                                prose-img:rounded-2xl prose-img:shadow-2xl prose-img:w-full prose-img:object-cover prose-img:my-8
+                                prose-a:text-lime-400 hover:prose-a:text-lime-300 transition-colors
+                                prose-strong:text-white">
+                        {!! $productDetail->mo_ta_chi_tiet !!}
+                    </div>
                 </div>
             </div>
-            
-            <div class="md:col-span-4 glass-panel overflow-hidden group">
-                <img src="{{ $productDetail->link_anh_dai_dien }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-            </div>
-
-            <div class="md:col-span-4 glass-panel overflow-hidden group">
-                <img src="{{ $productDetail->link_anh_dai_dien }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-            </div>
-
-            <div class="md:col-span-8 glass-panel p-16 flex flex-col items-center justify-center text-center space-y-8 border-l-4 border-lime-400">
-                <i data-lucide="snowflake" class="w-16 h-16 text-lime-400 animate-pulse"></i>
-                <h3 class="font-display text-4xl font-black tracking-tight uppercase">CÔNG NGHỆ CRYO-FLOW</h3>
-                <p class="text-gray-400 text-xl tracking-[0.05em] max-w-2xl font-bold uppercase">
-                    TĂNG 35% HIỆU QUẢ TẢN NHIỆT SO VỚI THẾ HỆ G4 SERIES, ĐẢM BẢO DUY TRÌ TỐC ĐỘ XUNG NHỊP TỐI ĐA TRONG THỜI GIAN DÀI.
-                </p>
-            </div>
-        </div>
-    </section>[0.05em] max-w-2xl font-bold uppercase">
-                    TĂNG 35% HIỆU QUẢ TẢN NHIỆT SO VỚI THẾ HỆ G4 SERIES, ĐẢM BẢO DUY TRÌ TỐC ĐỘ XUNG NHỊP TỐI ĐA TRONG THỜI GIAN DÀI.
-                </p>
-            </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     <!-- Reviews -->
     <section class="mt-40">
