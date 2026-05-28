@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('flash_sales', function (Blueprint $collection) {
-            $collection->string('ma_flash_sales')->unique()->index();
+            $collection->string('ma_flash_sales')->unique();
             $collection->string('ten_flash_sales')->nullable();
             $collection->text('mo_ta')->nullable();
             $collection->dateTime('bat_dau')->nullable();

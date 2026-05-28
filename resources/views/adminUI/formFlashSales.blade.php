@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', isset($flash_sales) ? 'Cấu hình chi tiết Flash Sale - VNTech' : 'Tạo mới Flash Sale - VNTech')
+@section('title', isset($flash_sales) ? 'Cập nhật Flash Sale - VNTech' : 'Tạo mới Flash Sale - VNTech')
 
 @section('content')
 <div class="w-full">
@@ -12,7 +12,7 @@
                 <span>Trở lại danh sách</span>
             </a>
             <h1 class="text-4xl md:text-6xl font-display font-bold text-neon-green drop-shadow-[0_0_15px_rgba(0,229,91,0.3)] uppercase leading-none">
-                {{ isset($flash_sales) ? 'CẤU HÌNH FLASH SALE' : 'TẠO MỚI FLASH SALE' }}
+                {{ isset($flash_sales) ? 'CẬP NHẬT FLASH SALE' : 'TẠO MỚI FLASH SALE' }}
             </h1>
             @if(isset($flash_sales))
             <div class="mt-3 flex items-center gap-2 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
@@ -40,7 +40,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ isset($flash_sales) ? route('admin.flashsales.update', $flash_sales->ma_flash_sales) : route('admin.flashsales.store') }}" class="space-y-6 mb-8">
+    <form method="POST" action="{{ isset($flash_sales) ? route('admin.flashsales.update', $flash_sales->ma_flash_sales) : route('admin.flashsales.store') }}" class="space-y-6 pb-28">
         @csrf
         @if(isset($flash_sales))
             @method('PUT')
@@ -166,121 +166,124 @@
                 $products = $flash_sale_products ?? collect();
             @endphp
 
-            @if(empty($products) || (is_object($products) && $products->isEmpty()) || (is_array($products) && count($products) == 0))
-                <div class="text-center py-16 border border-dashed border-white/15 bg-white/[0.02] rounded-xl">
-                    <i data-lucide="inbox" class="mx-auto text-gray-500 mb-3 size-8"></i>
-                    <p class="text-sm text-gray-300">Chưa có sản phẩm cấu hình thuộc chiến dịch</p>
-                    <p class="text-xs text-gray-500 mt-1 uppercase font-mono">Thêm sản phẩm từ trang quản lý sản phẩm</p>
-                </div>
-            @else
-                <div class="space-y-4">
-                    @foreach($products as $index => $prod)
-                        <div class="p-4 rounded-xl border border-white/5 bg-dark-bg/70 transition-all duration-300 hover:border-neon-green/20 group flex flex-col xl:flex-row xl:items-center gap-5">
-                            <input type="hidden" name="products[{{ $index }}][ma_bien_the]" value="{{ $prod->ma_bien_the }}">
-                            
-                            <!-- Thông tin sản phẩm -->
-                            <div class="flex items-center gap-4 flex-1 min-w-0">
-                                <div class="w-16 h-16 bg-white p-0.5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden text-2xl shrink-0">
-                                    @if(isset($prod->variant) && $prod->variant->link_anh_bien_the)
-                                        <img src="{{ $prod->variant->link_anh_bien_the }}" alt="{{ $prod->variant->ten_bien_the }}" class="w-full h-full object-cover">
-                                    @else
-                                        <i data-lucide="image" class="text-gray-400 size-6"></i>
-                                    @endif
-                                </div>
-                                <div class="min-w-0">
-                                    <h3 class="text-white font-bold text-base leading-snug truncate" title="{{ $prod->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}">
-                                        {{ $prod->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}
-                                    </h3>
-                                    <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mt-1.5 truncate">
-                                      GIÁ GỐC: <span class="text-gray-400 line-through">{{ number_format($prod->variant->gia_ban ?? 0, 0, ',', '.') }} ₫</span>
-                                    </p>
+            <div id="no-variants-message" class="{{ (empty($products) || (is_object($products) && $products->isEmpty()) || (is_array($products) && count($products) == 0)) ? '' : 'hidden' }} text-center py-16 border border-dashed border-white/15 bg-white/[0.02] rounded-xl">
+                <i data-lucide="inbox" class="mx-auto text-gray-500 mb-3 size-8"></i>
+                <p class="text-sm text-gray-300">Chưa có sản phẩm cấu hình thuộc chiến dịch</p>
+                <p class="text-xs text-gray-500 mt-1 uppercase font-mono">Bấm nút "Thêm sản phẩm" phía trên để lựa chọn</p>
+            </div>
+
+            <div id="variant-list-container" class="space-y-4 {{ (empty($products) || (is_object($products) && $products->isEmpty()) || (is_array($products) && count($products) == 0)) ? 'hidden' : '' }}">
+                @foreach($products as $index => $prod)
+                    <div class="variant-row p-4 rounded-xl border border-white/5 bg-dark-bg/70 transition-all duration-300 hover:border-neon-green/20 group flex flex-col xl:flex-row xl:items-center gap-5" data-ma-bien-the="{{ $prod->ma_bien_the }}">
+                        <input type="hidden" name="products[{{ $index }}][ma_bien_the]" value="{{ $prod->ma_bien_the }}">
+                        <input type="hidden" name="products[{{ $index }}][ma_chi_tiet_flash_sales]" value="{{ $prod->ma_chi_tiet_flash_sales }}">
+                        
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
+                            <div class="w-16 h-16 bg-white p-0.5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden text-2xl shrink-0">
+                                @if(isset($prod->variant) && $prod->variant->link_anh_bien_the)
+                                    <img src="{{ $prod->variant->link_anh_bien_the }}" alt="{{ $prod->variant->ten_bien_the }}" class="w-full h-full object-cover">
+                                @else
+                                    <i data-lucide="image" class="text-gray-400 size-6"></i>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-white font-bold text-base leading-snug truncate" title="{{ $prod->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}">
+                                    {{ $prod->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}
+                                </h3>
+                                <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mt-1.5 truncate">
+                                  GIÁ GỐC: <span class="text-gray-400 line-through">{{ number_format($prod->variant->gia_ban ?? 0, 0, ',', '.') }} ₫</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:flex md:flex-row gap-4 shrink-0">
+                            <div class="space-y-1.5 w-full md:w-36 shrink-0">
+                                <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block">Giá flash sale</label>
+                                <div class="relative">
+                                    <input
+                                      name="products[{{ $index }}][gia_flash_sale]"
+                                      type="number"
+                                      value="{{ $prod->gia_flash_sale ?? 0 }}"
+                                      class="w-full h-11 bg-dark-bg border border-white/10 px-3 pr-8 text-sm font-mono text-neon-green focus:border-neon-green/50 outline-none transition-colors text-right rounded-lg"
+                                    />
+                                    <span class="absolute right-3 top-3 text-[10px] text-neon-green font-mono">₫</span>
                                 </div>
                             </div>
 
-                            <!-- Input Grid -->
-                            <div class="grid grid-cols-2 md:flex md:flex-row gap-4 shrink-0">
-                                <div class="space-y-1.5 w-full md:w-36 shrink-0">
-                                    <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block">Giá flash sale</label>
-                                    <div class="relative">
-                                        <input
-                                          name="products[{{ $index }}][gia_flash_sale]"
-                                          type="number"
-                                          value="{{ $prod->gia_flash_sale ?? 0 }}"
-                                          class="w-full h-11 bg-dark-bg border border-white/10 px-3 pr-8 text-sm font-mono text-neon-green focus:border-neon-green/50 outline-none transition-colors text-right rounded-lg"
-                                        />
-                                        <span class="absolute right-3 top-3 text-[10px] text-neon-green font-mono">₫</span>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-1.5 w-full md:w-24 shrink-0">
-                                    <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block" title="Số lượng giới hạn">SL giới hạn</label>
-                                    <input
-                                      name="products[{{ $index }}][so_luong_gioi_han]"
-                                      type="number"
-                                      value="{{ $prod->so_luong_gioi_han ?? 0 }}"
-                                      class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
-                                    />
-                                </div>
-
-                                <div class="space-y-1.5 w-full md:w-32 shrink-0">
-                                    <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block" title="Giới hạn mỗi người">Giới hạn / User</label>
-                                    <input
-                                      name="products[{{ $index }}][gioi_han_moi_nguoi]"
-                                      type="number"
-                                      value="{{ $prod->gioi_han_moi_nguoi ?? 0 }}"
-                                      class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
-                                    />
-                                </div>
-
-                                <div class="space-y-1.5 w-full md:w-20 shrink-0">
-                                    <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block">Đã bán</label>
-                                    <div class="w-full h-11 bg-white/[0.03] border border-white/10 px-2 flex items-center justify-center text-sm font-mono text-gray-400 rounded-lg">
-                                        <span>{{ $prod->so_luong_da_ban ?? 0 }}</span>
-                                    </div>
-                                </div>
+                            <div class="space-y-1.5 w-full md:w-24 shrink-0">
+                                <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block" title="Số lượng giới hạn">SL giới hạn</label>
+                                <input
+                                  name="products[{{ $index }}][so_luong_gioi_han]"
+                                  type="number"
+                                  value="{{ $prod->so_luong_gioi_han ?? 0 }}"
+                                  class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
+                                />
                             </div>
 
-                            <!-- Actions & Status -->
-                            <div class="flex items-center justify-end gap-2 shrink-0 md:pl-2">
-                                <!-- Status Toggle -->
-                                <div class="flex flex-col items-center">
-                                    <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block">Trạng thái</label>
-                                    <div class="h-11 flex items-center justify-center">
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="hidden" name="products[{{ $index }}][trang_thai]" value="DRAFT">
-                                            <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="ACTIVE" {{ strtoupper($prod->trang_thai ?? 'DRAFT') === 'ACTIVE' ? 'checked' : '' }} class="sr-only peer">
-                                            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="w-px h-10 bg-white/10 mx-2 hidden md:block"></div>
+                            <div class="space-y-1.5 w-full md:w-32 shrink-0">
+                                <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block" title="Giới hạn mỗi người">Giới hạn / User</label>
+                                <input
+                                  name="products[{{ $index }}][gioi_han_moi_nguoi]"
+                                  type="number"
+                                  value="{{ $prod->gioi_han_moi_nguoi ?? 0 }}"
+                                  class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
+                                />
+                            </div>
 
-                                <!-- Delete Button -->
-                                <div class="flex flex-col items-center">
-                                    <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block opacity-0 select-none">Xóa</label>
-                                    <div class="h-11 flex items-center justify-center">
-                                        <button type="button" class="w-10 h-10 flex items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500 hover:text-white transition-colors" title="Xóa sản phẩm">
-                                            <i data-lucide="trash-2" class="size-5"></i>
-                                        </button>
-                                    </div>
+                            <div class="space-y-1.5 w-full md:w-20 shrink-0">
+                                <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block">Đã bán</label>
+                                <div class="w-full h-11 bg-white/[0.03] border border-white/10 px-2 flex items-center justify-center text-sm font-mono text-gray-400 rounded-lg">
+                                    <span>{{ $prod->so_luong_da_ban ?? 0 }}</span>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-            @endif
+
+                        <div class="flex items-center justify-end gap-2 shrink-0 md:pl-2">
+                            <div class="flex flex-col items-center">
+                                <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block">Trạng thái</label>
+                                <div class="h-11 flex items-center justify-center">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="hidden" name="products[{{ $index }}][trang_thai]" value="DRAFT">
+                                        <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="ACTIVE" {{ strtoupper($prod->trang_thai ?? 'DRAFT') === 'ACTIVE' ? 'checked' : '' }} class="sr-only peer">
+                                        <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="w-px h-10 bg-white/10 mx-2 hidden md:block"></div>
+
+                            <div class="flex flex-col items-center">
+                                <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block opacity-0 select-none">Xóa</label>
+                                <div class="h-11 flex items-center justify-center">
+                                    <button type="button" onclick="removeVariantRow(this)" class="w-10 h-10 flex items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500 hover:text-white transition-colors" title="Xóa sản phẩm">
+                                        <i data-lucide="trash-2" class="size-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
 
-        <div class="flex flex-col md:flex-row justify-end items-center gap-3">
-            <button type="submit" name="action_type" value="DRAFT" class="w-full md:w-auto group flex justify-center items-center gap-3 bg-transparent border-2 border-white/10 text-white px-8 py-3.5 font-bold uppercase tracking-widest hover:bg-white/5 hover:border-neon-green/40 transition-all duration-300 rounded-none">
-                <i data-lucide="save" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-                <span>LƯU NHÁP</span>
-            </button>
-            <button type="submit" name="action_type" value="ACTIVE" class="w-full md:w-auto group flex justify-center items-center gap-3 bg-neon-green text-black border-2 border-neon-green px-8 py-3.5 font-bold uppercase tracking-widest hover:brightness-110 transition-all duration-300 rounded-none">
-                <i data-lucide="zap" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
-                <span>KÍCH HOẠT</span>
-            </button>
+        <!-- Fixed Action Footer -->
+        <div class="fixed bottom-0 left-0 lg:left-72 right-0 px-12 py-4 bg-dark-bg/95 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 z-40 shadow-[0_-8px_30px_rgb(0,0,0,0.6)] backdrop-blur-md">
+            <div class="text-[10px] text-gray-500 uppercase tracking-widest font-mono hidden md:block">
+                * Vui lòng kiểm tra kỹ cấu hình trước khi xác nhận.
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <a href="{{ route('admin.flashsales.index') }}" class="w-full md:w-auto flex justify-center items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all rounded-lg no-underline">
+                    <span>Hủy bỏ</span>
+                </a>
+                <button type="submit" name="action_type" value="DRAFT" class="w-full md:w-auto group flex justify-center items-center gap-2 bg-transparent border border-white/20 text-white px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-white/5 hover:border-neon-green/45 transition-all rounded-lg">
+                    <i data-lucide="save" class="w-4 h-4 group-hover:scale-110 transition-all"></i>
+                    <span>Lưu bản tạm</span>
+                </button>
+                <button type="submit" name="action_type" value="ACTIVE" class="w-full md:w-auto group flex justify-center items-center gap-2 bg-neon-green text-black border border-neon-green px-6 py-3 text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all rounded-lg shadow-[0_0_15px_rgba(0,229,91,0.2)]">
+                    <i data-lucide="zap" class="w-4 h-4 group-hover:scale-110 transition-all"></i>
+                    <span>{{ isset($flash_sales) ? 'Cập nhật' : 'Tạo mới'}}</span>
+                </button>
+            </div>
         </div>
     </form>
 </div>
@@ -343,7 +346,9 @@
                                             </div>
                                             <div class="flex items-center gap-4 shrink-0 sm:justify-end">
                                                 <p class="text-xs font-mono text-gray-400 line-through">{{ number_format($variant->gia_ban ?? 0, 0, ',', '.') }} ₫</p>
-                                                <button type="button" class="bg-neon-green/10 text-neon-green hover:bg-neon-green hover:text-black border border-neon-green px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all">
+                                                <button type="button" 
+                                                        onclick="addVariantToFlashSale('{{ $variant->ma_bien_the }}', '{{ addslashes($variant->ten_bien_the) }}', '{{ $variant->link_anh_bien_the }}', '{{ $variant->gia_ban }}')"
+                                                        class="bg-neon-green/10 text-neon-green hover:bg-neon-green hover:text-black border border-neon-green px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all">
                                                     Thêm
                                                 </button>
                                             </div>
@@ -367,6 +372,8 @@
 </div>
 
 <script>
+    let variantIndex = parseInt('{{ count($products) }}') || 0;
+
     function filterProducts() {
         const query = document.getElementById('search-product').value.toLowerCase();
         const products = document.querySelectorAll('.product-item');
@@ -396,6 +403,156 @@
                 prod.style.display = 'none';
             }
         });
+    }
+
+    function addVariantToFlashSale(maBienThe, tenBienThe, linkAnhBienThe, giaBan) {
+        // Parse giaBan as number
+        giaBan = Number(giaBan) || 0;
+
+        // Check if variant already exists in list
+        const exists = document.querySelector(`input[value="${maBienThe}"][name^="products"]`);
+        if (exists) {
+            alert('Biến thể này đã được thêm vào danh sách.');
+            return;
+        }
+
+        // Hide no-variants message
+        const noMsg = document.getElementById('no-variants-message');
+        if (noMsg) noMsg.classList.add('hidden');
+
+        const container = document.getElementById('variant-list-container');
+        if (container) container.classList.remove('hidden');
+
+        // Create row HTML
+        const formattedGiaBan = new Intl.NumberFormat('vi-VN').format(giaBan) + ' ₫';
+        
+        // Fallback image icon if linkAnhBienThe is empty/null/undefined
+        const imgHtml = linkAnhBienThe && linkAnhBienThe !== '' 
+            ? `<img src="${linkAnhBienThe}" alt="${tenBienThe}" class="w-full h-full object-cover">`
+            : `<i data-lucide="image" class="text-gray-400 size-6"></i>`;
+
+        const rowHtml = `
+            <div class="variant-row p-4 rounded-xl border border-white/5 bg-dark-bg/70 transition-all duration-300 hover:border-neon-green/20 group flex flex-col xl:flex-row xl:items-center gap-5" data-ma-bien-the="${maBienThe}">
+                <input type="hidden" name="products[${variantIndex}][ma_bien_the]" value="${maBienThe}">
+                <input type="hidden" name="products[${variantIndex}][ma_chi_tiet_flash_sales]" value="">
+                
+                <!-- Thông tin sản phẩm -->
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <div class="w-16 h-16 bg-white p-0.5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden text-2xl shrink-0">
+                        ${imgHtml}
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-white font-bold text-base leading-snug truncate" title="${tenBienThe}">
+                            ${tenBienThe}
+                        </h3>
+                        <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mt-1.5 truncate">
+                          GIÁ GỐC: <span class="text-gray-400 line-through">${formattedGiaBan}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Input Grid -->
+                <div class="grid grid-cols-2 md:flex md:flex-row gap-4 shrink-0">
+                    <div class="space-y-1.5 w-full md:w-36 shrink-0">
+                        <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block">Giá flash sale</label>
+                        <div class="relative">
+                            <input
+                              name="products[${variantIndex}][gia_flash_sale]"
+                              type="number"
+                              value="0"
+                              class="w-full h-11 bg-dark-bg border border-white/10 px-3 pr-8 text-sm font-mono text-neon-green focus:border-neon-green/50 outline-none transition-colors text-right rounded-lg"
+                            />
+                            <span class="absolute right-3 top-3 text-[10px] text-neon-green font-mono">₫</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 w-full md:w-24 shrink-0">
+                        <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block" title="Số lượng giới hạn">SL giới hạn</label>
+                        <input
+                          name="products[${variantIndex}][so_luong_gioi_han]"
+                          type="number"
+                          value="0"
+                          class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
+                        />
+                    </div>
+
+                    <div class="space-y-1.5 w-full md:w-32 shrink-0">
+                        <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block" title="Giới hạn mỗi người">Giới hạn / User</label>
+                        <input
+                          name="products[${variantIndex}][gioi_han_moi_nguoi]"
+                          type="number"
+                          value="0"
+                          class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
+                        />
+                    </div>
+
+                    <div class="space-y-1.5 w-full md:w-20 shrink-0">
+                        <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block">Đã bán</label>
+                        <div class="w-full h-11 bg-white/[0.03] border border-white/10 px-2 flex items-center justify-center text-sm font-mono text-gray-400 rounded-lg">
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions & Status -->
+                <div class="flex items-center justify-end gap-2 shrink-0 md:pl-2">
+                    <!-- Status Toggle -->
+                    <div class="flex flex-col items-center">
+                        <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block">Trạng thái</label>
+                        <div class="h-11 flex items-center justify-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="hidden" name="products[${variantIndex}][trang_thai]" value="DRAFT">
+                                <input type="checkbox" name="products[${variantIndex}][trang_thai]" value="ACTIVE" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="w-px h-10 bg-white/10 mx-2 hidden md:block"></div>
+
+                    <!-- Delete Button -->
+                    <div class="flex flex-col items-center">
+                        <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block opacity-0 select-none">Xóa</label>
+                        <div class="h-11 flex items-center justify-center">
+                            <button type="button" onclick="removeVariantRow(this)" class="w-10 h-10 flex items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500 hover:text-white transition-colors" title="Xóa sản phẩm">
+                                <i data-lucide="trash-2" class="size-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Append to container
+        container.insertAdjacentHTML('beforeend', rowHtml);
+        
+        // Increment index
+        variantIndex++;
+
+        // Re-initialize lucide icons
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+
+    function removeVariantRow(button) {
+        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi Flash Sale?')) {
+            const row = button.closest('.variant-row');
+            if (row) {
+                row.remove();
+                
+                // Check if there are any rows left
+                const container = document.getElementById('variant-list-container');
+                const noMsg = document.getElementById('no-variants-message');
+                if (container) {
+                    const rows = container.querySelectorAll('.variant-row');
+                    if (rows.length === 0) {
+                        container.classList.add('hidden');
+                        if (noMsg) noMsg.classList.remove('hidden');
+                    }
+                }
+            }
+        }
     }
 </script>
 

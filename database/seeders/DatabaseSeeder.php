@@ -435,14 +435,13 @@ class DatabaseSeeder extends Seeder
 
 
         FlashSaleItem::create([
-            'ma_bien_the'        => (string) $allVariants[0]->_id,
-            'gia_flash_sale'     => 9999999,
-            'so_luong_gioi_han'  => 50,
-            'so_luong_da_ban'    => 5,
-            'gioi_han_moi_nguoi' => 2,
-            'bat_dau'            => Carbon::now()->subHours(1),
-            'ket_thuc'           => Carbon::now()->addDays(2),
-            'trang_thai'         => 'active',
+            'ma_flash_sales'      => (string) $flashSale->_id,
+            'ma_bien_the'         => (string) $allVariants[0]->_id,
+            'gia_flash_sale'      => 9999999,
+            'so_luong_gioi_han'   => 50,
+            'so_luong_da_ban'     => 5,
+            'gioi_han_moi_nguoi'  => 2,
+            'trang_thai'          => 'active',
         ]);
 
 

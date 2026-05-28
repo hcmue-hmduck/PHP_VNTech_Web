@@ -73,43 +73,40 @@ if (document.readyState === 'loading') {
     initHomePage();
 }
 
-// Alpine Timer
-window.timer = function () {
+window.timer = function (targetTime) {
     return {
-        timeLeft: {
-            Hours: '02',
-            Mins: '45',
-            Secs: '12'
-        },
+        hours: '00',
+        minutes: '00',
+        seconds: '00',
+        ms: '00',
+        target: targetTime ? new Date(targetTime).getTime() : null,
 
         init() {
+            if (!this.target) {
+                this.target = new Date().getTime() + 2 * 3600 * 1000 + 45 * 60 * 1000;
+            }
             setInterval(() => {
-                let h = parseInt(this.timeLeft.Hours);
-                let m = parseInt(this.timeLeft.Mins);
-                let s = parseInt(this.timeLeft.Secs);
+                const now = new Date().getTime();
+                const diff = this.target - now;
 
-                s--;
-
-                if (s < 0) {
-                    s = 59;
-                    m--;
+                if (diff <= 0) {
+                    this.hours = '00';
+                    this.minutes = '00';
+                    this.seconds = '00';
+                    this.ms = '00';
+                    return;
                 }
 
-                if (m < 0) {
-                    m = 59;
-                    h--;
-                }
+                const h = Math.floor(diff / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                const milliseconds = Math.floor((diff % 1000) / 10);
 
-                if (h < 0) {
-                    h = 0;
-                    m = 0;
-                    s = 0;
-                }
-
-                this.timeLeft.Hours = h.toString().padStart(2, '0');
-                this.timeLeft.Mins = m.toString().padStart(2, '0');
-                this.timeLeft.Secs = s.toString().padStart(2, '0');
-            }, 1000);
+                this.hours = h.toString().padStart(2, '0');
+                this.minutes = m.toString().padStart(2, '0');
+                this.seconds = s.toString().padStart(2, '0');
+                this.ms = milliseconds.toString().padStart(2, '0');
+            }, 10);
         }
     };
 };

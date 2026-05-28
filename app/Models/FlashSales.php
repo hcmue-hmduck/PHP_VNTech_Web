@@ -22,4 +22,9 @@ class FlashSales extends Model
         'bat_dau' => 'datetime',
         'ket_thuc' => 'datetime',
     ];
+    
+    public function flash_sale_items()
+    {
+        return $this->hasMany(FlashSaleItem::class, 'ma_flash_sales', 'ma_flash_sales');
+    }
 }
