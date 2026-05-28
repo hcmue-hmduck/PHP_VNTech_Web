@@ -134,11 +134,11 @@
                                     class="w-full h-12 bg-dark-bg/50 border border-white/10 pl-11 pr-10 text-sm font-mono text-white focus:border-neon-green focus:bg-neon-green/5 outline-none appearance-none cursor-pointer rounded-lg transition-all"
                                 >
                                     @php
-                                        $currentStatus = strtoupper(old('trang_thai', $flash_sales->trang_thai ?? 'DRAFT'));
+                                        $currentStatus = strtolower(old('trang_thai', $flash_sales->trang_thai ?? 'draft'));
                                     @endphp
-                                    <option value="DRAFT" {{ $currentStatus === 'DRAFT' ? 'selected' : '' }}>BẢN NHÁP</option>
-                                    <option value="ACTIVE" {{ $currentStatus === 'ACTIVE' ? 'selected' : '' }}>ĐANG HOẠT ĐỘNG</option>
-                                    <option value="FINISHED" {{$currentStatus ==='FINISHED' ? 'selected' : '' }}>ĐÃ KẾT THÚC</option>
+                                    <option value="draft" {{ $currentStatus === 'draft' ? 'selected' : '' }}>BẢN NHÁP</option>
+                                    <option value="active" {{ $currentStatus === 'active' ? 'selected' : '' }}>ĐANG HOẠT ĐỘNG</option>
+                                    <option value="finished" {{ $currentStatus === 'finished' ? 'selected' : '' }}>ĐÃ KẾT THÚC</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                                     <i data-lucide="chevron-down" class="size-4 text-gray-500"></i>
@@ -243,8 +243,8 @@
                                 <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block">Trạng thái</label>
                                 <div class="h-11 flex items-center justify-center">
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="hidden" name="products[{{ $index }}][trang_thai]" value="DRAFT">
-                                        <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="ACTIVE" {{ strtoupper($prod->trang_thai ?? 'DRAFT') === 'ACTIVE' ? 'checked' : '' }} class="sr-only peer">
+                                        <input type="hidden" name="products[{{ $index }}][trang_thai]" value="draft">
+                                        <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="active" {{ strtolower($prod->trang_thai ?? 'draft') === 'active' ? 'checked' : '' }} class="sr-only peer">
                                         <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
                                     </label>
                                 </div>
@@ -501,8 +501,8 @@
                         <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block">Trạng thái</label>
                         <div class="h-11 flex items-center justify-center">
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="hidden" name="products[${variantIndex}][trang_thai]" value="DRAFT">
-                                <input type="checkbox" name="products[${variantIndex}][trang_thai]" value="ACTIVE" checked class="sr-only peer">
+                                <input type="hidden" name="products[${variantIndex}][trang_thai]" value="draft">
+                                <input type="checkbox" name="products[${variantIndex}][trang_thai]" value="active" checked class="sr-only peer">
                                 <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
                             </label>
                         </div>

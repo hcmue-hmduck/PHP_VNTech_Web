@@ -9,15 +9,15 @@
     $totalCampaigns = $flash_sales->count();
     
     $liveCampaigns = $flash_sales->filter(function($c) {
-        return in_array(strtoupper($c->trang_thai ?? ''), ['LIVE', 'ACTIVE', 'ĐANG HOẠT ĐỘNG']);
+        return in_array(strtolower($c->trang_thai ?? ''), ['live', 'active', 'đang hoạt động']);
     })->count();
 
     $scheduledCampaigns = $flash_sales->filter(function($c) {
-        return in_array(strtoupper($c->trang_thai ?? ''), ['SCHEDULED', 'UPCOMING', 'SẮP DIỄN RA']);
+        return in_array(strtolower($c->trang_thai ?? ''), ['scheduled', 'upcoming', 'sắp diễn ra', 'draft', 'bản nháp']);
     })->count();
 
     $endedCampaigns = $flash_sales->filter(function($c) {
-        return in_array(strtoupper($c->trang_thai ?? ''), ['ENDED', 'EXPIRED', 'ĐÃ KẾT THÚC']);
+        return in_array(strtolower($c->trang_thai ?? ''), ['ended', 'expired', 'đã kết thúc', 'finished']);
     })->count();
 @endphp
 
@@ -127,10 +127,10 @@
     <div class="space-y-4 mb-8">
         @forelse($flash_sales as $campaign)
             @php
-                $status = strtoupper($campaign->trang_thai ?? 'SCHEDULED');
-                $isLive = $status === 'LIVE' || $status === 'ACTIVE';
-                $isScheduled = $status === 'SCHEDULED' || $status === 'UPCOMING';
-                $isEnded = $status === 'ENDED' || $status === 'EXPIRED';
+                $status = strtolower($campaign->trang_thai ?? 'draft');
+                $isLive = $status === 'live' || $status === 'active';
+                $isScheduled = $status === 'scheduled' || $status === 'upcoming' || $status === 'draft';
+                $isEnded = $status === 'ended' || $status === 'expired' || $status === 'finished';
                 
                 $start = substr($campaign->bat_dau, 0, 16);
                 $end = substr($campaign->ket_thuc, 0, 16);

@@ -37,7 +37,7 @@ class FlashSalesController extends Controller
             'mo_ta'             => 'nullable|string',
             'bat_dau'           => 'required|date',
             'ket_thuc'          => 'required|date|after:bat_dau',
-            'trang_thai'        => 'required|string|in:ACTIVE,DRAFT,FINISHED',
+            'trang_thai'        => 'required|string|in:active,draft,finished',
             'products'          => 'nullable|array'
         ]);
 
@@ -70,7 +70,7 @@ class FlashSalesController extends Controller
             'mo_ta'             => 'nullable|string',
             'bat_dau'           => 'required|date',
             'ket_thuc'          => 'required|date|after:bat_dau',
-            'trang_thai'        => 'required|string|in:ACTIVE,DRAFT,FINISHED',
+            'trang_thai'        => 'required|string|in:active,draft,finished',
         ]);
         $flash_sales->update($data);
 

@@ -76,21 +76,24 @@
             top: -55px;
             left: 50%;
             transform: translateX(-50%);
-            width: 250px;
+            width: 280px;
             height: 52px;
-            background: linear-gradient(180deg, #070809, #121414);
+            background: linear-gradient(180deg, #020304, #0b0d0e);
             border: 2px solid #00ff66;
             border-radius: 18px 18px 8px 8px;
             color: #00ff66;
             font-weight: 900;
-            font-size: 20px;
+            font-size: 22px;
             font-style: italic;
-            text-align: center;
-            line-height: 52px;
             text-transform: uppercase;
-            box-shadow: 0 3px 12px rgba(0,255,102,0.2);
+            box-shadow: 0 4px 20px rgba(0,255,102,0.4), inset 0 0 10px rgba(0,255,102,0.1);
             z-index: 10;
-            text-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
+            text-shadow: 0 0 12px rgba(0, 255, 102, 0.6);
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .flash-header {
             height: 70px;
@@ -269,7 +272,10 @@
         <div class="flash-wrapper">
             <div class="flash-top"></div>
             <div class="flash-label">
-                FLASHSALE <span class="ml-1" x-text="campaigns[activeCampaignId].start_time_str + '-' + campaigns[activeCampaignId].end_time_str"></span>
+                <svg class="w-6 h-6 text-[#00ff66] fill-[#00ff66] animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>FLASHSALE</span>
             </div>
 
             <div class="flash-header">

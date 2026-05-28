@@ -100,15 +100,76 @@
                 {{ $productDetail->mo_ta_ngan }}
             </p>
 
-            <div class="flex items-end gap-6 mb-12">
-                <!-- Giá Bán -->
-                <div class="text-lime-400 font-display text-4xl font-bold bloom-effect tracking-tighter" x-text="formatPrice(currentVariant.gia_ban)">
-                    {{ number_format($variants[0]->gia_ban ?? $productDetail->gia_thap_nhat, 0, ',', '.') }}₫
+            <!-- Khối Giá / Flash Sale -->
+            <div class="mb-12">
+                <!-- Khối Flash Sale (Hiển thị nếu có Flash Sale) -->
+                <div x-show="currentVariant.flash_sale_info" class="space-y-4 w-full">
+                    <!-- Flash Sale Banner nổi bật -->
+                    <div class="bg-gradient-to-r from-lime-950/80 to-slate-900/80 border border-lime-500/35 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-[0_0_15px_rgba(0,255,102,0.15)]">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-lime-500/20 flex items-center justify-center animate-pulse border border-lime-400/30">
+                                <i data-lucide="zap" class="w-5 h-5 text-lime-400 fill-lime-400"></i>
+                            </div>
+                            <div>
+                                <div class="text-lime-400 font-black text-sm tracking-widest uppercase italic flex items-center gap-2">
+                                    FLASHSALE
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Countdown Timer -->
+                        <div class="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-lg border border-white/5">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">KẾT THÚC SAU:</span>
+                            <div class="flex items-center gap-1.5 font-mono text-sm font-black text-lime-400">
+                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20" x-text="countdown.days">00</span>
+                                <span>:</span>
+                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20" x-text="countdown.hours">00</span>
+                                <span>:</span>
+                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20" x-text="countdown.minutes">00</span>
+                                <span>:</span>
+                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20 text-white animate-pulse" x-text="countdown.seconds">00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Khối giá Flash Sale -->
+                    <div class="flex items-end gap-6">
+                        <div>
+                            <div class="text-[10px] text-lime-400 font-black tracking-widest uppercase mb-1">GIÁ FLASHSALE</div>
+                            <div class="text-lime-400 font-display text-5xl font-black bloom-effect tracking-tighter" x-text="currentVariant.flash_sale_info ? formatPrice(currentVariant.flash_sale_info.gia_flash_sale) : ''"></div>
+                        </div>
+                        
+                        <div class="flex flex-col pb-1">
+                            <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase mb-0.5">GIÁ GỐC</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-gray-500 line-through text-lg font-bold opacity-60" x-text="formatPrice(currentVariant.gia_ban)"></span>
+                                <span class="bg-lime-500 text-black px-2 py-0.5 font-black text-[11px] tracking-wider rounded">
+                                    -<span x-text="currentVariant.flash_sale_info ? Math.round(100 - (currentVariant.flash_sale_info.gia_flash_sale / currentVariant.gia_ban * 100)) : 0"></span>%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tiến độ bán hàng -->
+                    <div class="mt-4 max-w-md">
+                        <div class="flex justify-between items-center text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-widest">
+                            <span>Đã bán: <span class="text-lime-400 font-black" x-text="currentVariant.flash_sale_info ? (currentVariant.flash_sale_info.so_luong_da_ban || 0) : 0"></span> / <span x-text="currentVariant.flash_sale_info ? currentVariant.flash_sale_info.so_luong_gioi_han : 0"></span> sản phẩm</span>
+                            <span x-text="currentVariant.flash_sale_info ? Math.round(( (currentVariant.flash_sale_info.so_luong_da_ban || 0) / currentVariant.flash_sale_info.so_luong_gioi_han ) * 100) + '%' : '0%'"></span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5 relative">
+                            <div class="h-full bg-gradient-to-r from-emerald-600 to-lime-400 rounded-full transition-all duration-500" 
+                                 :style="currentVariant.flash_sale_info ? 'width: ' + Math.min(100, (((currentVariant.flash_sale_info.so_luong_da_ban || 0) / currentVariant.flash_sale_info.so_luong_gioi_han) * 100)) + '%' : 'width: 0%'"></div>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- Giá Niêm Yết (Gạch Ngang) -->
-                <template x-if="currentVariant.gia_niem_yet > currentVariant.gia_ban">
-                    <div class="flex items-end gap-4 pb-1">
+
+                <!-- Khối giá thường (Hiển thị nếu KHÔNG có Flash Sale) -->
+                <div x-show="!currentVariant.flash_sale_info" class="flex items-end gap-6">
+                    <div class="text-lime-400 font-display text-4xl font-bold bloom-effect tracking-tighter" x-text="formatPrice(currentVariant.gia_ban)">
+                        {{ number_format($variants[0]->gia_ban ?? $productDetail->gia_thap_nhat, 0, ',', '.') }}₫
+                    </div>
+                    
+                    <div x-show="currentVariant.gia_niem_yet > currentVariant.gia_ban" class="flex items-end gap-4 pb-1">
                         <div class="text-gray-500 line-through text-xl font-medium opacity-60" x-text="formatPrice(currentVariant.gia_niem_yet)">
                             {{ number_format($variants[0]->gia_niem_yet ?? 0, 0, ',', '.') }}₫
                         </div>
@@ -116,7 +177,7 @@
                             -<span x-text="Math.round(100 - (currentVariant.gia_ban / currentVariant.gia_niem_yet * 100))"></span>%
                         </div>
                     </div>
-                </template>
+                </div>
             </div>
 
             <!-- Chọn biến thể -->
@@ -135,8 +196,17 @@
                     @endphp
                     <button @click="selectVariant({{ $idx }})" 
                             :class="selectedIndex === {{ $idx }} ? 'border-lime-400 text-lime-400 shadow-[0_0_10px_rgba(163,230,53,0.2)]' : 'border-white/5 text-gray-400 hover:border-white/20'"
-                            class="py-3 px-4 glass-panel text-[11px] font-black tracking-wider transition-all duration-300">
-                        {{ $thong_tin_bien_the }} — {{ number_format($variant->gia_ban, 0, ',', '.') }}₫
+                            class="py-3 px-4 glass-panel text-[11px] font-black tracking-wider transition-all duration-300 flex items-center gap-2">
+                        <span>{{ $thong_tin_bien_the }}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-gray-600/40"></span>
+                        @if($variant->flash_sale_info)
+                            <span class="text-lime-400 font-extrabold flex items-center gap-0.5">
+                                <i data-lucide="zap" class="w-3.5 h-3.5 fill-lime-400 text-lime-400 inline"></i>
+                                {{ number_format($variant->flash_sale_info->gia_flash_sale, 0, ',', '.') }}₫
+                            </span>
+                        @else
+                            <span>{{ number_format($variant->gia_ban, 0, ',', '.') }}₫</span>
+                        @endif
                     </button>
                     @endforeach
                 </div>
@@ -145,13 +215,13 @@
             <!-- CTA Buttons -->
             <div class="space-y-4">
                 <a :href="'{{ route('cart.addItem') }}?ma_bien_the=' + currentVariant.id" 
-                class="w-full py-6 bg-lime-400 text-black font-black text-sm tracking-[0.3em] flex items-center justify-center gap-3 active:scale-95 transition-all text-center">
+                   class="w-full py-6 bg-lime-400 text-black hover:bg-lime-300 font-black text-sm tracking-[0.3em] flex items-center justify-center gap-3 active:scale-95 transition-all text-center shadow-[0_0_15px_rgba(0,255,102,0.15)]">
                     <i data-lucide="shopping-cart" class="w-5 h-5 fill-black"></i>
                     THÊM VÀO GIỎ HÀNG
                 </a>
 
                 <a :href="'{{ route('viewPayment') }}/' +  currentVariant.id"
-                class="w-full py-6 border border-lime-400 text-lime-400 font-black text-sm tracking-[0.3em] hover:bg-lime-400/10 transition-all flex items-center justify-center active:scale-95 text-center">
+                   class="w-full py-6 border border-lime-400 text-lime-400 hover:bg-lime-400/10 font-black text-sm tracking-[0.3em] transition-all flex items-center justify-center active:scale-95 text-center">
                     MUA NGAY
                 </a>
             </div>
@@ -339,6 +409,57 @@
             gallery: ["{{ $productDetail->link_anh_dai_dien }}", ...galleryData],
             activeImageIndex: 0,
             selectedIndex: 0,
+            countdown: {
+                days: '00',
+                hours: '00',
+                minutes: '00',
+                seconds: '00'
+            },
+            timerInterval: null,
+
+            init() {
+                this.startCountdown();
+                this.$watch('selectedIndex', () => {
+                    this.startCountdown();
+                });
+            },
+
+            startCountdown() {
+                if (this.timerInterval) clearInterval(this.timerInterval);
+                
+                const update = () => {
+                    const variant = this.currentVariant;
+                    if (!variant || !variant.flash_sale_campaign) {
+                        this.countdown = { days: '00', hours: '00', minutes: '00', seconds: '00' };
+                        return;
+                    }
+                    
+                    const endTimeStr = variant.flash_sale_campaign.ket_thuc;
+                    const target = new Date(endTimeStr).getTime();
+                    const now = new Date().getTime();
+                    const diff = target - now;
+                    
+                    if (diff <= 0) {
+                        this.countdown = { days: '00', hours: '00', minutes: '00', seconds: '00' };
+                        return;
+                    }
+                    
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    this.countdown = {
+                        days: d.toString().padStart(2, '0'),
+                        hours: h.toString().padStart(2, '0'),
+                        minutes: m.toString().padStart(2, '0'),
+                        seconds: s.toString().padStart(2, '0')
+                    };
+                };
+                
+                update();
+                this.timerInterval = setInterval(update, 1000);
+            },
             
             get currentVariant() {
                 return this.variants[this.selectedIndex] || {};
