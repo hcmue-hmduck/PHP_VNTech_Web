@@ -353,10 +353,14 @@
                                         <span class="sold-text">Đã bán: {{ $item->so_luong_da_ban ?? 0 }}</span>
                                     </div>
 
-                                    <a href="{{ $item->variant ? route('viewProductDetail', $item->variant->ma_san_pham) : '#' }}"
-                                       class="block w-full rounded-xl py-3 bg-lime-400 text-black font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
-                                        Xem chi tiết
-                                    </a>
+                                     <a href="{{ $item->variant ? route('payment.view', $item->variant->ma_bien_the) : '#' }}"
+                                        class="block w-full rounded-xl py-3 bg-lime-400 text-black font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
+                                         Săn ngay
+                                     </a>
+                                     <a href="{{ $item->variant ? route('viewProductDetail', $item->variant->ma_san_pham) : '#' }}"
+                                        class="block w-full rounded-xl py-3 bg-white/5 border border-white/10 text-white font-black text-[10px] uppercase tracking-widest hover:bg-white/10 active:scale-95 transition-all text-center">
+                                         Xem chi tiết
+                                     </a>
                                 </div>
                             </div>
                         </div>

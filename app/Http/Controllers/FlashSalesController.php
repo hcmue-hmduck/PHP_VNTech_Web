@@ -43,7 +43,7 @@ class FlashSalesController extends Controller
 
         $flash_sales = FlashSales::create($data);
         $flash_sales->ma_flash_sales = $flash_sales->_id;
-        $flash_sales->update();
+        $flash_sales->save();
 
         if ($request->has('products')) {
             foreach ($request->products as $product) {
@@ -57,7 +57,7 @@ class FlashSalesController extends Controller
                     'trang_thai'            => $product['trang_thai'],
                 ]);
                 $flash_sale_items->ma_chi_tiet_flash_sales = $flash_sale_items->_id;
-                $flash_sale_items->update();
+                $flash_sale_items->save();
             }
         }
 
@@ -96,11 +96,12 @@ class FlashSalesController extends Controller
                         'ma_bien_the'           => $product['ma_bien_the'],
                         'gia_flash_sale'        => $product['gia_flash_sale'],
                         'so_luong_gioi_han'     => $product['so_luong_gioi_han'],
+                        'so_luong_da_ban'       => 0,
                         'gioi_han_moi_nguoi'    => $product['gioi_han_moi_nguoi'],
                         'trang_thai'            => $product['trang_thai'],
                     ]);
                     $flash_sale_items->ma_chi_tiet_flash_sales = $flash_sale_items->_id;
-                    $flash_sale_items->update();
+                    $flash_sale_items->save();
                     $keptFlashSaleItems[] = $flash_sale_items->ma_chi_tiet_flash_sales;
                 }
             } 

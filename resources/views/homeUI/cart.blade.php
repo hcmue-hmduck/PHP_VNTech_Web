@@ -9,8 +9,8 @@
 @php
     $itemsForJs = $cartItems->map(function($item) {
         $variant = $item->variant;
-        $isFlashSale = $variant->flash_sale_info ? true : false;
-        $price = $isFlashSale ? $variant->flash_sale_info->gia_flash_sale : $variant->gia_ban;
+        $ma_flash_sales = $variant->flash_sale_info?->ma_flash_sales;
+        $price = $ma_flash_sales ? $variant->flash_sale_info->gia_flash_sale : $variant->gia_ban;
         return [
             'id' => $item->id,
             'ma_bien_the' => $item->ma_bien_the,
@@ -19,7 +19,7 @@
             'quantity' => $item->so_luong,
             'image' => $variant->link_anh_bien_the,
             'checked' => true,
-            'is_flash_sale' => $isFlashSale,
+            'ma_flash_sales' => $ma_flash_sales,
             'original_price' => $variant->gia_ban
         ];
     })->toArray();
@@ -35,6 +35,7 @@
       <input type="hidden" name="cart_json" x-bind:value="JSON.stringify(cartItems.filter(i => i.checked).map(item => ({
           ma_san_pham: item.id,
           ma_bien_the: item.ma_bien_the,
+          ma_flash_sales: item.ma_flash_sales,
           ten_bien_the: item.name,
           gia_ban: item.price,
           so_luong: item.quantity,
@@ -64,7 +65,7 @@
                             <h3 class="font-['Space_Grotesk'] text-lg md:text-xl font-bold text-white mb-1" x-text="item.name"></h3>
                             <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
                                 <p class="text-lime-400 font-['Space_Grotesk'] font-bold text-lg drop-shadow-[0_0_8px_rgba(0,255,102,0.4)] flex items-center gap-1">
-                                    <template x-if="item.is_flash_sale">
+                                    <template x-if="item.ma_flash_sales">
                                         <span class="inline-flex items-center gap-0.5 text-lime-400 animate-pulse font-black text-xs uppercase tracking-wider mr-1 bg-lime-950/80 px-1.5 py-0.5 rounded border border-lime-500/20">
                                             <svg class="w-3 h-3 text-lime-400 fill-lime-400" viewBox="0 0 24 24" fill="currentColor">
                                                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
@@ -74,7 +75,7 @@
                                     </template>
                                     <span x-text="formatCurrency(item.price)"></span>
                                 </p>
-                                <template x-if="item.is_flash_sale">
+                                <template x-if="item.ma_flash_sales">
                                     <span class="text-gray-500 line-through text-sm font-semibold opacity-60" x-text="formatCurrency(item.original_price)"></span>
                                 </template>
                             </div>

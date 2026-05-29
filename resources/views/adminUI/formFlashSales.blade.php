@@ -173,25 +173,25 @@
             </div>
 
             <div id="variant-list-container" class="space-y-4 {{ (empty($products) || (is_object($products) && $products->isEmpty()) || (is_array($products) && count($products) == 0)) ? 'hidden' : '' }}">
-                @foreach($products as $index => $prod)
-                    <div class="variant-row p-4 rounded-xl border border-white/5 bg-dark-bg/70 transition-all duration-300 hover:border-neon-green/20 group flex flex-col xl:flex-row xl:items-center gap-5" data-ma-bien-the="{{ $prod->ma_bien_the }}">
-                        <input type="hidden" name="products[{{ $index }}][ma_bien_the]" value="{{ $prod->ma_bien_the }}">
-                        <input type="hidden" name="products[{{ $index }}][ma_chi_tiet_flash_sales]" value="{{ $prod->ma_chi_tiet_flash_sales }}">
+                @foreach($products as $index => $item)
+                    <div class="variant-row p-4 rounded-xl border border-white/5 bg-dark-bg/70 transition-all duration-300 hover:border-neon-green/20 group flex flex-col xl:flex-row xl:items-center gap-5" data-ma-bien-the="{{ $item->ma_bien_the }}">
+                        <input type="hidden" name="products[{{ $index }}][ma_bien_the]" value="{{ $item->ma_bien_the }}">
+                        <input type="hidden" name="products[{{ $index }}][ma_chi_tiet_flash_sales]" value="{{ $item->ma_chi_tiet_flash_sales }}">
                         
                         <div class="flex items-center gap-4 flex-1 min-w-0">
                             <div class="w-16 h-16 bg-white p-0.5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden text-2xl shrink-0">
-                                @if(isset($prod->variant) && $prod->variant->link_anh_bien_the)
-                                    <img src="{{ $prod->variant->link_anh_bien_the }}" alt="{{ $prod->variant->ten_bien_the }}" class="w-full h-full object-cover">
+                                @if(isset($item->variant) && $item->variant->link_anh_bien_the)
+                                    <img src="{{ $item->variant->link_anh_bien_the }}" alt="{{ $item->variant->ten_bien_the }}" class="w-full h-full object-cover">
                                 @else
                                     <i data-lucide="image" class="text-gray-400 size-6"></i>
                                 @endif
                             </div>
                             <div class="min-w-0">
-                                <h3 class="text-white font-bold text-base leading-snug truncate" title="{{ $prod->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}">
-                                    {{ $prod->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}
+                                <h3 class="text-white font-bold text-base leading-snug truncate" title="{{ $item->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}">
+                                    {{ $item->variant->ten_bien_the ?? 'Sản phẩm không tồn tại' }}
                                 </h3>
                                 <p class="text-xs font-mono text-gray-500 uppercase tracking-wide mt-1.5 truncate">
-                                  GIÁ GỐC: <span class="text-gray-400 line-through">{{ number_format($prod->variant->gia_ban ?? 0, 0, ',', '.') }} ₫</span>
+                                  GIÁ GỐC: <span class="text-gray-400 line-through">{{ number_format($item->variant->gia_ban ?? 0, 0, ',', '.') }} ₫</span>
                                 </p>
                             </div>
                         </div>
@@ -203,7 +203,7 @@
                                     <input
                                       name="products[{{ $index }}][gia_flash_sale]"
                                       type="number"
-                                      value="{{ $prod->gia_flash_sale ?? 0 }}"
+                                      value="{{ $item->gia_flash_sale ?? 0 }}"
                                       class="w-full h-11 bg-dark-bg border border-white/10 px-3 pr-8 text-sm font-mono text-neon-green focus:border-neon-green/50 outline-none transition-colors text-right rounded-lg"
                                     />
                                     <span class="absolute right-3 top-3 text-[10px] text-neon-green font-mono">₫</span>
@@ -215,7 +215,7 @@
                                 <input
                                   name="products[{{ $index }}][so_luong_gioi_han]"
                                   type="number"
-                                  value="{{ $prod->so_luong_gioi_han ?? 0 }}"
+                                  value="{{ $item->so_luong_gioi_han ?? 0 }}"
                                   class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
                                 />
                             </div>
@@ -225,7 +225,7 @@
                                 <input
                                   name="products[{{ $index }}][gioi_han_moi_nguoi]"
                                   type="number"
-                                  value="{{ $prod->gioi_han_moi_nguoi ?? 0 }}"
+                                  value="{{ $item->gioi_han_moi_nguoi ?? 0 }}"
                                   class="w-full h-11 bg-dark-bg border border-white/10 px-2 text-sm font-mono text-white focus:border-neon-green/50 outline-none transition-colors text-center rounded-lg"
                                 />
                             </div>
@@ -233,7 +233,7 @@
                             <div class="space-y-1.5 w-full md:w-20 shrink-0">
                                 <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 truncate block">Đã bán</label>
                                 <div class="w-full h-11 bg-white/[0.03] border border-white/10 px-2 flex items-center justify-center text-sm font-mono text-gray-400 rounded-lg">
-                                    <span>{{ $prod->so_luong_da_ban ?? 0 }}</span>
+                                    <span>{{ $item->so_luong_da_ban ?? 0 }}</span>
                                 </div>
                             </div>
                         </div>
@@ -244,7 +244,7 @@
                                 <div class="h-11 flex items-center justify-center">
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="hidden" name="products[{{ $index }}][trang_thai]" value="draft">
-                                        <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="active" {{ strtolower($prod->trang_thai ?? 'draft') === 'active' ? 'checked' : '' }} class="sr-only peer">
+                                        <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="active" {{ strtolower($item->trang_thai ?? 'draft') === 'active' ? 'checked' : '' }} class="sr-only peer">
                                         <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
                                     </label>
                                 </div>

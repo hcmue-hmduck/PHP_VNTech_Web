@@ -10,7 +10,7 @@ class OrderItem extends Model {
 
     protected $fillable = [
         'ma_chi_tiet_don_hang',
-        'ma_flash_sale',
+        'ma_flash_sales',
         'ma_don_hang',
         'ma_bien_the',
         'ten_bien_the',

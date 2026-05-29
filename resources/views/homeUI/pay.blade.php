@@ -312,7 +312,7 @@
                 <input type="hidden" name="ho_ten_nguoi_nhan" id="sel_ho_ten" value="{{ $defaultAddress->ho_ten ?? '' }}">
                 <input type="hidden" name="so_dien_thoai_nhan" id="sel_sdt" value="{{ $defaultAddress->so_dien_thoai ?? '' }}">
                 <input type="hidden" name="dia_chi_giao_hang" id="sel_dc" value="{{ $fullAddress }}">
-                <input type="hidden" name="tong_tien_hang" value="{{ $tongTien }}">
+                <input type="hidden" name="tong_tien_hang" value="{{ $tamTinh }}">
                 <input type="hidden" name="phi_van_chuyen" value="0">
                 <input type="hidden" name="ma_voucher" value="{{ $MaVoucher }}">
                 <input type="hidden" name="gia_tri_giam_voucher" value="{{ $giam_gia }}">

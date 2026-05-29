@@ -29,6 +29,7 @@ class PaymentController extends Controller
                     [
                         'ma_san_pham' => $variant->ma_san_pham,
                         'ma_bien_the' => $variant->ma_bien_the,
+                        'ma_flash_sales' => $variant?->flash_sale_info->ma_flash_sales ?? '',
                         'ten_bien_the' => $variant->ten_bien_the,
                         'gia_ban' => $variant->flash_sale_info ? $variant->flash_sale_info->gia_flash_sale : $variant->gia_ban,
                         'so_luong' => 1,

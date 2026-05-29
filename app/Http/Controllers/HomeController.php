@@ -17,6 +17,9 @@ class HomeController extends Controller {
         $flashSales = FlashSales::where('trang_thai', 'active')
             ->where('bat_dau', '<=', $now)
             ->where('ket_thuc', '>=', $now)
+            ->whereHas('flash_sale_items', function ($query) {
+                $query->where('trang_thai', 'active');
+            })
             ->with([
                 'flash_sale_items' => function ($query) {
                     $query->where('trang_thai', 'active');

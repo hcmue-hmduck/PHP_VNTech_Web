@@ -9,6 +9,7 @@ use App\Models\ProductVariant;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Voucher;
+use App\Models\FlashSaleItem;
 use App\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -77,6 +78,7 @@ class OrderController extends Controller
             $orderItems = OrderItem::create([
                 'ma_don_hang' => $order->ma_don_hang,
                 'ma_bien_the' => $item['ma_bien_the'],
+                'ma_flash_sales' => $item['ma_flash_sales'] ?? '',
                 'ten_bien_the' => $item['ten_bien_the'],
                 'gia_ban' => $item['gia_ban'],
                 'so_luong' => $item['so_luong'],
@@ -85,6 +87,12 @@ class OrderController extends Controller
             ]);
             $orderItems->ma_chi_tiet_don_hang = $orderItems->_id;
             $orderItems->save();
+
+            if (!empty($item['ma_flash_sales'])) {
+                FlashSaleItem::where('ma_flash_sales', $item['ma_flash_sales'])
+                    ->where('ma_bien_the', $item['ma_bien_the'])
+                    ->increment('so_luong_da_ban', (int)$item['so_luong']);
+            }
         }
 
         // Clear only the purchased items from user's cart
