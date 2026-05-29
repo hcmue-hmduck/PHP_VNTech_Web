@@ -48,6 +48,26 @@
 
 @php
     $tongTien = collect($cartItems ?? [])->sum(fn ($item) => ($item['gia_ban'] ?? 0) * ($item['so_luong'] ?? 0));
+    $tamTinh = $tongTien;
+    $ma_voucher = request('ma_voucher');
+    $giam_gia = 0;
+    $MaVoucher = '';
+    if ($ma_voucher) {
+        $check_voucher = $voucher->firstWhere('ten_voucher', $ma_voucher);
+        if ($check_voucher) {
+            $MaVoucher = $check_voucher->ma_voucher;
+            if ($check_voucher->hinh_thuc_giam === 'percent') {
+                $giam_gia = $tongTien * ($check_voucher->gia_tri_giam / 100);
+            }
+            else {
+                $giam_gia = $check_voucher->gia_tri_giam;
+            }
+            if ($check_voucher->muc_giam_toi_da > 0 && $giam_gia > $check_voucher->muc_giam_toi_da) {
+                $giam_gia = $check_voucher->muc_giam_toi_da;
+            }
+            $tongTien = max(0, $tongTien - $giam_gia);
+        }
+    }
 @endphp
 
 @if ($errors->any())
@@ -285,7 +305,7 @@
             </section>
 
             <!-- PHẦN 2: THÔNG TIN THANH TOÁN (FORM CHÍNH) -->
-            <form id="checkout-form" method="POST" action="{{ route('storeCreateOrder') }}" x-data="{ paymentMethod: 'momo', cartItems: {{ json_encode($cartItems ?? []) }} }" class="space-y-8">
+            <form id="checkout-form" method="POST" action="{{ route('order.store') }}" x-data="{ paymentMethod: 'cod', cartItems: {{ json_encode($cartItems ?? []) }} }" class="space-y-8">
                 @csrf
                 <input type="hidden" name="ma_don_hang" value="">
                 <input type="hidden" name="ma_nguoi_dung" value="{{ auth()->id() ?? 'guest' }}">
@@ -294,7 +314,8 @@
                 <input type="hidden" name="dia_chi_giao_hang" id="sel_dc" value="{{ $fullAddress }}">
                 <input type="hidden" name="tong_tien_hang" value="{{ $tongTien }}">
                 <input type="hidden" name="phi_van_chuyen" value="0">
-                <input type="hidden" name="gia_tri_giam_voucher" value="0">
+                <input type="hidden" name="ma_voucher" value="{{ $MaVoucher }}">
+                <input type="hidden" name="gia_tri_giam_voucher" value="{{ $giam_gia }}">
                 <input type="hidden" name="tong_thanh_toan" value="{{ $tongTien }}">
                 <input type="hidden" name="phuong_thuc_thanh_toan" x-model="paymentMethod">
                 <input type="hidden" name="cart_items" x-bind:value="JSON.stringify(cartItems)">
@@ -308,20 +329,20 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button type="button" @click="paymentMethod = 'momo'"
-                                :class="paymentMethod === 'momo' ? 'border-lime-400 bg-lime-400/5 text-lime-400 shadow-[0_0_20px_rgba(163,230,53,0.12)]' : 'border-white/10 text-white/60 hover:border-white/30'"
-                                class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group rounded-xl">
-                            <i data-lucide="wallet-cards" :class="paymentMethod === 'momo' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
-                            <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Thanh toán MoMo</span>
-                            <span class="text-[9px] text-white/35 uppercase tracking-[0.2em]">Ví MoMo / quét mã QR MoMo</span>
-                        </button>
-                        
                         <button type="button" @click="paymentMethod = 'cod'"
                                 :class="paymentMethod === 'cod' ? 'border-lime-400 bg-lime-400/5 text-lime-400 shadow-[0_0_20px_rgba(163,230,53,0.12)]' : 'border-white/10 text-white/60 hover:border-white/30'"
                                 class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group rounded-xl">
                             <i data-lucide="hand-coins" :class="paymentMethod === 'cod' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
                             <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Thanh toán khi nhận hàng</span>
                             <span class="text-[9px] text-white/35 uppercase tracking-[0.2em]">COD / trả tiền cho shipper</span>
+                        </button>
+
+                        <button type="button" @click="paymentMethod = 'momo'"
+                                :class="paymentMethod === 'momo' ? 'border-lime-400 bg-lime-400/5 text-lime-400 shadow-[0_0_20px_rgba(163,230,53,0.12)]' : 'border-white/10 text-white/60 hover:border-white/30'"
+                                class="flex flex-col items-center gap-4 p-6 border transition-all cursor-pointer group rounded-xl">
+                            <i data-lucide="wallet-cards" :class="paymentMethod === 'momo' ? 'animate-pulse' : ''" class="w-8 h-8"></i>
+                            <span class="text-[10px] uppercase font-bold tracking-[0.2em]">Thanh toán MoMo</span>
+                            <span class="text-[9px] text-white/35 uppercase tracking-[0.2em]">Ví MoMo / quét mã QR MoMo</span>
                         </button>
                     </div>
                 </section>
@@ -378,13 +399,35 @@
                     @endif
                 </div>
 
+                {{-- Voucher Input --}}
+                <div class="py-6 border-t border-white/5">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-mono">Mã giảm giá / Voucher</label>
+                    <form action="" method="GET">
+                        <div class="flex gap-2">
+                            <input type="text" 
+                                name="ma_voucher" 
+                                placeholder="NHẬP MÃ VOUCHER..." 
+                                value="{{ request('ma_voucher') }}"
+                                class="flex-1 bg-white/5 border border-white/10 focus:border-lime-400/50 rounded-lg px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none transition-all uppercase font-mono tracking-widest" />
+                            <button type="submit" 
+                                    class="bg-transparent hover:bg-lime-400 border border-lime-400/30 hover:border-lime-400 text-lime-400 hover:text-black font-mono font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-lg transition-all duration-300 flex items-center justify-center whitespace-nowrap cursor-pointer">
+                                Áp dụng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="space-y-3 pt-6 border-t border-white/5">
                     <div class="flex justify-between items-center text-sm">
                         <span class="text-white/40 uppercase tracking-widest text-[10px]">Tạm tính</span>
-                        <span class="text-white font-['Space_Grotesk']">{{ number_format($tongTien, 0, ',', '.') }}đ</span>
+                        <span class="text-white font-['Space_Grotesk']">{{ number_format($tamTinh, 0, ',', '.') }}đ</span>
                     </div>
                     <div class="flex justify-between items-center text-sm">
-                        <span class="text-white/40 uppercase tracking-widest text-[10px]">Phí vận hành</span>
+                        <span class="text-white/40 uppercase tracking-widest text-[10px]">Giảm giá (Voucher)</span>
+                        <span class="text-rose-500 font-['Space_Grotesk']">-{{ number_format($giam_gia, 0, ',', '.') }}đ</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-white/40 uppercase tracking-widest text-[10px]">Phí vận chuyển</span>
                         <span class="text-lime-400 uppercase font-bold text-[10px]">MIỄN PHÍ</span>
                     </div>
                     <div class="flex justify-between items-end pt-8 mt-4 border-t border-white/10">

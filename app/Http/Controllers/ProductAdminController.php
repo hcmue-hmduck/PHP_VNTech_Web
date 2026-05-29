@@ -13,11 +13,12 @@ class ProductAdminController extends Controller
 {
     public function viewProductAdmin()
     {
-        $products = Product::with(['variants' => function ($query) {
-            $query->where('trang_thai', '!=', 'delete');
+        $products = Product::where('trang_thai', '!=', 'deleted')->with(['variants' => function ($query) {
+            $query->where('trang_thai', '!=', 'deleted');
         }])->latest()->paginate(10);
-        $totalProducts = $products->count();
-        $activeProducts = $products->where('trang_thai', 'active')->count();
+        
+        $totalProducts = Product::where('trang_thai', '!=', 'deleted')->count();
+        $activeProducts = Product::where('trang_thai', 'active')->count();
         // $lowStockProducts = Product::where('stock_quantity', '<', 5)->count();
         // $inventoryValue = Product::sum(DB::raw('import_price * stock_quantity'));
         $brands = Brand::latest()->get();
@@ -213,20 +214,26 @@ class ProductAdminController extends Controller
                     }
                 }
             }
-
-            // Any existing variants not present in the submitted form -> mark as deleted
             foreach ($allProductVariant as $existingVariant) {
                 if (!in_array($existingVariant->ma_bien_the, $keptMaBienThe)) {
-                    ProductVariant::where('ma_bien_the', $existingVariant->ma_bien_the)->update(['trang_thai' => 'delete']);
+                    ProductVariant::where('ma_bien_the', $existingVariant->ma_bien_the)->update(['trang_thai' => 'deleted']);
                 }
             }
         }
         else {
-            ProductVariant::where('ma_san_pham', $product->ma_san_pham)->update(['trang_thai' => 'delete']);
+            ProductVariant::where('ma_san_pham', $product->ma_san_pham)->update(['trang_thai' => 'deleted']);
         }
 
-
-
+        
         return redirect()->back()->with('success', 'Cập nhật sản phẩm thành công!');
+    }
+
+    public function deleteProductAdmin(Product $product) {
+        $product->trang_thai = 'deleted';
+        $product->save();
+
+        ProductVariant::where('ma_san_pham', $product->ma_san_pham)->update(['trang_thai' => 'deleted']);
+
+        return redirect()->back()->with('success', 'Xoá sản phẩm thành công!');
     }
 }

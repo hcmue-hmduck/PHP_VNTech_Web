@@ -12,6 +12,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserAddressController;
 use App\Http\Controllers\Brands_CategoriesAdminController;
 use App\Http\Controllers\FlashSalesController;
+use App\Http\Controllers\VoucherController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
 
@@ -36,16 +37,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/cart/add-item', [CartController::class, 'addItem'])->name('cart.addItem');
     Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
     Route::post('/cart/remove-item', [CartController::class, 'removeItem'])->name('cart.removeItem');
-    Route::get('/cart', [CartController::class, 'viewCart'])->name('viewCart');
+    Route::get('/cart', [CartController::class, 'viewCart'])->name('cart.view');
 
     Route::post('/user-address', [UserAddressController::class, 'storeAddress'])->name('user-address.store');
 
-    Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('viewPayment');
-    Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('preparePayment');
+    Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('payment.view');
+    Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('payment.prepare');
 
-    Route::post('/order/create', [OrderController::class, 'storeCreateOrder'])->name('storeCreateOrder');
-    Route::get('/orders', [OrderController::class, 'viewOrder'])->name('viewOrder');
-    Route::get('/orders/{ma_don_hang}', [OrderController::class, 'viewOrderDetail'])->name('viewOrderDetail');
+    Route::post('/order/create', [OrderController::class, 'storeCreateOrder'])->name('order.store');
+    Route::get('/orders', [OrderController::class, 'viewOrder'])->name('order.view');
+    Route::get('/orders/{ma_don_hang}', [OrderController::class, 'viewOrderDetail'])->name('order_detail.view');
 
     Route::get('/momo/create/{ma_don_hang}', [PaymentController::class, 'createMomoPayment'])->name('momo.create');
     Route::get('/momo/return', [PaymentController::class, 'momoReturn'])->name('momo.return');
@@ -55,13 +56,13 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
+
     Route::get('/products', [ProductAdminController::class, 'viewProductAdmin'])->name('admin.products.index');
     Route::get('/products/create', [ProductAdminController::class, 'viewCreateProductAdmin'])->name('admin.products.create');
-
     Route::post('/products', [ProductAdminController::class, 'storeCreateProductAdmin'])->name('admin.products.store');
-
     Route::get('/products/{product}/edit', [ProductAdminController::class, 'viewEditProductAdmin'])->name('admin.products.edit');
     Route::put('/products/{product}', [ProductAdminController::class, 'updateEditProductAdmin'])->name('admin.products.update');
+    Route::put('/product/{product}/delete', [ProductAdminController::class, 'deleteProductAdmin'])->name('admin.product.delete');
 
     Route::get('/order', [OrderController::class, 'viewAdminOrder'])->name('admin.order.index');
     Route::get('/order/{ma_don_hang}', [OrderController::class, 'viewAdminOrderDetail'])->name('admin.order.view');
@@ -82,4 +83,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
 
     Route::get('/flash-sales/{flash_sales}/edit', [FlashSalesController::class, 'viewEditFlashSalesAdmin'])->name('admin.flashsales.edit');
     Route::put('/flash-sales/{flash_sales}', [FlashSalesController::class, 'updateEditFlashSalesAdmin'])->name('admin.flashsales.update');
+
+    Route::get('/vouchers', [VoucherController::class, 'viewVoucherAdmin'])->name('admin.voucher.view');
+    Route::get('/voucher/create', [VoucherController::class, 'viewCreateVoucherAdmin'])->name('admin.voucher.create');
+    Route::post('/vouchers', [VoucherController::class, 'storeCreateVoucherAdmin'])->name('admin.voucher.store');
+    Route::get('/voucher/{voucher}/edit', [VoucherController::class, 'viewEditVoucherAdmin'])->name('admin.voucher.edit');
+    Route::put('/voucher/{voucher}', [VoucherController::class, 'updateEditVoucherAdmin'])->name('admin.voucher.update');
+    Route::put('/voucher/{voucher}/delete', [VoucherController::class, 'deleteVoucherAdmin'])->name('admin.voucher.delete');
 });

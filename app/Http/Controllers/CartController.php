@@ -15,7 +15,9 @@ class CartController extends Controller {
         if (!$cart) {
             $cartItems = collect();
         } else {
-            $cartItems = CartItem::with('variant.product')->where('ma_gio_hang', $cart->_id)->get(); 
+            $cartItems = CartItem::with(['variant.product', 'variant.activeFlashSaleItem.campaign'])
+                ->where('ma_gio_hang', $cart->_id)
+                ->get(); 
         }
         
         return view('homeUI.cart', compact('cartItems', 'cart'));
@@ -62,5 +64,3 @@ class CartController extends Controller {
         return redirect()->back()->with('success', 'Đã thêm vào giỏ hàng!');
     }
 }
-
-?>

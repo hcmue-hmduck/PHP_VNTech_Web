@@ -30,4 +30,28 @@ class ProductVariant extends Model {
     {
         return $this->belongsTo(Product::class, 'ma_san_pham', 'ma_san_pham');
     }
+
+    public function activeFlashSaleItem()
+    {
+        $now = now();
+        $activeCampaignIds = FlashSales::where('trang_thai', 'active')
+            ->where('bat_dau', '<=', $now)
+            ->where('ket_thuc', '>=', $now)
+            ->pluck('ma_flash_sales')
+            ->toArray();
+
+        return $this->hasOne(FlashSaleItem::class, 'ma_bien_the', 'ma_bien_the')
+            ->where('trang_thai', 'active')
+            ->whereIn('ma_flash_sales', $activeCampaignIds);
+    }
+
+    public function getFlashSaleInfoAttribute()
+    {
+        return $this->activeFlashSaleItem;
+    }
+
+    public function getFlashSaleCampaignAttribute()
+    {
+        return $this->activeFlashSaleItem?->campaign;
+    }
 }

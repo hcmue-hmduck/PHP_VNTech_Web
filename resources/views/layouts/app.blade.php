@@ -84,9 +84,9 @@
                     }
                 }
             @endphp
-            <!-- Shopping Cart & User Section -->
+               <!-- Shopping Cart & User Section -->
             <div class="flex items-center gap-4">
-                <a href="{{ auth()->check() ? route('viewCart') : route('login') }}" class="hover:bg-white/5 p-2 rounded-full transition-all text-lime-400 relative inline-block">
+                <a href="{{ auth()->check() ? route('cart.view') : route('login') }}" class="hover:bg-white/5 p-2 rounded-full transition-all text-lime-400 relative inline-block">
                     <i data-lucide="shopping-cart" class="w-6 h-6"></i>
                     <span class="absolute top-0 right-0 bg-white text-black text-[8px] font-bold px-1 rounded-full">{{ $cartCount }}</span>
                 </a>
@@ -109,7 +109,7 @@
                         <div class="w-10 h-10 rounded-full border-2 border-lime-400/30 overflow-hidden group-hover:border-lime-400 transition-all shadow-[0_0_15px_rgba(0,229,91,0.1)]">
                             <img src="{{ Auth::user()->avatar_url }}" 
                                  class="w-full h-full object-cover" 
-                                 alt="Avatar">
+                                  alt="Avatar">
                         </div>
                     </button>
 
@@ -133,7 +133,7 @@
                             <i data-lucide="user-cog" class="w-4 h-4"></i> Hồ sơ cá nhân
                         </a>
                         
-                        <a href="{{ route('viewOrder') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 hover:bg-white/5 hover:text-lime-400 transition-all">
+                        <a href="{{ route('order.view') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 hover:bg-white/5 hover:text-lime-400 transition-all">
                             <i data-lucide="shopping-bag" class="w-4 h-4"></i> Lịch sử mua hàng
                         </a>
 

@@ -44,4 +44,14 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariant::class, 'ma_san_pham', 'ma_san_pham');
     }
+
+    public function getFlashSaleInfoAttribute()
+    {
+        foreach ($this->variants as $variant) {
+            if ($variant->flash_sale_info) {
+                return $variant->flash_sale_info;
+            }
+        }
+        return null;
+    }
 }

@@ -94,8 +94,8 @@
                             ['name' => 'Hãng / Danh mục', 'icon' => 'layers', 'route' => 'admin.brandscategories.index', 'active' => 'admin.brandscategories*'],
                             ['name' => 'Đơn hàng', 'icon' => 'shopping-cart', 'route' => 'admin.order.index', 'active' => 'admin.order*'],
                             ['name' => 'Flash Sales', 'icon' => 'zap', 'route' => 'admin.flashsales.index', 'active'=>'admin.flashsales*'],
+                            ['name' => 'Voucher', 'icon' => 'ticket', 'route' => 'admin.voucher.view', 'active' => 'admin.voucher*'],
                             ['name' => 'Banner quảng cáo', 'icon' => 'image', 'route' => 'admin.banners'],
-                            ['name' => 'Cấu hình hệ thống', 'icon' => 'settings', 'route' => 'admin.settings'],
                         ];
                     @endphp
 

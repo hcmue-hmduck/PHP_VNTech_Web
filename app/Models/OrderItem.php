@@ -10,14 +10,13 @@ class OrderItem extends Model {
 
     protected $fillable = [
         'ma_chi_tiet_don_hang',
+        'ma_flash_sale',
         'ma_don_hang',
         'ma_bien_the',
         'ten_bien_the',
         'link_anh_dai_dien',
         'so_luong',
         'gia_ban',
-        'ma_bien_the_flash_sale',
-        'so_tien_giam_flash_sale',
         'thanh_tien',
     ];
 
@@ -25,7 +24,6 @@ class OrderItem extends Model {
         'so_luong'               => 'integer',
         'gia_niem_yet'           => 'decimal:0',
         'don_gia'                => 'decimal:0',
-        'so_tien_giam_flash_sale'=> 'decimal:0',
         'thanh_tien'             => 'decimal:0',
     ];
 

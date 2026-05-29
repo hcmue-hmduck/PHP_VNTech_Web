@@ -13,12 +13,15 @@ class HomeController extends Controller {
         $brands = Brand::latest()->get();
         $categories = Category::latest()->get();
 
-        $flashSales = FlashSales::where('trang_thai', 'active')->with([
-            'flash_sale_items' => function ($query) {
-                $query->where('trang_thai', 'active');
-            }
-        ])->get();
-
+        $now = now();
+        $flashSales = FlashSales::where('trang_thai', 'active')
+            ->where('bat_dau', '<=', $now)
+            ->where('ket_thuc', '>=', $now)
+            ->with([
+                'flash_sale_items' => function ($query) {
+                    $query->where('trang_thai', 'active');
+                }
+            ])->get();
         return view('homeUI.home', compact('brands', 'categories', 'products', 'flashSales'));
     }
 }

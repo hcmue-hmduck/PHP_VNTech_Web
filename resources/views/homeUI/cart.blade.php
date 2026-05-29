@@ -9,19 +9,23 @@
 @php
     $itemsForJs = $cartItems->map(function($item) {
         $variant = $item->variant;
+        $isFlashSale = $variant->flash_sale_info ? true : false;
+        $price = $isFlashSale ? $variant->flash_sale_info->gia_flash_sale : $variant->gia_ban;
         return [
             'id' => $item->id,
             'ma_bien_the' => $item->ma_bien_the,
             'name' => $variant->ten_bien_the,
-            'price' => $variant->gia_ban,
+            'price' => $price,
             'quantity' => $item->so_luong,
             'image' => $variant->link_anh_bien_the,
-            'checked' => true
+            'checked' => true,
+            'is_flash_sale' => $isFlashSale,
+            'original_price' => $variant->gia_ban
         ];
     })->toArray();
 @endphp
 
-<form method="POST" action="{{ route('preparePayment') }}" class="min-h-screen bg-[#121414] font-sans selection:bg-lime-400 selection:text-black pt-32 pb-24 px-6 max-w-7xl mx-auto"
+<form method="POST" action="{{ route('payment.prepare') }}" class="min-h-screen bg-[#121414] font-sans selection:bg-lime-400 selection:text-black pt-32 pb-24 px-6 max-w-7xl mx-auto"
         x-data='cartComponent(@json($itemsForJs), {
           updateUrl: "{{ route("cart.updateQuantity") }}",
           removeUrl: "{{ route("cart.removeItem") }}",
@@ -58,7 +62,22 @@
                         
                         <div class="flex-grow text-center md:text-left">
                             <h3 class="font-['Space_Grotesk'] text-lg md:text-xl font-bold text-white mb-1" x-text="item.name"></h3>
-                            <p class="text-lime-400 font-['Space_Grotesk'] font-bold text-lg drop-shadow-[0_0_8px_rgba(0,255,102,0.4)]" x-text="formatCurrency(item.price)"></p>
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                <p class="text-lime-400 font-['Space_Grotesk'] font-bold text-lg drop-shadow-[0_0_8px_rgba(0,255,102,0.4)] flex items-center gap-1">
+                                    <template x-if="item.is_flash_sale">
+                                        <span class="inline-flex items-center gap-0.5 text-lime-400 animate-pulse font-black text-xs uppercase tracking-wider mr-1 bg-lime-950/80 px-1.5 py-0.5 rounded border border-lime-500/20">
+                                            <svg class="w-3 h-3 text-lime-400 fill-lime-400" viewBox="0 0 24 24" fill="currentColor">
+                                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                            </svg>
+                                            FLASH SALE
+                                        </span>
+                                    </template>
+                                    <span x-text="formatCurrency(item.price)"></span>
+                                </p>
+                                <template x-if="item.is_flash_sale">
+                                    <span class="text-gray-500 line-through text-sm font-semibold opacity-60" x-text="formatCurrency(item.original_price)"></span>
+                                </template>
+                            </div>
                         </div>
 
                         <div class="flex items-center gap-6">

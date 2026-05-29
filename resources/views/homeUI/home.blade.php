@@ -323,15 +323,15 @@
                                class="aspect-square bg-slate-950 overflow-hidden relative block">
                                 <img
                                     class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
-                                    src="{{ $item->variant?->link_anh_bien_the ?? $item->variant?->product?->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
-                                    alt="{{ $item->variant?->product?->ten_san_pham ?? 'Sản phẩm Flash Sale' }}"
+                                    src="{{ $item->variant->link_anh_bien_the ?? $item->variant->product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
+                                    alt="{{ $item->variant->ten_bien_the ?? 'Sản phẩm Flash Sale' }}"
                                 >
                             </a>
 
                             <div class="p-5 flex-1 flex flex-col justify-between">
                                 <div>
                                     <h5 class="font-black uppercase text-sm text-white text-center line-clamp-1 group-hover:text-lime-400 transition-colors">
-                                        {{ $item->variant?->product?->ten_san_pham ?? 'Sản phẩm Flash Sale' }}
+                                        {{ $item->variant->ten_bien_the ?? 'Sản phẩm Flash Sale' }}
                                     </h5>
                                 </div>
 

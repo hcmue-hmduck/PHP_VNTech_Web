@@ -31,13 +31,24 @@ class FlashSaleItem extends Model {
         return $this->belongsTo(ProductVariant::class, 'ma_bien_the', 'ma_bien_the');
     }
 
+    public function campaign()
+    {
+        return $this->belongsTo(FlashSales::class, 'ma_flash_sales', 'ma_flash_sales');
+    }
+
     /**
      * Scope: Lấy các Flash Sale đang diễn ra
      */
     public function scopeActive(Builder $query)
     {
-        return $query->where('trang_thai', 'active')
-                     ->where('bat_dau', '<=', now())
-                     ->where('ket_thuc', '>=', now());
+        $now = now();
+        $activeCampaignIds = FlashSales::where('trang_thai', 'active')
+            ->where('bat_dau', '<=', $now)
+            ->where('ket_thuc', '>=', $now)
+            ->pluck('ma_flash_sales')
+            ->toArray();
+
+        return $query->whereIn('ma_flash_sales', $activeCampaignIds)
+                     ->where('trang_thai', 'active');
     }
 }

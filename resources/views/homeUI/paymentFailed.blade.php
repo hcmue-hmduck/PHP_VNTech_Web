@@ -70,7 +70,7 @@
         {{-- Actions --}}
         <div class="mt-10 flex flex-col gap-4 sm:flex-row">
             @if(!empty($orderId))
-            <a href="{{ route('viewOrderDetail', ['ma_don_hang' => $orderId]) }}"
+            <a href="{{ route('order_detail.view', ['ma_don_hang' => $orderId]) }}"
                class="inline-flex items-center justify-center gap-3 rounded-full bg-white/10 border border-white/15 px-8 py-4 text-sm font-black uppercase tracking-widest text-white transition hover:bg-white/15 hover:border-white/30">
                 <i data-lucide="package" class="h-4 w-4"></i>
                 Xem đơn hàng

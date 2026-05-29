@@ -12,30 +12,33 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\UserAddress;
+use App\Models\Voucher;
 
 class PaymentController extends Controller
 {
     public function viewPayment($ma_bien_the = null)
     {
+        $voucher = Voucher::get();
         $user_id = Auth::id();
         $user_address = UserAddress::where('ma_nguoi_dung', $user_id)->get();
         $cartItems = session('cartItems', []);
         if ($ma_bien_the) {
-            $variant = ProductVariant::where('ma_bien_the', $ma_bien_the)->first();
+            $variant = ProductVariant::with(['activeFlashSaleItem.campaign'])->where('ma_bien_the', $ma_bien_the)->first();
             if ($variant) {
                 $cartItems = [
                     [
                         'ma_san_pham' => $variant->ma_san_pham,
                         'ma_bien_the' => $variant->ma_bien_the,
                         'ten_bien_the' => $variant->ten_bien_the,
-                        'gia_ban' => $variant->gia_ban,
+                        'gia_ban' => $variant->flash_sale_info ? $variant->flash_sale_info->gia_flash_sale : $variant->gia_ban,
                         'so_luong' => 1,
                         'link_anh_dai_dien' => $variant->link_anh_bien_the ?: ($variant->product->link_anh_dai_dien ?? '')
                     ]
                 ];
             }
         }
-        return view('homeUI.pay', compact('user_address', 'cartItems'));
+
+        return view('homeUI.pay', compact('user_address', 'cartItems', 'voucher'));
     }
 
     public function preparePayment(Request $request)
@@ -52,7 +55,7 @@ class PaymentController extends Controller
 
         session(['cartItems' => $cartItems]);
 
-        return redirect()->route('viewPayment');
+        return redirect()->route('payment.view');
     }
 
     public function createMomoPayment(Request $request)
@@ -113,7 +116,7 @@ class PaymentController extends Controller
 
         dd($result);
 
-        return redirect()->route('viewOrderDetail', ['ma_don_hang' => $maDonHang])
+        return redirect()->route('order_detail.view', ['ma_don_hang' => $maDonHang])
             ->with('error', $result['message'] ?? 'Không thể tạo thanh toán MoMo, vui lòng thử lại.');
     }
 
@@ -125,7 +128,7 @@ class PaymentController extends Controller
         $internalOrderId = $this->resolveInternalOrderId($request->query('extraData'), $orderId);
 
         if ($resultCode == 0 || $resultCode == 9000) {
-            return redirect()->route('viewOrderDetail', ['ma_don_hang' => $internalOrderId]);
+            return redirect()->route('order_detail.view', ['ma_don_hang' => $internalOrderId]);
         }
 
         $message = $request->query('message');

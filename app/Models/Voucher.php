@@ -8,12 +8,9 @@ use MongoDB\Laravel\Eloquent\Model;
 class Voucher extends Model {
     use HasFactory;
 
-    protected $primaryKey = 'ma_voucher';
-    public $incrementing = false;
-    protected $keyType = 'string';
-
     protected $fillable = [
         'ma_voucher',
+        'ten_voucher',
         'mo_ta',
         'loai_voucher',
         'hinh_thuc_giam',

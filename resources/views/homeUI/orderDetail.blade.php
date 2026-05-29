@@ -136,7 +136,7 @@
                         @endphp
                         <a
                             x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $statusText }}'"
-                            href="{{ route('viewOrderDetail', ['ma_don_hang' => $o->ma_don_hang]) }}"
+                            href="{{ route('order_detail.view', ['ma_don_hang' => $o->ma_don_hang]) }}"
                             class="order-card w-[280px] p-6 rounded-lg cursor-pointer transition-all duration-300 border block {{ $isActive ? 'bg-[#282a2b] border-neon-green active-order-glow' : 'bg-[#1a1c1c] border-white/5 hover:border-neon-green/50' }}"
                         >
                             <div class="flex justify-between items-start mb-4">

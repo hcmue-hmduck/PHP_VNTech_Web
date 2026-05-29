@@ -3,6 +3,12 @@
 @section('title', $productDetail->ten_san_pham)
 
 @section('content')
+@php
+    $selectedVariant = $variants->firstWhere('ma_bien_the', request('ma_bien_the')) ?? $variants->first();
+    $flashSaleInfo = $selectedVariant->flash_sale_info;
+    $flashSaleCampaign = $selectedVariant->flash_sale_campaign;
+    $isFlashSaleActive = $flashSaleInfo && $flashSaleCampaign;
+@endphp
 <!-- Custom Styles for Product Detail -->
 <style>
     .glass-panel {
@@ -25,8 +31,7 @@
     }
 </style>
 
-    <main class="flex-1 pt-32 pb-24 px-12 max-w-[1440px] mx-auto w-full uppercase" 
-      x-data="productDetail({{ $variants->toJson() }}, {{ json_encode($productDetail->hinh_anh ?? []) }})">
+    <main class="flex-1 pt-32 pb-24 px-12 max-w-[1440px] mx-auto w-full uppercase">
     
     <!-- Breadcrumbs -->
     <nav class="mb-8 flex items-center gap-2 text-gray-500 font-bold text-[10px] tracking-[0.2em]">
@@ -39,17 +44,17 @@
         <!-- Left: Gallery -->
         <div class="lg:col-span-7 space-y-6">
             <div class="glass-panel aspect-video rounded-none overflow-hidden relative group">
-                <img :src="gallery[activeImageIndex]" alt="{{ $productDetail->ten_san_pham }}" class="w-full h-full object-cover">
+                <img id="main-product-image" src="{{ $selectedVariant->link_anh_bien_the ?: $productDetail->link_anh_dai_dien }}" alt="{{ $productDetail->ten_san_pham }}" class="w-full h-full object-cover">
                 <div class="absolute top-4 right-4 bg-lime-400 text-black px-3 py-1 font-black text-[10px] tracking-[0.2em] uppercase">
                     THẾ HỆ MỚI
                 </div>
 
                 <!-- Navigation Buttons -->
                 <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button @click="prevImage" class="w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all">
+                    <button type="button" onclick="prevImage()" class="w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all">
                         <i data-lucide="chevron-left" class="w-6 h-6"></i>
                     </button>
-                    <button @click="nextImage" class="w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all">
+                    <button type="button" onclick="nextImage()" class="w-12 h-12 flex items-center justify-center bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all">
                         <i data-lucide="chevron-right" class="w-6 h-6"></i>
                     </button>
                 </div>
@@ -58,33 +63,27 @@
             <!-- Single Row Thumbnail Slider -->
             <div class="relative group/thumbs">
                 <!-- Arrow Left -->
-                <button @click="$refs.thumbTrack.scrollBy({left: -$refs.thumbTrack.offsetWidth, behavior: 'smooth'})" 
+                <button type="button" onclick="document.getElementById('thumbTrack').scrollBy({left: -200, behavior: 'smooth'})" 
                         class="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all rounded-full opacity-0 group-hover/thumbs:opacity-100">
                     <i data-lucide="chevron-left" class="w-4 h-4"></i>
                 </button>
 
                 <!-- Track -->
-                <div x-ref="thumbTrack" class="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2">
-                    <template x-for="(img, idx) in gallery" :key="idx">
-                        <div @click="activeImageIndex = idx" 
-                             class="glass-panel basis-[calc(25%-12px)] flex-shrink-0 aspect-square flex items-center justify-center cursor-pointer overflow-hidden border-white/5 hover:border-lime-400 transition-all relative">
-                            <template x-if="img === 'video'">
-                                <div class="text-lime-400 flex flex-col items-center justify-center opacity-60 hover:opacity-100">
-                                    <i data-lucide="play-circle" class="w-8 h-8"></i>
-                                </div>
-                            </template>
-                            <template x-if="img !== 'video'">
-                                <img :src="img" class="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity"
-                                     :class="{'opacity-100': activeImageIndex === idx}">
-                                <div class="absolute inset-0 border-2 border-lime-400 transition-opacity pointer-events-none"
-                                     :class="activeImageIndex === idx ? 'opacity-100' : 'opacity-0'"></div>
-                            </template>
+                <div id="thumbTrack" class="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2">
+                    @php
+                        $galleryImages = array_merge([$selectedVariant->link_anh_bien_the ?: $productDetail->link_anh_dai_dien], $productDetail->hinh_anh ?? []);
+                    @endphp
+                    @foreach($galleryImages as $idx => $img)
+                        <div data-index="{{ $idx }}" 
+                             class="thumb-container glass-panel basis-[calc(25%-12px)] flex-shrink-0 aspect-square flex items-center justify-center cursor-pointer overflow-hidden border border-white/5 hover:border-lime-400 transition-all relative">
+                            <img src="{{ $img }}" class="w-full h-full object-cover transition-opacity {{ $idx === 0 ? 'opacity-100' : 'opacity-60' }}">
+                            <div class="thumb-border absolute inset-0 border-2 border-lime-400 transition-opacity pointer-events-none {{ $idx === 0 ? 'opacity-100' : 'opacity-0' }}"></div>
                         </div>
-                    </template>
+                    @endforeach
                 </div>
 
                 <!-- Arrow Right -->
-                <button @click="$refs.thumbTrack.scrollBy({left: $refs.thumbTrack.offsetWidth, behavior: 'smooth'})" 
+                <button type="button" onclick="document.getElementById('thumbTrack').scrollBy({left: 200, behavior: 'smooth'})" 
                         class="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-lime-400 hover:text-black transition-all rounded-full opacity-0 group-hover/thumbs:opacity-100">
                     <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </button>
@@ -102,82 +101,102 @@
 
             <!-- Khối Giá / Flash Sale -->
             <div class="mb-12">
-                <!-- Khối Flash Sale (Hiển thị nếu có Flash Sale) -->
-                <div x-show="currentVariant.flash_sale_info" class="space-y-4 w-full">
-                    <!-- Flash Sale Banner nổi bật -->
-                    <div class="bg-gradient-to-r from-lime-950/80 to-slate-900/80 border border-lime-500/35 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-[0_0_15px_rgba(0,255,102,0.15)]">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-lime-500/20 flex items-center justify-center animate-pulse border border-lime-400/30">
-                                <i data-lucide="zap" class="w-5 h-5 text-lime-400 fill-lime-400"></i>
+                @if($isFlashSaleActive)
+                    <!-- Khối Flash Sale (Hiển thị nếu có Flash Sale) -->
+                    <div class="space-y-4 w-full">
+                        <!-- Flash Sale Banner nổi bật -->
+                        <div class="bg-gradient-to-r from-lime-950/80 to-slate-900/80 border border-lime-500/35 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-[0_0_15px_rgba(0,255,102,0.15)]">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-lime-500/20 flex items-center justify-center animate-pulse border border-lime-400/30">
+                                    <i data-lucide="zap" class="w-5 h-5 text-lime-400 fill-lime-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-lime-400 font-black text-sm tracking-widest uppercase italic flex items-center gap-2">
+                                        FLASHSALE
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <div class="text-lime-400 font-black text-sm tracking-widest uppercase italic flex items-center gap-2">
-                                    FLASHSALE
+                            
+                            <!-- Countdown Timer -->
+                            @php
+                                $endTimeStr = is_string($flashSaleCampaign->ket_thuc) 
+                                    ? $flashSaleCampaign->ket_thuc 
+                                    : ($flashSaleCampaign->ket_thuc instanceof \Carbon\Carbon 
+                                        ? $flashSaleCampaign->ket_thuc->toIso8601String() 
+                                        : (string)$flashSaleCampaign->ket_thuc);
+                            @endphp
+                            <div id="flash-sale-countdown" data-endtime="{{ $endTimeStr }}" class="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-lg border border-white/5">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">KẾT THÚC SAU:</span>
+                                <div class="flex items-center gap-1.5 font-mono text-sm font-black text-lime-400">
+                                    <span id="countdown-days" class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20">00</span>
+                                    <span>:</span>
+                                    <span id="countdown-hours" class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20">00</span>
+                                    <span>:</span>
+                                    <span id="countdown-minutes" class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20">00</span>
+                                    <span>:</span>
+                                    <span id="countdown-seconds" class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20 text-white animate-pulse">00</span>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Countdown Timer -->
-                        <div class="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-lg border border-white/5">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">KẾT THÚC SAU:</span>
-                            <div class="flex items-center gap-1.5 font-mono text-sm font-black text-lime-400">
-                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20" x-text="countdown.days">00</span>
-                                <span>:</span>
-                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20" x-text="countdown.hours">00</span>
-                                <span>:</span>
-                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20" x-text="countdown.minutes">00</span>
-                                <span>:</span>
-                                <span class="bg-lime-950/80 px-2 py-1 rounded border border-lime-400/20 text-white animate-pulse" x-text="countdown.seconds">00</span>
+                        <!-- Khối giá Flash Sale -->
+                        <div class="flex items-end gap-6">
+                            <div>
+                                <div class="text-[10px] text-lime-400 font-black tracking-widest uppercase mb-1">GIÁ FLASHSALE</div>
+                                <div class="text-lime-400 font-display text-5xl font-black bloom-effect tracking-tighter">
+                                    {{ number_format($flashSaleInfo->gia_flash_sale, 0, ',', '.') }}₫
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col pb-1">
+                                <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase mb-0.5">GIÁ GỐC</span>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-gray-500 line-through text-lg font-bold opacity-60">
+                                        {{ number_format($selectedVariant->gia_ban, 0, ',', '.') }}₫
+                                    </span>
+                                    <span class="bg-lime-500 text-black px-2 py-0.5 font-black text-[11px] tracking-wider rounded">
+                                        -{{ round(100 - ($flashSaleInfo->gia_flash_sale / $selectedVariant->gia_ban * 100)) }}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tiến độ bán hàng -->
+                        @php
+                            $daBan = $flashSaleInfo->so_luong_da_ban ?? 0;
+                            $gioiHan = $flashSaleInfo->so_luong_gioi_han ?? 1;
+                            $percent = round(($daBan / $gioiHan) * 100);
+                        @endphp
+                        <div class="mt-4 max-w-md">
+                            <div class="flex justify-between items-center text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-widest">
+                                <span>Đã bán: <span class="text-lime-400 font-black">{{ $daBan }}</span> / <span>{{ $gioiHan }}</span> sản phẩm</span>
+                                <span>{{ $percent }}%</span>
+                            </div>
+                            <div class="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5 relative">
+                                <div id="flash-sale-progress-bar" class="h-full bg-gradient-to-r from-emerald-600 to-lime-400 rounded-full transition-all duration-500" 
+                                     data-width="{{ min(100, $percent) }}%"></div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Khối giá Flash Sale -->
+                @else
+                    <!-- Khối giá thường (Hiển thị nếu KHÔNG có Flash Sale) -->
                     <div class="flex items-end gap-6">
-                        <div>
-                            <div class="text-[10px] text-lime-400 font-black tracking-widest uppercase mb-1">GIÁ FLASHSALE</div>
-                            <div class="text-lime-400 font-display text-5xl font-black bloom-effect tracking-tighter" x-text="currentVariant.flash_sale_info ? formatPrice(currentVariant.flash_sale_info.gia_flash_sale) : ''"></div>
+                        <div class="text-lime-400 font-display text-4xl font-bold bloom-effect tracking-tighter">
+                            {{ number_format($selectedVariant->gia_ban, 0, ',', '.') }}₫
                         </div>
                         
-                        <div class="flex flex-col pb-1">
-                            <span class="text-[10px] text-slate-500 font-bold tracking-widest uppercase mb-0.5">GIÁ GỐC</span>
-                            <div class="flex items-center gap-3">
-                                <span class="text-gray-500 line-through text-lg font-bold opacity-60" x-text="formatPrice(currentVariant.gia_ban)"></span>
-                                <span class="bg-lime-500 text-black px-2 py-0.5 font-black text-[11px] tracking-wider rounded">
-                                    -<span x-text="currentVariant.flash_sale_info ? Math.round(100 - (currentVariant.flash_sale_info.gia_flash_sale / currentVariant.gia_ban * 100)) : 0"></span>%
-                                </span>
+                        @if($selectedVariant->gia_niem_yet > $selectedVariant->gia_ban)
+                            <div class="flex items-end gap-4 pb-1">
+                                <div class="text-gray-500 line-through text-xl font-medium opacity-60">
+                                    {{ number_format($selectedVariant->gia_niem_yet, 0, ',', '.') }}₫
+                                </div>
+                                <div class="bg-red-600 text-white px-2 py-0.5 font-black text-[12px] tracking-wider">
+                                    -{{ round(100 - ($selectedVariant->gia_ban / $selectedVariant->gia_niem_yet * 100)) }}%
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
-
-                    <!-- Tiến độ bán hàng -->
-                    <div class="mt-4 max-w-md">
-                        <div class="flex justify-between items-center text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-widest">
-                            <span>Đã bán: <span class="text-lime-400 font-black" x-text="currentVariant.flash_sale_info ? (currentVariant.flash_sale_info.so_luong_da_ban || 0) : 0"></span> / <span x-text="currentVariant.flash_sale_info ? currentVariant.flash_sale_info.so_luong_gioi_han : 0"></span> sản phẩm</span>
-                            <span x-text="currentVariant.flash_sale_info ? Math.round(( (currentVariant.flash_sale_info.so_luong_da_ban || 0) / currentVariant.flash_sale_info.so_luong_gioi_han ) * 100) + '%' : '0%'"></span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-950 rounded-full overflow-hidden border border-white/5 relative">
-                            <div class="h-full bg-gradient-to-r from-emerald-600 to-lime-400 rounded-full transition-all duration-500" 
-                                 :style="currentVariant.flash_sale_info ? 'width: ' + Math.min(100, (((currentVariant.flash_sale_info.so_luong_da_ban || 0) / currentVariant.flash_sale_info.so_luong_gioi_han) * 100)) + '%' : 'width: 0%'"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Khối giá thường (Hiển thị nếu KHÔNG có Flash Sale) -->
-                <div x-show="!currentVariant.flash_sale_info" class="flex items-end gap-6">
-                    <div class="text-lime-400 font-display text-4xl font-bold bloom-effect tracking-tighter" x-text="formatPrice(currentVariant.gia_ban)">
-                        {{ number_format($variants[0]->gia_ban ?? $productDetail->gia_thap_nhat, 0, ',', '.') }}₫
-                    </div>
-                    
-                    <div x-show="currentVariant.gia_niem_yet > currentVariant.gia_ban" class="flex items-end gap-4 pb-1">
-                        <div class="text-gray-500 line-through text-xl font-medium opacity-60" x-text="formatPrice(currentVariant.gia_niem_yet)">
-                            {{ number_format($variants[0]->gia_niem_yet ?? 0, 0, ',', '.') }}₫
-                        </div>
-                        <div class="bg-red-600 text-white px-2 py-0.5 font-black text-[12px] tracking-wider">
-                            -<span x-text="Math.round(100 - (currentVariant.gia_ban / currentVariant.gia_niem_yet * 100))"></span>%
-                        </div>
-                    </div>
-                </div>
+                @endif
             </div>
 
             <!-- Chọn biến thể -->
@@ -193,10 +212,10 @@
                             }
                         } 
                         $thong_tin_bien_the = rtrim($thong_tin_bien_the, '/');
+                        $isActive = $variant->ma_bien_the === $selectedVariant->ma_bien_the;
                     @endphp
-                    <button @click="selectVariant({{ $idx }})" 
-                            :class="selectedIndex === {{ $idx }} ? 'border-lime-400 text-lime-400 shadow-[0_0_10px_rgba(163,230,53,0.2)]' : 'border-white/5 text-gray-400 hover:border-white/20'"
-                            class="py-3 px-4 glass-panel text-[11px] font-black tracking-wider transition-all duration-300 flex items-center gap-2">
+                    <a href="?ma_bien_the={{ $variant->ma_bien_the }}" 
+                       class="py-3 px-4 glass-panel text-[11px] font-black tracking-wider transition-all duration-300 flex items-center gap-2 border {{ $isActive ? 'border-lime-400 text-lime-400 shadow-[0_0_10px_rgba(163,230,53,0.2)]' : 'border-white/5 text-gray-400 hover:border-white/20' }}">
                         <span>{{ $thong_tin_bien_the }}</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-gray-600/40"></span>
                         @if($variant->flash_sale_info)
@@ -207,20 +226,20 @@
                         @else
                             <span>{{ number_format($variant->gia_ban, 0, ',', '.') }}₫</span>
                         @endif
-                    </button>
+                    </a>
                     @endforeach
                 </div>
             </div>
 
             <!-- CTA Buttons -->
             <div class="space-y-4">
-                <a :href="'{{ route('cart.addItem') }}?ma_bien_the=' + currentVariant.id" 
+                <a href="{{ route('cart.addItem') }}?ma_bien_the={{ $selectedVariant->ma_bien_the }}" 
                    class="w-full py-6 bg-lime-400 text-black hover:bg-lime-300 font-black text-sm tracking-[0.3em] flex items-center justify-center gap-3 active:scale-95 transition-all text-center shadow-[0_0_15px_rgba(0,255,102,0.15)]">
                     <i data-lucide="shopping-cart" class="w-5 h-5 fill-black"></i>
                     THÊM VÀO GIỎ HÀNG
                 </a>
 
-                <a :href="'{{ route('viewPayment') }}/' +  currentVariant.id"
+                <a href="{{ route('payment.view', $selectedVariant->ma_bien_the) }}"
                    class="w-full py-6 border border-lime-400 text-lime-400 hover:bg-lime-400/10 font-black text-sm tracking-[0.3em] transition-all flex items-center justify-center active:scale-95 text-center">
                     MUA NGAY
                 </a>
@@ -249,12 +268,18 @@
                     @endforeach
 
                     <!-- Thông số kỹ thuật riêng của biến thể đang chọn -->
-                    <template x-for="(spec, index) in currentVariant.thong_so_ky_thuat_rieng" :key="index">
+                    @if(isset($selectedVariant->thong_so_ky_thuat_rieng) && is_array($selectedVariant->thong_so_ky_thuat_rieng))
+                        @foreach($selectedVariant->thong_so_ky_thuat_rieng as $spec)
                         <tr class="hover:bg-white/5 transition-colors group">
-                            <td class="p-8 font-black text-[11px] tracking-[0.2em] text-gray-400 w-1/3 group-hover:text-lime-400 transition-colors uppercase" x-text="spec.ten"></td>
-                            <td class="p-8 text-white font-medium text-sm normal-case" x-text="spec.gia_tri"></td>
+                            <td class="p-8 font-black text-[11px] tracking-[0.2em] text-gray-400 w-1/3 group-hover:text-lime-400 transition-colors uppercase">
+                                {{ $spec['ten'] ?? '' }}
+                            </td>
+                            <td class="p-8 text-white font-medium text-sm normal-case">
+                                {{ $spec['gia_tri'] ?? '' }}
+                            </td>
                         </tr>
-                    </template>
+                        @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -400,93 +425,122 @@
 </main>
 @endsection
 
+<script id="gallery-json" type="application/json">
+    {!! json_encode(array_merge([$selectedVariant->link_anh_bien_the ?: $productDetail->link_anh_dai_dien], $productDetail->hinh_anh ?? [])) !!}
+</script>
+
 @section('scripts')
 <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('productDetail', (variantsData, galleryData) => ({
-            variants: variantsData,
-            // Gộp ảnh đại diện vào đầu mảng gallery
-            gallery: ["{{ $productDetail->link_anh_dai_dien }}", ...galleryData],
-            activeImageIndex: 0,
-            selectedIndex: 0,
-            countdown: {
-                days: '00',
-                hours: '00',
-                minutes: '00',
-                seconds: '00'
-            },
-            timerInterval: null,
+    // Initialize Lucide icons and progress bar
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
 
-            init() {
-                this.startCountdown();
-                this.$watch('selectedIndex', () => {
-                    this.startCountdown();
-                });
-            },
+        // Set progress bar width dynamically to avoid inline style lint issues
+        const progressBar = document.getElementById('flash-sale-progress-bar');
+        if (progressBar) {
+            progressBar.style.width = progressBar.getAttribute('data-width');
+        }
 
-            startCountdown() {
-                if (this.timerInterval) clearInterval(this.timerInterval);
-                
-                const update = () => {
-                    const variant = this.currentVariant;
-                    if (!variant || !variant.flash_sale_campaign) {
-                        this.countdown = { days: '00', hours: '00', minutes: '00', seconds: '00' };
-                        return;
-                    }
-                    
-                    const endTimeStr = variant.flash_sale_campaign.ket_thuc;
-                    const target = new Date(endTimeStr).getTime();
-                    const now = new Date().getTime();
-                    const diff = target - now;
-                    
-                    if (diff <= 0) {
-                        this.countdown = { days: '00', hours: '00', minutes: '00', seconds: '00' };
-                        return;
-                    }
-                    
-                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
-                    
-                    this.countdown = {
-                        days: d.toString().padStart(2, '0'),
-                        hours: h.toString().padStart(2, '0'),
-                        minutes: m.toString().padStart(2, '0'),
-                        seconds: s.toString().padStart(2, '0')
-                    };
-                };
-                
-                update();
-                this.timerInterval = setInterval(update, 1000);
-            },
-            
-            get currentVariant() {
-                return this.variants[this.selectedIndex] || {};
-            },
-            
-            nextImage() {
-                this.activeImageIndex = (this.activeImageIndex + 1) % this.gallery.length;
-            },
-            
-            prevImage() {
-                this.activeImageIndex = (this.activeImageIndex - 1 + this.gallery.length) % this.gallery.length;
-            },
-            
-            formatPrice(price) {
-                if (!price) return '0₫';
-                return new Intl.NumberFormat('vi-VN').format(price) + '₫';
-            },
-            
-            selectVariant(index) {
-                this.selectedIndex = index;
-                // Nếu biến thể có ảnh riêng, có thể thêm logic cập nhật activeImageIndex ở đây
+        // Bind click events to thumbnail elements
+        const thumbs = document.querySelectorAll('.thumb-container');
+        thumbs.forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                const index = parseInt(thumb.getAttribute('data-index'), 10);
+                changeMainImage(index);
+            });
+        });
+
+        // Countdown Timer Logic
+        const timerContainer = document.getElementById('flash-sale-countdown');
+        if (timerContainer) {
+            const endTimeStr = timerContainer.getAttribute('data-endtime');
+            const targetTime = new Date(endTimeStr).getTime();
+
+            const daysEl = document.getElementById('countdown-days');
+            const hoursEl = document.getElementById('countdown-hours');
+            const minutesEl = document.getElementById('countdown-minutes');
+            const secondsEl = document.getElementById('countdown-seconds');
+
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    if (daysEl) daysEl.innerText = '00';
+                    if (hoursEl) hoursEl.innerText = '00';
+                    if (minutesEl) minutesEl.innerText = '00';
+                    if (secondsEl) secondsEl.innerText = '00';
+                    clearInterval(timerInterval);
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (daysEl) daysEl.innerText = d.toString().padStart(2, '0');
+                if (hoursEl) hoursEl.innerText = h.toString().padStart(2, '0');
+                if (minutesEl) minutesEl.innerText = m.toString().padStart(2, '0');
+                if (secondsEl) secondsEl.innerText = s.toString().padStart(2, '0');
+            };
+
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 1000);
+        }
+    });
+
+    // Gallery navigation
+    let activeImageIndex = 0;
+    const gallery = JSON.parse(document.getElementById('gallery-json').textContent);
+
+    function changeMainImage(index) {
+        activeImageIndex = index;
+        const mainImg = document.getElementById('main-product-image');
+        if (mainImg) {
+            mainImg.src = gallery[activeImageIndex];
+        }
+
+        // Highlight active thumbnail border
+        const thumbs = document.querySelectorAll('.thumb-container');
+        thumbs.forEach((thumb, idx) => {
+            const border = thumb.querySelector('.thumb-border');
+            const img = thumb.querySelector('img');
+            if (idx === index) {
+                if (border) {
+                    border.classList.remove('opacity-0');
+                    border.classList.add('opacity-100');
+                }
+                if (img) {
+                    img.classList.remove('opacity-60');
+                    img.classList.add('opacity-100');
+                }
+            } else {
+                if (border) {
+                    border.classList.remove('opacity-100');
+                    border.classList.add('opacity-0');
+                }
+                if (img) {
+                    img.classList.remove('opacity-100');
+                    img.classList.add('opacity-60');
+                }
             }
-        }));
-    });
+        });
+    }
 
-    document.addEventListener('alpine:initialized', () => {
-        lucide.createIcons();
-    });
+    function prevImage() {
+        let newIndex = activeImageIndex - 1;
+        if (newIndex < 0) {
+            newIndex = gallery.length - 1;
+        }
+        changeMainImage(newIndex);
+    }
+
+    function nextImage() {
+        let newIndex = (activeImageIndex + 1) % gallery.length;
+        changeMainImage(newIndex);
+    }
 </script>
 @endsection

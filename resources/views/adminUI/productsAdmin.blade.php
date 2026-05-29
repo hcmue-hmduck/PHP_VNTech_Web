@@ -112,13 +112,13 @@
             <table class="w-full text-left">
                 <thead class="bg-surface-high/80 border-b border-white/10">
                     <tr>
-                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Ảnh</th>
-                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Thông tin sản phẩm</th>
-                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Giá bán (VND)</th>
-                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Tồn kho</th>
-                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Lượt xem</th>
-                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Trạng thái</th>
-                        <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 text-right">Thao tác</th>
+                        <th class="w-[10%] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Ảnh</th>
+                        <th class="w-[40%] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Thông tin sản phẩm</th>
+                        <th class="w-[15%] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Giá bán (VND)</th>
+                        <th class="w-[10%] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Tồn kho</th>
+                        <th class="w-[10%] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Lượt xem</th>
+                        <th class="w-[10%] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Trạng thái</th>
+                        <th class="w-[5%] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 text-right">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -179,15 +179,16 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2 transition-opacity">
-                                <button class="p-2 hover:text-neon-green hover:bg-neon-green/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
-                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                </button>
                                 <a href="{{ route('admin.products.edit', $product) }}" class="p-2 hover:text-blue-400 hover:bg-blue-400/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
                                     <i data-lucide="pencil" class="w-4 h-4"></i>
                                 </a>
-                                <button class="p-2 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
+                                <form action="{{ route('admin.product.delete', $product) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="p-2 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

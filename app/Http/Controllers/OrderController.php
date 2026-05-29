@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\ProductVariant;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Voucher;
 use App\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -96,12 +97,16 @@ class OrderController extends Controller
         }
 
         $request->session()->forget('cartItems');
+
+        if ($request->filled('ma_voucher')) {
+            Voucher::where('ma_voucher', $request->ma_voucher)->increment('da_dung');
+        }
         
         if ($paymentMethod === 'momo') {
             return redirect()->route('momo.create', ['ma_don_hang' => $order->ma_don_hang]);
         }
 
-        return redirect()->route('viewOrderDetail', ['ma_don_hang' => $order->ma_don_hang])->with('success', 'Tạo đơn hàng thành công!');
+        return redirect()->route('order_detail.view', ['ma_don_hang' => $order->ma_don_hang])->with('success', 'Tạo đơn hàng thành công!');
     }
 
     public function viewOrderDetail(Request $request)
