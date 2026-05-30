@@ -52,10 +52,20 @@
     $ma_voucher = request('ma_voucher');
     $giam_gia = 0;
     $MaVoucher = '';
+    $voucher_error = '';
+    $voucher_success = '';
+
     if ($ma_voucher) {
         $check_voucher = $voucher->firstWhere('ten_voucher', $ma_voucher);
-        if ($check_voucher) {
+        if (!$check_voucher) {
+            $voucher_error = 'Mã giảm giá không tồn tại hoặc đã hết hạn!';
+        } elseif (!$check_voucher->isAvailable()) {
+            $voucher_error = 'Mã giảm giá này đã hết lượt sử dụng!';
+        } elseif ($tamTinh < ($check_voucher->don_hang_toi_thieu ?? 0)) {
+            $voucher_error = 'Đơn hàng chưa đạt giá trị tối thiểu (' . number_format($check_voucher->don_hang_toi_thieu, 0, ',', '.') . '₫)!';
+        } else {
             $MaVoucher = $check_voucher->ma_voucher;
+            $voucher_success = 'Áp dụng mã giảm giá thành công!';
             if ($check_voucher->hinh_thuc_giam === 'percent') {
                 $giam_gia = $tongTien * ($check_voucher->gia_tri_giam / 100);
             }
@@ -408,12 +418,18 @@
                                 name="ma_voucher" 
                                 placeholder="NHẬP MÃ VOUCHER..." 
                                 value="{{ request('ma_voucher') }}"
-                                class="flex-1 bg-white/5 border border-white/10 focus:border-lime-400/50 rounded-lg px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none transition-all uppercase font-mono tracking-widest" />
+                                class="flex-1 bg-white/5 border {{ $voucher_error ? 'border-rose-500/50' : ($voucher_success ? 'border-lime-500/50' : 'border-white/10') }} focus:border-lime-400/50 rounded-lg px-4 py-3 text-xs text-white placeholder:text-white/20 focus:outline-none transition-all uppercase font-mono tracking-widest" />
                             <button type="submit" 
                                     class="bg-transparent hover:bg-lime-400 border border-lime-400/30 hover:border-lime-400 text-lime-400 hover:text-black font-mono font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-lg transition-all duration-300 flex items-center justify-center whitespace-nowrap cursor-pointer">
                                 Áp dụng
                             </button>
                         </div>
+                        @if($voucher_error)
+                            <p class="text-[10px] text-rose-500 font-mono mt-2 uppercase tracking-widest">{{ $voucher_error }}</p>
+                        @endif
+                        @if($voucher_success)
+                            <p class="text-[10px] text-lime-400 font-mono mt-2 uppercase tracking-widest">{{ $voucher_success }}</p>
+                        @endif
                     </form>
                 </div>
 

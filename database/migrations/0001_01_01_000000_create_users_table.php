@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $collection) {
+            $collection->string('ma_nguoi_dung')->index();
             $collection->string('ho_ten');
             $collection->string('email')->unique(); 
             

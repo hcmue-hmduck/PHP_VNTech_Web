@@ -45,11 +45,11 @@
 
         <!-- Center: Navigation Links -->
         <nav class="hidden md:flex items-center gap-8">
-            <a class="text-lime-400 border-b-2 border-lime-400 pb-1 text-sm font-medium uppercase tracking-wider" href="#">Store</a>
+            <a class="text-lime-400 border-b-2 border-lime-400 pb-1 text-sm font-medium uppercase tracking-wider" href="{{ route('viewHome') }}">Trang chủ</a>
             <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Hardware</a>
             <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Gear</a>
             <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Community</a>
-            <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Support</a>
+            <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Liên hệ</a>
         </nav>
 
         <!-- Right: Actions (Search, Compare, Cart, User) -->
@@ -129,7 +129,13 @@
                             <p class="text-sm font-bold text-lime-400 truncate">{{ Auth::user()->email }}</p>
                         </div>
 
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 hover:bg-white/5 hover:text-lime-400 transition-all">
+                        @if (Auth::user()->vai_tro == 'admin') 
+                            <a href="{{ route('admin.dashboard.index') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 hover:bg-white/5 hover:text-lime-400 transition-all">
+                                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Trang quản trị
+                            </a>
+                        @endif
+
+                        <a href="{{ route('user.view') }}" class="flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 hover:bg-white/5 hover:text-lime-400 transition-all">
                             <i data-lucide="user-cog" class="w-4 h-4"></i> Hồ sơ cá nhân
                         </a>
                         

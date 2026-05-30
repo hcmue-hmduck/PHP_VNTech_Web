@@ -22,8 +22,7 @@ class OrderItem extends Model {
 
     protected $casts = [
         'so_luong'               => 'integer',
-        'gia_niem_yet'           => 'decimal:0',
-        'don_gia'                => 'decimal:0',
+        'gia_ban'                => 'decimal:0',
         'thanh_tien'             => 'decimal:0',
     ];
 

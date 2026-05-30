@@ -111,19 +111,28 @@
 
                 <!-- Profile Footer -->
                 <div class="border-t border-white/5 pt-6 mt-auto">
+                    <!-- Nút Quay lại Trang chủ dài -->
+                    <a href="{{ route('viewHome') }}" class="flex items-center justify-center gap-2 w-full py-3 mb-4 rounded-xl bg-neon-green/10 border border-neon-green/20 text-neon-green hover:bg-neon-green/20 font-bold text-xs uppercase tracking-widest transition-all duration-300">
+                        <i data-lucide="home" class="size-4"></i>
+                        <span>Quay lại Trang chủ</span>
+                    </a>
+                    
                     <div class="flex items-center gap-3 p-3 bg-surface-high rounded-xl border border-white/5">
-                        <div class="size-10 rounded-lg overflow-hidden bg-neon-green/5 flex items-center justify-center border border-neon-green/10">
-                            <div class="size-6 rounded-full bg-neon-green/20 border border-neon-green flex items-center justify-center">
-                                <span class="text-[10px] font-bold text-neon-green">AD</span>
-                            </div>
+                        <div class="size-10 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                            <img src="{{ Auth::user()->avatar_url }}" alt="avatar" class="w-full h-full object-cover">
                         </div>
                         <div class="flex flex-col flex-1">
-                            <span class="text-sm font-bold text-white">admin</span>
-                            <span class="text-[10px] text-gray-500 uppercase tracking-tight">System Operator</span>
+                            <span class="text-[9px] text-gray-500 uppercase tracking-widest leading-none">Xin chào,</span>
+                            <span class="text-sm font-bold text-white mt-1">{{ Auth::user()->ho_ten }}</span>
                         </div>
-                        <button class="flex items-center justify-center size-8 bg-red-500/10 text-red-500 rounded-lg cursor-pointer hover:bg-red-500/20 transition-colors">
-                            <i data-lucide="power" class="size-4"></i>
-                        </button>
+                        <form action="{{ route('logout') }}" method="POST" class="m-0 p-0 flex items-center">
+                            @csrf
+                            <button type="submit"
+                                    class="flex items-center justify-center size-8 bg-red-500/10 text-red-500 rounded-lg cursor-pointer hover:bg-red-500/20 transition-colors" 
+                                    title="Đăng xuất">
+                                <i data-lucide="power" class="size-4"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -131,40 +140,15 @@
 
         <!-- MAIN CONTENT -->
         <main class="flex-1 flex flex-col h-full overflow-y-auto relative">
-            <!-- HEADER -->
-            <header class="flex items-center justify-between px-12 py-6 border-b border-white/5 bg-dark-bg/50 backdrop-blur-md sticky top-0 z-10">
-                <div class="flex items-center gap-4">
-                    <div class="p-2.5 rounded bg-neon-green/10 border border-neon-green/20">
-                        <i data-lucide="scan-line" class="size-6 text-neon-green"></i>
-                    </div>
-                    <h2 class="font-display text-lg tracking-widest text-white uppercase font-bold">Trung tâm Chỉ huy</h2>
-                </div>
-                
-                <div class="flex items-center gap-6">
-                    <div class="flex items-center gap-2.5 px-4 py-2 rounded-lg bg-surface border border-white/5">
-                        <div class="size-2 rounded-full bg-neon-green animate-pulse neon-glow"></div>
-                        <span class="text-[10px] font-bold text-neon-green tracking-[0.2em] uppercase">Trạng thái mạng: ỔN ĐỊNH</span>
-                    </div>
-                    <button class="px-6 py-2.5 rounded-lg bg-neon-green text-black font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-[0_0_20px_rgba(0,229,91,0.2)]">
-                        Đăng xuất
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <button class="p-2 rounded-lg bg-surface border border-white/5 text-gray-400 hover:text-white transition-all">
-                            <i data-lucide="bell" class="size-5"></i>
-                        </button>
-                        <button class="p-2 rounded-lg bg-surface border border-white/5 text-gray-400 hover:text-white transition-all">
-                            <i data-lucide="shield" class="size-5"></i>
-                        </button>
-                    </div>
-                </div>
-            </header>
 
             <!-- CONTENT AREA -->
-            <div class="p-12 space-y-8 w-full">
+            <div class="pt-6 pb-12 px-12 space-y-8 w-full">
                 @yield('content')
             </div>
         </main>
     </div>
+    
+
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>

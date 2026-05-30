@@ -18,7 +18,7 @@ class PaymentController extends Controller
 {
     public function viewPayment($ma_bien_the = null)
     {
-        $voucher = Voucher::get();
+        $voucher = Voucher::active()->get();
         $user_id = Auth::id();
         $user_address = UserAddress::where('ma_nguoi_dung', $user_id)->get();
         $cartItems = session('cartItems', []);

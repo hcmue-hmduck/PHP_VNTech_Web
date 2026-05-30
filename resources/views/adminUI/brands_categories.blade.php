@@ -3,10 +3,10 @@
 
 @section('content')
 @php
-    $activeBrands = $brands->filter(fn ($brand) => strtolower((string) ($brand->trang_thai ?? '')) === 'active')->count();
-    $inactiveBrands = $brands->filter(fn ($brand) => strtolower((string) ($brand->trang_thai ?? '')) !== 'active')->count();
-    $activeCategories = $categories->filter(fn ($category) => strtolower((string) ($category->trang_thai ?? '')) === 'active')->count();
-    $inactiveCategories = $categories->filter(fn ($category) => strtolower((string) ($category->trang_thai ?? '')) !== 'active')->count();
+    $activeBrands = $activeBrandsCount;
+    $inactiveBrands = $totalBrandsCount - $activeBrandsCount;
+    $activeCategories = $activeCategoriesCount;
+    $inactiveCategories = $totalCategoriesCount - $activeCategoriesCount;
 @endphp
 
 {{-- Khởi tạo biến showIds để ẩn hiện mã code bằng Alpine.js --}}
@@ -162,7 +162,7 @@
                 <i data-lucide="badge-check" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
             </div>
             <div class="z-10">
-                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $brands->count() }}</h3>
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $totalBrandsCount }}</h3>
                 <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Đang quản lý</p>
             </div>
         </div>
@@ -186,7 +186,7 @@
                 <i data-lucide="layers-3" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
             </div>
             <div class="z-10">
-                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $categories->count() }}</h3>
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $totalCategoriesCount }}</h3>
                 <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Đang quản lý</p>
             </div>
         </div>
@@ -204,55 +204,37 @@
         </div>
     </div>
 
-    <!-- Filters Bar -->
-    <div class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-        <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Search Brands</label>
-            <div class="relative">
-                <input type="text" placeholder="MÃ, TÊN HOẶC MÔ TẢ..." class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none transition-colors" />
-            </div>
-        </div>
-
-        <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Brand Status</label>
-            <select class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer">
-                <option>TẤT CẢ TRẠNG THÁI</option>
-                <option value="active">ACTIVE</option>
-                <option value="inactive">INACTIVE</option>
-            </select>
-        </div>
-
-        <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Category Status</label>
-            <select class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer">
-                <option>TẤT CẢ TRẠNG THÁI</option>
-                <option value="active">ACTIVE</option>
-                <option value="inactive">INACTIVE</option>
-            </select>
-        </div>
-
-        {{-- Thêm tính năng toggle showIds ẩn hiện ID hệ thống trực quan --}}
-        <button type="button" @click="showIds = !showIds" :class="showIds ? 'bg-neon-green text-black' : 'bg-white/5 text-white'" class="h-11 border border-white/10 hover:bg-white/10 text-[10px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2">
-            <span x-text="showIds ? 'ẨN MÃ HỆ THỐNG' : 'HIỆN MÃ HỆ THỐNG'"></span>
-        </button>
-    </div>
-
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
         <!-- Brands Table -->
         <div class="glass-panel overflow-hidden" id="brand-section">
-            <div class="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-surface-high/40">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 border-b border-white/10 bg-surface-high/40 gap-4">
                 <div>
                     <h2 class="font-display text-xl font-bold uppercase text-white">Danh sách thương hiệu</h2>
-                    <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-[0.2em]">Partner registry</p>
+                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
+                        {{ $brands->total() }} thương hiệu
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="openBrandModal" type="button" class="group flex items-center gap-2 bg-neon-green text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:brightness-110 transition-all duration-300 shadow-[0_0_20px_rgba(0,229,91,0.2)]">
-                        <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"></i>
-                        <span>THÊM THƯƠNG HIỆU</span>
-                    </button>
-                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
-                        {{ $brands->count() }} thương hiệu
+                    <div class="relative">
+                        <input type="text" 
+                               placeholder="Tìm thương hiệu..." 
+                               value="{{ request('search_brands') }}" 
+                               onkeydown="if(event.key === 'Enter') { 
+                                   const url = new URL(window.location.href);
+                                   if(this.value.trim() === '') {
+                                       url.searchParams.delete('search_brands');
+                                   } else {
+                                       url.searchParams.set('search_brands', this.value);
+                                   }
+                                   url.searchParams.delete('brands_page');
+                                   window.location.href = url.toString();
+                               }"
+                               class="w-40 sm:w-48 h-9 bg-dark-bg border border-white/10 px-3 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white" />
                     </div>
+                    <button id="openBrandModal" type="button" class="group flex items-center gap-2 bg-neon-green text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:brightness-110 transition-all duration-300 shadow-[0_0_20px_rgba(0,229,91,0.2)] shrink-0 h-9">
+                        <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"></i>
+                        <span>THÊM</span>
+                    </button>
                 </div>
             </div>
 
@@ -266,7 +248,7 @@
                             <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 text-right">Thao tác</th>
                         </tr>
                     </thead>
-                    {{-- FIX LỖI: Bổ sung id="brandTableBody" để JavaScript bắt sự kiện click nút sửa --}}
+
                     <tbody id="brandTableBody" class="divide-y divide-white/5">
                         @forelse($brands as $brand)
                             @php
@@ -295,12 +277,9 @@
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                                        <button class="p-2 hover:text-neon-green hover:bg-neon-green/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
-                                            <i data-lucide="eye" class="w-4 h-4"></i>
-                                        </button>
                                         <button type="button" 
                                                 class="edit-brand-btn p-2 hover:text-blue-400 hover:bg-blue-400/10 transition-colors border border-transparent hover:border-white/10 rounded-lg"
-                                                data-id="{{ $brand->_id ?? $brand->id }}"
+                                                data-id="{{ $brand->ma_thuong_hieu }}"
                                                 data-name="{{ $brand->ten_thuong_hieu }}"
                                                 data-desc="{{ $brand->mo_ta }}"
                                                 data-status="{{ $brandStatus }}"
@@ -322,23 +301,43 @@
                     </tbody>
                 </table>
             </div>
+            @if ($brands->hasPages())
+                <div class="px-6 py-4 border-t border-white/5 bg-surface-high/20">
+                    {{ $brands->appends(request()->query())->links() }}
+                </div>
+            @endif
         </div>
 
         <!-- Categories Table -->
         <div class="glass-panel overflow-hidden" id="category-section">
-            <div class="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-surface-high/40">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 border-b border-white/10 bg-surface-high/40 gap-4">
                 <div>
                     <h2 class="font-display text-xl font-bold uppercase text-white">Danh sách danh mục</h2>
-                    <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-[0.2em]">Catalog hierarchy</p>
+                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
+                        {{ $categories->total() }} Danh mục
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="openCategoryModal" type="button" class="group flex items-center gap-2 bg-transparent border-2 border-neon-green text-neon-green px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-neon-green hover:text-black transition-all duration-300">
-                        <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"></i>
-                        <span>THÊM DANH MỤC</span>
-                    </button>
-                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
-                        {{ $categories->count() }} Danh mục
+                    <div class="relative">
+                        <input type="text" 
+                               placeholder="Tìm danh mục..." 
+                               value="{{ request('search_categories') }}" 
+                               onkeydown="if(event.key === 'Enter') { 
+                                   const url = new URL(window.location.href);
+                                   if(this.value.trim() === '') {
+                                       url.searchParams.delete('search_categories');
+                                   } else {
+                                       url.searchParams.set('search_categories', this.value);
+                                   }
+                                   url.searchParams.delete('categories_page');
+                                   window.location.href = url.toString();
+                               }"
+                               class="w-40 sm:w-48 h-9 bg-dark-bg border border-white/10 px-3 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white" />
                     </div>
+                    <button id="openCategoryModal" type="button" class="group flex items-center gap-2 bg-neon-green text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:brightness-110 transition-all duration-300 shadow-[0_0_20px_rgba(0,229,91,0.2)] shrink-0 h-9">
+                        <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"></i>
+                        <span>THÊM</span>
+                    </button>
                 </div>
             </div>
 
@@ -391,12 +390,9 @@
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                                        <button class="p-2 hover:text-neon-green hover:bg-neon-green/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
-                                            <i data-lucide="eye" class="w-4 h-4"></i>
-                                        </button>
                                         <button type="button" 
                                                 class="edit-category-btn p-2 hover:text-blue-400 hover:bg-blue-400/10 transition-colors border border-transparent hover:border-white/10 rounded-lg"
-                                                data-id="{{ $category->_id ?? $category->id }}"
+                                                data-id="{{ $category->ma_danh_muc }}"
                                                 data-name="{{ $category->ten_danh_muc }}"
                                                 data-parent="{{ $category->ma_danh_muc_cha ?? '' }}"
                                                 data-status="{{ $categoryStatus }}"
@@ -418,6 +414,11 @@
                     </tbody>
                 </table>
             </div>
+            @if ($categories->hasPages())
+                <div class="px-6 py-4 border-t border-white/5 bg-surface-high/20">
+                    {{ $categories->appends(request()->query())->links() }}
+                </div>
+            @endif
         </div>
     </div>
 </div>

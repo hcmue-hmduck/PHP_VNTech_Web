@@ -10,9 +10,23 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 class Brands_CategoriesAdminController extends Controller
 {
     public function viewBrandsCategories() {
-        $brands = Brand::latest()->get();
-        $categories = Category::latest()->get();
-        return view('adminUI.brands_categories', compact('brands', 'categories'));
+        $brands = Brand::where('trang_thai', '!=', 'deleted')->latest()->paginate(10, ['*'], 'brands_page');
+        $categories = Category::where('trang_thai', '!=', 'deleted')->latest()->paginate(10, ['*'], 'categories_page');
+
+        $totalBrandsCount = Brand::where('trang_thai', '!=', 'deleted')->count();
+        $activeBrandsCount = Brand::where('trang_thai', 'active')->count();
+        
+        $totalCategoriesCount = Category::where('trang_thai', '!=', 'deleted')->count();
+        $activeCategoriesCount = Category::where('trang_thai', 'active')->count();
+
+        return view('adminUI.brands_categories', compact(
+            'brands', 
+            'categories', 
+            'totalBrandsCount', 
+            'activeBrandsCount', 
+            'totalCategoriesCount', 
+            'activeCategoriesCount'
+        ));
     }
 
     public function storeCreateBrand(Request $request) {

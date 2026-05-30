@@ -196,9 +196,6 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-                                    <a href="{{ route('admin.order.index', $order->ma_don_hang) }}" class="p-2 hover:text-neon-green hover:bg-neon-green/10 transition-colors border border-transparent hover:border-white/10 rounded-lg inline-block">
-                                        <i data-lucide="eye" class="w-4 h-4"></i>
-                                    </a>
                                     <a href="{{ route('admin.order.view', $order->ma_don_hang) }}" 
                                     class="p-2 hover:text-blue-400 hover:bg-blue-400/10 transition-colors border border-transparent hover:border-white/10 rounded-lg inline-block">
                                         <i data-lucide="pencil" class="w-4 h-4"></i>

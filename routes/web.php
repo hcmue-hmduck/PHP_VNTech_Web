@@ -13,6 +13,7 @@ use App\Http\Controllers\UserAddressController;
 use App\Http\Controllers\Brands_CategoriesAdminController;
 use App\Http\Controllers\FlashSalesController;
 use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
 
@@ -39,6 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/remove-item', [CartController::class, 'removeItem'])->name('cart.removeItem');
     Route::get('/cart', [CartController::class, 'viewCart'])->name('cart.view');
 
+    Route::get('/user', [UserController::class, 'viewUserInfo'])->name('user.view');
+    
     Route::post('/user-address', [UserAddressController::class, 'storeAddress'])->name('user-address.store');
 
     Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('payment.view');
@@ -55,7 +58,7 @@ Route::middleware('auth')->group(function () {
 
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
-    Route::get('/', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
+    Route::get('/dashboard', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
 
     Route::get('/products', [ProductAdminController::class, 'viewProductAdmin'])->name('admin.products.index');
     Route::get('/products/create', [ProductAdminController::class, 'viewCreateProductAdmin'])->name('admin.products.create');

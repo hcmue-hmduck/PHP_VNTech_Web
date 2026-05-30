@@ -53,6 +53,9 @@ class AuthController extends Controller
             'vai_tro' => 'user',
         ]);
 
+        $user->ma_nguoi_dung = $user->_id;
+        $user->save();
+
         Auth::login($user);
         return redirect('/');
     }
