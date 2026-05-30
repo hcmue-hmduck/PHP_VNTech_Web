@@ -14,12 +14,19 @@ use App\Http\Controllers\Brands_CategoriesAdminController;
 use App\Http\Controllers\FlashSalesController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AiController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
 
 Route::post('/momo/ipn', [PaymentController::class, 'momoIpn'])->name('momo.ipn');
 
 Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
+
+// chatbot
+Route::get('/chat/history', [AiController::class, 'history'])->name('chat.history');
+Route::post('/chat', [AiController::class, 'chat'])->name('chat');
+Route::post('/chat/clear', [AiController::class, 'clear'])->name('chat.clear');
+
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -87,10 +94,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/flash-sales/{flash_sales}/edit', [FlashSalesController::class, 'viewEditFlashSalesAdmin'])->name('admin.flashsales.edit');
     Route::put('/flash-sales/{flash_sales}', [FlashSalesController::class, 'updateEditFlashSalesAdmin'])->name('admin.flashsales.update');
 
-    Route::get('/vouchers', [VoucherController::class, 'viewVoucherAdmin'])->name('admin.voucher.view');
-    Route::get('/voucher/create', [VoucherController::class, 'viewCreateVoucherAdmin'])->name('admin.voucher.create');
-    Route::post('/vouchers', [VoucherController::class, 'storeCreateVoucherAdmin'])->name('admin.voucher.store');
-    Route::get('/voucher/{voucher}/edit', [VoucherController::class, 'viewEditVoucherAdmin'])->name('admin.voucher.edit');
-    Route::put('/voucher/{voucher}', [VoucherController::class, 'updateEditVoucherAdmin'])->name('admin.voucher.update');
-    Route::put('/voucher/{voucher}/delete', [VoucherController::class, 'deleteVoucherAdmin'])->name('admin.voucher.delete');
+    // Route::get('/vouchers', [VoucherController::class, 'viewVoucherAdmin'])->name('admin.voucher.view');
+    // Route::get('/voucher/create', [VoucherController::class, 'viewCreateVoucherAdmin'])->name('admin.voucher.create');
+    // Route::post('/vouchers', [VoucherController::class, 'storeCreateVoucherAdmin'])->name('admin.voucher.store');
+    // Route::get('/voucher/{voucher}/edit', [VoucherController::class, 'viewEditVoucherAdmin'])->name('admin.voucher.edit');
+    // Route::put('/voucher/{voucher}', [VoucherController::class, 'updateEditVoucherAdmin'])->name('admin.voucher.update');
+    // Route::put('/voucher/{voucher}/delete', [VoucherController::class, 'deleteVoucherAdmin'])->name('admin.voucher.delete');
 });

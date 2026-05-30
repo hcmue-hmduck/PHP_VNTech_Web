@@ -31,7 +31,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only(['email', 'password']))) {
             $request->session()->regenerate();
-            return redirect()->intended('/');
+            return redirect()->intended('/')->with('clear_chatbot', true);
         }
         return back()->withErrors([
             'email' => 'Email hoặc mật khẩu không đúng'
@@ -57,7 +57,7 @@ class AuthController extends Controller
         $user->save();
 
         Auth::login($user);
-        return redirect('/');
+        return redirect('/')->with('clear_chatbot', true);
     }
 
     public function logout(Request $request)
@@ -65,7 +65,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        return redirect('/')->with('clear_chatbot', true);
     }
 
     public function redirectToGoogle()
@@ -93,6 +93,6 @@ class AuthController extends Controller
         }
 
         Auth::login($foundUser);
-        return redirect('/');
+        return redirect('/')->with('clear_chatbot', true);
     }
 }

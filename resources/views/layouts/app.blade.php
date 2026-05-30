@@ -199,6 +199,7 @@
     <script>
         lucide.createIcons();
     </script>
+    @include('layouts.chatbot')
     @yield('scripts')
 </body>
 </html>

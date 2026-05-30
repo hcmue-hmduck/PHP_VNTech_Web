@@ -9,7 +9,8 @@ export default defineConfig({
                 'resources/css/app.css', 
                 'resources/js/app.js',
                 'resources/css/home.css',
-                'resources/js/home.js'
+                'resources/js/home.js',
+                'resources/js/chatbot.js'
             ],
             refresh: true,
         }),

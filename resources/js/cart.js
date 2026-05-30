@@ -6,6 +6,7 @@ document.addEventListener('alpine:init', () => {
             return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
         },
 
+
         async updateQuantity(id, delta) {
             let item = this.cartItems.find(i => i.id === id);
             if (item) {
