@@ -70,7 +70,7 @@ class PaymentController extends Controller
         $ipnUrl = config('services.momo.ipn_url');
         $returnUrl = config('services.momo.return_url');
         $orderId = $maDonHang . '_' . now()->format('YmdHisv');
-        $amount = $order->tong_tien_hang;
+        $amount = $order->tong_thanh_toan;
         $orderInfo = 'Thanh toán đơn hàng';
         $requestId = (string) Str::uuid();
         $extraData = base64_encode(json_encode([
