@@ -30,6 +30,12 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($request->only(['email', 'password']))) {
+            if (Auth::user()->trang_thai !== 'active') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Tài khoản của bạn đã bị khóa hoặc chưa kích hoạt.'
+                ])->withInput($request->only('email'));
+            }
             $request->session()->regenerate();
             return redirect()->intended('/')->with('clear_chatbot', true);
         }

@@ -95,6 +95,7 @@
                             ['name' => 'Đơn hàng', 'icon' => 'shopping-cart', 'route' => 'admin.order.index', 'active' => 'admin.order*'],
                             ['name' => 'Flash Sales', 'icon' => 'zap', 'route' => 'admin.flashsales.index', 'active'=>'admin.flashsales*'],
                             ['name' => 'Voucher', 'icon' => 'ticket', 'route' => 'admin.voucher.view', 'active' => 'admin.voucher*'],
+                            ['name' => 'Người dùng', 'icon' => 'users', 'route' => 'admin.user.view', 'active' => 'admin.user*'],
                             ['name' => 'Banner quảng cáo', 'icon' => 'image', 'route' => 'admin.banners'],
                         ];
                     @endphp

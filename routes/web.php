@@ -104,4 +104,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/voucher/{voucher}/edit', [VoucherController::class, 'viewEditVoucherAdmin'])->name('admin.voucher.edit');
     Route::put('/voucher/{voucher}', [VoucherController::class, 'updateEditVoucherAdmin'])->name('admin.voucher.update');
     Route::put('/voucher/{voucher}/delete', [VoucherController::class, 'deleteVoucherAdmin'])->name('admin.voucher.delete');
+
+    Route::get('/users', [UserController::class, 'viewUsersAdmin'])->name('admin.user.view');
+    Route::put('/users/{user}/status', [UserController::class, 'updateUserStatus'])->name('admin.user.update');
 });

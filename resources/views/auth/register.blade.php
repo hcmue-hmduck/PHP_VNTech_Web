@@ -72,23 +72,24 @@
                     </div>
 
                     <!-- Password -->
-                    <div class="space-y-1 group/field" x-data="{ show: false }">
+                    <div class="space-y-1 group/field">
                         <label class="font-space text-[10px] uppercase text-zinc-500 tracking-[0.2em] font-semibold">
                             Mật khẩu
                         </label>
-                        <div class="flex items-center bg-[#1a1c1c] border border-white/5 hover:border-lime-400/50 transition-all">
+                        <div class="flex items-center bg-[#1a1c1c] border border-white/5 hover:border-lime-400/50 transition-all relative">
                             <div class="p-3 text-zinc-500 group-focus-within/field:text-lime-400 transition-colors">
                                 <i data-lucide="key" class="w-5 h-5"></i>
                             </div>
                             <input 
-                                :type="show ? 'text' : 'password'"
+                                type="password"
+                                id="password"
                                 name="password"
-                                class="w-full bg-transparent border-none focus:ring-0 text-white font-inter placeholder:text-zinc-700 h-12 text-sm tracking-widest"
+                                class="w-full bg-transparent border-none focus:ring-0 text-white font-inter placeholder:text-zinc-700 h-12 text-sm tracking-widest pr-12"
                                 placeholder="••••••••••••"
                                 required
                             />
-                            <button type="button" @click="show = !show" class="p-3 text-zinc-500 hover:text-white transition-colors">
-                                <i :data-lucide="show ? 'eye-off' : 'eye'" class="w-5 h-5"></i>
+                            <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute right-3 text-zinc-500 hover:text-white transition-colors">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
                             </button>
                         </div>
                         @error('password')
@@ -101,17 +102,21 @@
                         <label class="font-space text-[10px] uppercase text-zinc-500 tracking-[0.2em] font-semibold">
                             Nhập lại mật khẩu
                         </label>
-                        <div class="flex items-center bg-[#1a1c1c] border border-white/5 hover:border-lime-400/50 transition-all">
+                        <div class="flex items-center bg-[#1a1c1c] border border-white/5 hover:border-lime-400/50 transition-all relative">
                             <div class="p-3 text-zinc-500 group-focus-within/field:text-lime-400 transition-colors">
                                 <i data-lucide="lock" class="w-5 h-5"></i>
                             </div>
                             <input 
                                 type="password"
+                                id="password_confirmation"
                                 name="password_confirmation"
-                                class="w-full bg-transparent border-none focus:ring-0 text-white font-inter placeholder:text-zinc-700 h-12 text-sm tracking-widest"
+                                class="w-full bg-transparent border-none focus:ring-0 text-white font-inter placeholder:text-zinc-700 h-12 text-sm tracking-widest pr-12"
                                 placeholder="••••••••••••"
                                 required
                             />
+                            <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" class="absolute right-3 text-zinc-500 hover:text-white transition-colors">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -151,4 +156,19 @@
     </main>
 </div>
 
+<script>
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerHTML = '<i data-lucide="eye-off" class="w-5 h-5"></i>';
+        } else {
+            input.type = 'password';
+            btn.innerHTML = '<i data-lucide="eye" class="w-5 h-5"></i>';
+        }
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+</script>
 @endsection

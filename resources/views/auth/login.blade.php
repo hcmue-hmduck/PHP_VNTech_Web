@@ -60,11 +60,15 @@
                         </div>
                         <input 
                             type="password" 
+                            id="password"
                             name="password"
                             placeholder="••••••••••••"
-                            class="w-full bg-slate-950/80 border border-white/5 py-4 pl-12 pr-4 text-sm font-space tracking-widest focus:outline-none focus:border-lime-400/50 focus:bg-slate-950 transition-all @error('password') border-red-500 @enderror"
+                            class="w-full bg-slate-950/80 border border-white/5 py-4 pl-12 pr-12 text-sm font-space tracking-widest focus:outline-none focus:border-lime-400/50 focus:bg-slate-950 transition-all @error('password') border-red-500 @enderror"
                             required
                         />
+                        <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute inset-y-0 right-4 flex items-center text-zinc-600 hover:text-lime-400 transition-colors z-20">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
                         <div class="absolute bottom-0 left-0 h-[1px] bg-lime-400 w-0 group-focus-within/field:w-full transition-all duration-500"></div>
                     </div>
                     @error('password')
@@ -120,4 +124,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerHTML = '<i data-lucide="eye-off" class="w-5 h-5"></i>';
+        } else {
+            input.type = 'password';
+            btn.innerHTML = '<i data-lucide="eye" class="w-5 h-5"></i>';
+        }
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+</script>
 @endsection

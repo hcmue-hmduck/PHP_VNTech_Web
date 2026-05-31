@@ -135,20 +135,20 @@
                             <div class="flex flex-col items-center gap-4 w-full md:w-1/4">
                                 <div class="relative">
                                     <img id="avatar-preview" 
-                                         src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : '' }}" 
+                                         src="{{ $realUser->avatar_url }}" 
                                          alt="Avatar" 
                                          class="w-32 h-32 rounded-full border-2 border-neon-green/40 object-cover shadow-[0_0_20px_rgba(0,255,102,0.1)] {{ empty($realUser->avatar_url) ? 'hidden' : '' }}">
                                     
                                     <div id="avatar-placeholder" 
                                          class="w-32 h-32 rounded-full bg-neon-green/10 border-2 border-neon-green/30 flex items-center justify-center text-neon-green font-space text-4xl font-bold shadow-[0_0_20px_rgba(0,255,102,0.1)] {{ !empty($realUser->avatar_url) ? 'hidden' : '' }}">
-                                        {{ strtoupper(substr($realUser->ho_ten ?? 'U', 0, 1)) }}
+                                        {{ $realUser->ho_ten }}
                                     </div>
                                     
                                     <!-- Nút upload ảnh nhỏ dạng camera ở góc dưới bên phải -->
                                     <div class="absolute bottom-1 right-1">
                                         <label class="w-8 h-8 rounded-full bg-[#121414] border border-white/10 hover:border-neon-green text-gray-400 hover:text-neon-green flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg hover:shadow-[0_0_10px_rgba(0,255,102,0.3)]">
                                             <i data-lucide="camera" class="w-4 h-4"></i>
-                                            <input type="file" name="avatar_url" class="hidden" accept="image/*" onchange="previewAvatar(event)">
+                                            <input type="file" name="avatar" class="hidden" accept="image/*" onchange="previewAvatar(event)">
                                         </label>
                                     </div>
                                 </div>

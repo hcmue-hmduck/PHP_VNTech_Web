@@ -19,6 +19,20 @@ class UserController extends Controller
         return view('homeUI.user', compact('user', 'user_address'));
     }
 
+    public function viewUsersAdmin() {
+        $users = User::select('ma_nguoi_dung', 'ho_ten', 'email', 'avatar_url', 'trang_thai')->where('vai_tro', 'user')->latest()->get();
+        return view('adminUI.userAdmin', compact('users'));
+    }
+
+    public function updateUserStatus(Request $request, User $user) {
+        $data = $request->validate([
+            'trang_thai'    => 'nullable|string',
+        ]);
+
+        $user->update($data);
+        return redirect()->back()->with('success', 'Cập nhật thông tin người dùng thành công');
+    }
+
     public function editUserInfo(Request $request, User $user) {
         if ($request->filled('password')) {
             $request->validate([
@@ -35,7 +49,7 @@ class UserController extends Controller
             'email'         => 'nullable|string',
             'so_dien_thoai' => 'nullable|string',
             'password'      => 'nullable|string',
-            'avatar_url'    => 'nullable|image|max:5120',
+            'avatar'    => 'nullable|image|max:5120',
             'bio'           => 'nullable|string',
         ]);
 
@@ -47,8 +61,8 @@ class UserController extends Controller
 
         $filePath = $user->ho_ten . ' - ' . $user->ma_nguoi_dung;
 
-        if ($request->hasFile('avatar_url')) {
-            $file = $request->file('avatar_url');
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
             try {
                 $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
                     'folder' => "vntech/avatars/{$filePath}"
