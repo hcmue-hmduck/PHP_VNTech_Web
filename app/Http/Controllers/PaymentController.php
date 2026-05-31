@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\UserAddress;
 use App\Models\Voucher;
+use App\Models\User;
+use App\Mail\OrderNotificationMail;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -149,9 +152,17 @@ class PaymentController extends Controller
         $internalOrderId = $this->resolveInternalOrderId($request->input('extraData'), $orderId);
 
         if (($resultCode == 0 || $resultCode == 9000)) {
-            Order::where('ma_don_hang', $internalOrderId)->update([
-                'trang_thai' => OrderStatus::WAITING_PICKUP->value,
-            ]);
+            $order = Order::where('ma_don_hang', $internalOrderId)->first();
+            if ($order) {
+                $order->update([
+                    'trang_thai' => OrderStatus::WAITING_PICKUP->value,
+                ]);
+
+                $customer = User::where('ma_nguoi_dung', $order->ma_nguoi_dung)->first();
+                if ($customer && $customer->email) {
+                    Mail::to($customer->email)->send(new OrderNotificationMail($order));
+                }
+            }
         }
 
         return response()->json('');

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
@@ -13,18 +14,21 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class UserController extends Controller
 {
-    public function viewUserInfo() {
+    public function viewUserInfo()
+    {
         $user = User::where('ma_nguoi_dung', Auth::user()->id)->firstOrFail();
         $user_address = UserAddress::where('ma_nguoi_dung', $user->ma_nguoi_dung)->get();
         return view('homeUI.user', compact('user', 'user_address'));
     }
 
-    public function viewUsersAdmin() {
+    public function viewUsersAdmin()
+    {
         $users = User::select('ma_nguoi_dung', 'ho_ten', 'email', 'avatar_url', 'trang_thai')->where('vai_tro', 'user')->latest()->get();
         return view('adminUI.userAdmin', compact('users'));
     }
 
-    public function updateUserStatus(Request $request, User $user) {
+    public function updateUserStatus(Request $request, User $user)
+    {
         $data = $request->validate([
             'trang_thai'    => 'nullable|string',
         ]);
@@ -33,7 +37,8 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Cập nhật thông tin người dùng thành công');
     }
 
-    public function editUserInfo(Request $request, User $user) {
+    public function editUserInfo(Request $request, User $user)
+    {
         if ($request->filled('password')) {
             $request->validate([
                 'password' => 'min:6|confirmed',
@@ -53,6 +58,8 @@ class UserController extends Controller
             'bio'           => 'nullable|string',
         ]);
 
+        console_log(['request' => $data]);
+
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
@@ -60,6 +67,7 @@ class UserController extends Controller
         }
 
         $filePath = $user->ma_nguoi_dung;
+
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
@@ -69,6 +77,7 @@ class UserController extends Controller
                 ]);
                 $data['avatar_url'] = $upload['secure_url'];
             } catch (\Exception $e) {
+                console_log(['cloudinary' => $e->getMessage()]);
                 return back()->withErrors(['cloudinary' => 'Lỗi upload: ' . $e->getMessage()]);
             }
         }

@@ -35,9 +35,12 @@ Route::post('/chat/clear', [AiController::class, 'clear'])->name('chat.clear');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+    Route::get('/verify-otp', [AuthController::class, 'showVerifyOtpForm'])->name('show.verify.otp');
 
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
+    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('resend.otp');
 
     Route::get('/login/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
     Route::get('/login/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');

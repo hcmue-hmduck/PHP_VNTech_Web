@@ -123,6 +123,11 @@ class OrderController extends Controller
             return redirect()->route('momo.create', ['ma_don_hang' => $order->ma_don_hang]);
         }
 
+        $customer = User::where('ma_nguoi_dung', $order->ma_nguoi_dung)->first();
+        if ($customer && $customer->email) {
+            Mail::to($customer->email)->send(new OrderNotificationMail($order));
+        }
+
         return redirect()->route('order_detail.view', ['ma_don_hang' => $order->ma_don_hang])->with('success', 'Tạo đơn hàng thành công!');
     }
 

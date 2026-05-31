@@ -6,25 +6,25 @@
 </head>
 <body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333333;">
     @php
-        // Bản đồ hóa các nhãn trạng thái từ enum OrderStatus
+        use App\OrderStatus;
+
         $trangThaiText = match($order->trang_thai) {
-            'cho_thanh_toan' => 'Chờ thanh toán (MoMo)',
-            'cho_xac_nhan'   => 'Chờ xác nhận',
-            'da_xac_nhan'    => 'Đã xác nhận & Chờ lấy hàng',
-            'dang_giao_hang' => 'Đang giao hàng',
-            'da_nhan_hang'   => 'Hoàn thành (Đã nhận hàng)',
-            'da_huy'         => 'Đã hủy',
-            default          => 'Chờ xác nhận',
+            OrderStatus::PENDING_PAYMENT->value      => 'Chờ thanh toán',
+            OrderStatus::PENDING_CONFIRMATION->value => 'Chờ xác nhận',
+            OrderStatus::WAITING_PICKUP->value       => 'Đã xác nhận & Chờ lấy hàng',
+            OrderStatus::WAITING_DELIVERY->value     => 'Đang giao hàng',
+            OrderStatus::DELIVERED->value            => 'Hoàn thành (Đã nhận hàng)',
+            OrderStatus::CANCELLED->value            => 'Đã hủy',
+            default                                  => 'Chờ xác nhận',
         };
 
-        // Màu sắc tương ứng với trạng thái
         $badgeColor = match($order->trang_thai) {
-            'da_nhan_hang'   => '#10b981', // Xanh lục
-            'dang_giao_hang' => '#0284c7', // Xanh dương
-            'da_xac_nhan'    => '#6366f1', // Indigo
-            'cho_thanh_toan' => '#f59e0b', // Cam
-            'da_huy'         => '#ef4444', // Đỏ
-            default          => '#6b7280', // Xám
+            OrderStatus::DELIVERED->value        => '#10b981', // Xanh lục
+            OrderStatus::WAITING_DELIVERY->value  => '#0284c7', // Xanh dương
+            OrderStatus::WAITING_PICKUP->value    => '#6366f1', // Indigo
+            OrderStatus::PENDING_PAYMENT->value   => '#f59e0b', // Cam
+            OrderStatus::CANCELLED->value         => '#ef4444', // Đỏ
+            default                              => '#6b7280', // Xám
         };
     @endphp
 

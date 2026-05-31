@@ -9,27 +9,29 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class Brands_CategoriesAdminController extends Controller
 {
-    public function viewBrandsCategories() {
+    public function viewBrandsCategories()
+    {
         $brands = Brand::where('trang_thai', '!=', 'deleted')->latest()->paginate(10, ['*'], 'brands_page');
         $categories = Category::where('trang_thai', '!=', 'deleted')->latest()->paginate(10, ['*'], 'categories_page');
 
         $totalBrandsCount = Brand::where('trang_thai', '!=', 'deleted')->count();
         $activeBrandsCount = Brand::where('trang_thai', 'active')->count();
-        
+
         $totalCategoriesCount = Category::where('trang_thai', '!=', 'deleted')->count();
         $activeCategoriesCount = Category::where('trang_thai', 'active')->count();
 
         return view('adminUI.brands_categories', compact(
-            'brands', 
-            'categories', 
-            'totalBrandsCount', 
-            'activeBrandsCount', 
-            'totalCategoriesCount', 
+            'brands',
+            'categories',
+            'totalBrandsCount',
+            'activeBrandsCount',
+            'totalCategoriesCount',
             'activeCategoriesCount'
         ));
     }
 
-    public function storeCreateBrand(Request $request) {
+    public function storeCreateBrand(Request $request)
+    {
         $data = $request->validate([
             'ma_thuong_hieu'  => 'nullable|string',
             'ten_thuong_hieu' => 'required|string',
@@ -56,7 +58,8 @@ class Brands_CategoriesAdminController extends Controller
         return redirect()->back()->with('success', 'Tạo brands thành công!');
     }
 
-    public function updateEditBrand(Request $request, Brand $brand) {
+    public function updateEditBrand(Request $request, Brand $brand)
+    {
         $data = $request->validate([
             'ma_thuong_hieu'  => 'nullable|string',
             'ten_thuong_hieu' => 'required|string',
@@ -78,11 +81,12 @@ class Brands_CategoriesAdminController extends Controller
                 return back()->withErrors(['cloudinary' => 'Lỗi upload: ' . $e->getMessage()]);
             }
         }
-        
+
         return redirect()->back()->with('success', 'Cập nhật brands thành công!');
     }
 
-    public function storeCreateCategory(Request $request) {
+    public function storeCreateCategory(Request $request)
+    {
         $data = $request->validate([
             'ma_danh_muc'       => 'nullable|string',
             'ma_danh_muc_cha'   => 'nullable|string',
@@ -110,7 +114,8 @@ class Brands_CategoriesAdminController extends Controller
         return redirect()->back()->with('success', 'Tạo category thành công!');
     }
 
-    public function updateEditCategory(Request $request, Category $category) {
+    public function updateEditCategory(Request $request, Category $category)
+    {
         $data = $request->validate([
             'ma_danh_muc'       => 'nullable|string',
             'ma_danh_muc_cha'   => 'nullable|string',
