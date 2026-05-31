@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderNotificationMail;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -10,9 +11,11 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Voucher;
 use App\Models\FlashSaleItem;
+use App\Models\User;
 use App\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -35,6 +38,12 @@ class OrderController extends Controller
         if ($order) {
             $order->trang_thai = $request->trang_thai;
             $order->save();
+            
+            $customer = User::where('ma_nguoi_dung', $order->ma_nguoi_dung)->first();
+            if ($customer && $customer->email) {
+                Mail::to($customer->email)->send(new OrderNotificationMail($order));
+            }
+
             return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
         }
         return redirect()->back()->with('error', 'Không tìm thấy đơn hàng!');
