@@ -145,7 +145,7 @@
 
                         <!-- Actions -->
                         <td class="px-6 py-4 text-right">
-                            <form action="{{ route('admin.user.update', $u->ma_nguoi_dung) }}" method="POST" class="inline">
+                            <form action="{{ route('admin.user.update', $u) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PUT')
                                 @if($isActive)

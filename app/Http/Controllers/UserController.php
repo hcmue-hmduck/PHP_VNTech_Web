@@ -59,7 +59,7 @@ class UserController extends Controller
             unset($data['password']);
         }
 
-        $filePath = $user->ho_ten . ' - ' . $user->ma_nguoi_dung;
+        $filePath = $user->ma_nguoi_dung;
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');

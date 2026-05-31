@@ -19,8 +19,8 @@
 
     {{-- Chat Window - fixed theo màn hình, không phụ thuộc vị trí widget --}}
     <div id="chatbot-window"
-         class="fixed top-1/2 -translate-y-1/2 right-[96px] w-[420px] max-w-[calc(100vw-24px)] h-[580px] rounded-2xl flex flex-col overflow-hidden shadow-2xl border border-white/10 bg-[#0e1010]/95 backdrop-blur-xl
-                opacity-0 scale-95 pointer-events-none transition-all duration-300 ease-out">
+         class="absolute bottom-16 right-0 sm:bottom-0 sm:right-[70px] w-[calc(100vw-48px)] sm:w-[420px] h-[580px] max-h-[calc(100vh-120px)] sm:max-h-none rounded-2xl flex flex-col overflow-hidden shadow-2xl border border-white/10 bg-[#0e1010]/95 backdrop-blur-xl
+                opacity-0 scale-95 translate-y-4 pointer-events-none transition-all duration-300 ease-out z-[9999]">
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#0e1010]/80 shrink-0">

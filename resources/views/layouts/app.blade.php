@@ -45,11 +45,10 @@
 
         <!-- Center: Navigation Links -->
         <nav class="hidden md:flex items-center gap-8">
-            <a class="text-lime-400 border-b-2 border-lime-400 pb-1 text-sm font-medium uppercase tracking-wider" href="{{ route('viewHome') }}">Trang chủ</a>
-            <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Hardware</a>
-            <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Gear</a>
-            <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Community</a>
-            <a class="text-white/70 hover:text-white transition-colors text-sm font-medium uppercase tracking-wider" href="#">Liên hệ</a>
+            <a class="{{ request()->routeIs('viewHome') ? 'text-lime-400 border-b-2 border-lime-400' : 'text-white/70 hover:text-white border-b-2 border-transparent hover:border-white/20' }} pb-1 text-sm font-medium uppercase tracking-wider transition-all" href="{{ route('viewHome') }}">Trang chủ</a>
+            <a class="{{ request()->routeIs('support') ? 'text-lime-400 border-b-2 border-lime-400' : 'text-white/70 hover:text-white border-b-2 border-transparent hover:border-white/20' }} pb-1 text-sm font-medium uppercase tracking-wider transition-all" href="{{ route('support') }}">Hỗ trợ</a>
+            <a class="{{ request()->routeIs('policy') ? 'text-lime-400 border-b-2 border-lime-400' : 'text-white/70 hover:text-white border-b-2 border-transparent hover:border-white/20' }} pb-1 text-sm font-medium uppercase tracking-wider transition-all" href="{{ route('policy') }}">Chính sách</a>
+            <a class="{{ request()->routeIs('contact') ? 'text-lime-400 border-b-2 border-lime-400' : 'text-white/70 hover:text-white border-b-2 border-transparent hover:border-white/20' }} pb-1 text-sm font-medium uppercase tracking-wider transition-all" href="{{ route('contact') }}">Liên hệ</a>
         </nav>
 
         <!-- Right: Actions (Search, Compare, Cart, User) -->
@@ -174,10 +173,10 @@
                     © 2024 VNTech Gaming Store. All Rights Reserved. Engineered for the future of play with uncompromising quality.
                 </p>
             </div>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                @foreach(['Privacy Policy', 'Terms of Service', 'Warranty', 'Returns'] as $link)
-                    <a class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors" href="#">{{ $link }}</a>
-                @endforeach
+            <div class="grid grid-cols-3 gap-8">
+                <a class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors" href="{{ route('policy') }}">Chính sách</a>
+                <a class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors" href="{{ route('support') }}">Hỗ trợ</a>
+                <a class="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors" href="{{ route('contact') }}">Liên hệ</a>
             </div>
             <div class="flex gap-4">
                 <div class="w-12 h-12 border border-white/10 flex items-center justify-center hover:border-lime-400 transition-all cursor-pointer group">

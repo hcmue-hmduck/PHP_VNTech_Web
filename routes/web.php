@@ -22,6 +22,10 @@ Route::post('/momo/ipn', [PaymentController::class, 'momoIpn'])->name('momo.ipn'
 
 Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
+Route::view('/ho-tro', 'homeUI.support')->name('support');
+Route::view('/chinh-sach', 'homeUI.policy')->name('policy');
+Route::view('/lien-he', 'homeUI.contact')->name('contact');
+
 // chatbot
 Route::get('/chat/history', [AiController::class, 'history'])->name('chat.history');
 Route::post('/chat', [AiController::class, 'chat'])->name('chat');

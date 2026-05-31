@@ -53,7 +53,7 @@ class ProductAdminController extends Controller
         $product->ma_san_pham = $product->_id;
         $product->save();
 
-        $filePath = $product->ten_san_pham . ' - ' . $product->ma_san_pham;
+        $filePath = $product->ma_san_pham;
 
         if ($request->hasFile('link_anh_dai_dien')) {
             $file = $request->file('link_anh_dai_dien');
@@ -98,7 +98,7 @@ class ProductAdminController extends Controller
                 $product_variant->ma_bien_the = $product_variant->_id;
                 $product_variant->save();
 
-                $fileVariantPath = $product_variant->ten_bien_the . ' - ' . $product_variant->ma_bien_the;
+                $fileVariantPath = $product_variant->ma_bien_the;
                 if ($request->hasFile("variants.$index.link_anh_bien_the")) {
                     $file = $request->file("variants.$index.link_anh_bien_the");
                     try {
@@ -137,10 +137,11 @@ class ProductAdminController extends Controller
             'gia_thap_nhat'             => 'required|numeric|min:0',
             'thong_so_ky_thuat_chung'   => 'nullable|array',
             'thong_tin_them'            => 'nullable|array',
-            'hinh_anh.*'                => 'nullable|image|max:5120'
+            'hinh_anh.*'                => 'nullable|image|max:5120',
+            'existing_hinh_anh'         => 'nullable|array'
         ]);
-
-        $filePath = $product->ten_san_pham . ' - ' . $product->ma_san_pham;
+        $existing_hinh_anh = $request->existing_hinh_anh ?? [];
+        $filePath = $product->ma_san_pham;
 
         if ($request->hasFile('link_anh_dai_dien')) {
             $file = $request->file('link_anh_dai_dien');
@@ -162,7 +163,10 @@ class ProductAdminController extends Controller
                 ]);
                 $gallery[] = $upload['secure_url'];
             }
-            $data['hinh_anh'] = $gallery;
+            $data['hinh_anh'] = array_merge($existing_hinh_anh, $gallery);
+        }
+        else {
+            $data['hinh_anh'] = $existing_hinh_anh;
         }
 
         $product->update($data);
@@ -203,7 +207,7 @@ class ProductAdminController extends Controller
 
                 if (isset($product_variant) && $request->hasFile("variants.$index.link_anh_bien_the")) {
                     $file = $request->file("variants.$index.link_anh_bien_the");
-                    $fileVariantPath = $product_variant->ten_bien_the . ' - ' . $product_variant->ma_bien_the;
+                    $fileVariantPath = $product_variant->ma_bien_the;
                     try {
                         $upload = Cloudinary::uploadApi()->upload($file->getRealPath(), [
                             'folder' => "vntech/products/" . $filePath . "/variants/" . $fileVariantPath

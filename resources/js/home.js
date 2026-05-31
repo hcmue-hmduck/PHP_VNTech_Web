@@ -7,7 +7,7 @@ function initHomePage() {
     }
 
     // Category pagination
-    const perPage = 6;
+    const perPage = 12;
 
     document.querySelectorAll('.category-section').forEach(function (section) {
         const items = Array.from(section.querySelectorAll('.product-item'));

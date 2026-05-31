@@ -32,6 +32,11 @@
     .bg-neon-green { background-color: #00e55b; }
     
     .image-preview-slot { position: relative; aspect-ratio: 1/1; background: white; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    #gallery-previews .image-preview-slot { width: calc((100% - 24px) / 4); flex-shrink: 0; }
+    #gallery-previews::-webkit-scrollbar { height: 4px; }
+    #gallery-previews::-webkit-scrollbar-track { background: transparent; }
+    #gallery-previews::-webkit-scrollbar-thumb { background: rgba(0, 229, 91, 0.15); border-radius: 99px; }
+    #gallery-previews::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 91, 0.4); }
     .image-preview-slot img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
     .remove-img-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; border-radius: 50%; padding: 2px; cursor: pointer; }
 </style>
@@ -203,10 +208,16 @@
                                             <input type="file" name="hinh_anh[]" multiple onchange="previewGallery(this)" class="hidden" accept="image/*">
                                         </label>
                                     </div>
-                                    <div id="gallery-previews" class="grid grid-cols-4 gap-2">
+                                    <div id="gallery-previews" class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                                         @if(isset($product) && is_array($product->hinh_anh))
                                             @foreach($product->hinh_anh as $img)
-                                                <div class="image-preview-slot"><img src="{{ $img }}"><div class="remove-img-btn" onclick="this.parentElement.remove()"><i data-lucide="x" class="size-3"></i></div></div>
+                                                <div class="image-preview-slot">
+                                                    <img src="{{ $img }}">
+                                                    <input type="hidden" name="existing_hinh_anh[]" value="{{ $img }}">
+                                                    <div class="remove-img-btn" onclick="this.parentElement.remove()">
+                                                        <i data-lucide="x" class="size-3"></i>
+                                                    </div>
+                                                </div>
                                             @endforeach
                                         @endif
                                     </div>
@@ -405,21 +416,45 @@
         }
     }
 
+    let galleryFiles = [];
+
     function previewGallery(input) {
         const container = document.getElementById('gallery-previews');
         if (input.files) {
             Array.from(input.files).forEach(file => {
+                const fileId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                galleryFiles.push({ id: fileId, file: file });
+
                 let reader = new FileReader();
                 reader.onload = e => {
                     const div = document.createElement('div');
                     div.className = 'image-preview-slot animate-fadeIn';
-                    div.innerHTML = `<img src="${e.target.result}"><div class="remove-img-btn" onclick="this.parentElement.remove()"><i data-lucide="x" class="size-3"></i></div>`;
+                    div.dataset.fileId = fileId;
+                    div.innerHTML = `<img src="${e.target.result}"><div class="remove-img-btn" onclick="removeGalleryFile('${fileId}', this)"><i data-lucide="x" class="size-3"></i></div>`;
                     container.appendChild(div);
                     lucide.createIcons();
                 };
                 reader.readAsDataURL(file);
             });
+            syncInputFiles(input);
         }
+    }
+
+    function syncInputFiles(input) {
+        const dt = new DataTransfer();
+        galleryFiles.forEach(item => {
+            dt.items.add(item.file);
+        });
+        input.files = dt.files;
+    }
+
+    function removeGalleryFile(fileId, btn) {
+        galleryFiles = galleryFiles.filter(item => item.id !== fileId);
+        const input = document.querySelector('input[name="hinh_anh[]"]');
+        if (input) {
+            syncInputFiles(input);
+        }
+        btn.closest('.image-preview-slot').remove();
     }
 
 

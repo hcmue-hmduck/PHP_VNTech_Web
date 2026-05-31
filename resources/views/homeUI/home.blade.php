@@ -211,6 +211,23 @@
             line-height: 16px;
         }
 
+        .filter-scrollable {
+            overflow-y: auto;
+        }
+        .filter-scrollable::-webkit-scrollbar {
+            width: 5px;
+        }
+        .filter-scrollable::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .filter-scrollable::-webkit-scrollbar-thumb {
+            background: rgba(163, 230, 53, 0.2);
+            border-radius: 999px;
+        }
+        .filter-scrollable::-webkit-scrollbar-thumb:hover {
+            background: rgba(163, 230, 53, 0.5);
+        }
+
     </style>
 
     @if(isset($flashSales) && $flashSales->count() > 0)
@@ -374,22 +391,34 @@
     @endif
 
     <!-- Product Grid Section -->
-    <section class="py-20 px-8 md:px-16 max-w-[1600px] mx-auto flex flex-col md:flex-row gap-12" id="product-grid-section">
+    <section class="py-20 px-8 md:px-16 w-full max-w-none flex flex-col lg:flex-row gap-12" id="product-grid-section" x-data="{ activeCategories: [] }">
         <!-- Sidebar Filters -->
-        <aside class="w-full md:w-80 bg-slate-900 border border-white/5 p-8 h-fit sticky top-24" id="sidebar-filters">
-            <div class="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
+        <aside class="w-full lg:w-80 bg-slate-900 border border-white/5 h-[calc(100vh-140px)] sticky top-24 flex flex-col overflow-hidden rounded-2xl shrink-0" id="sidebar-filters">
+            <div class="flex items-center gap-3 px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
                 <i data-lucide="filter" class="text-lime-400 w-6 h-6"></i>
                 <h3 class="font-bold uppercase tracking-[0.2em] text-base text-lime-400">Lọc Dữ liệu</h3>
             </div>
             
-            <div class="space-y-8">
+            <div class="space-y-6 filter-scrollable flex-1 pl-6 pr-4 py-6">
                 <div>
                     <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">Danh mục</h4>
                     <ul class="space-y-3">
-                        @foreach($categories as $idx => $cat)
-                        <li class="flex items-center gap-3 group cursor-pointer">
-                            <div class="w-4 h-4 border {{ $idx === 0 ? 'bg-lime-400 border-lime-400' : 'border-white/20' }} transition-all"></div>
-                            <span class="text-xs uppercase tracking-tight group-hover:text-lime-400">{{ $cat->ten_danh_muc }}</span>
+                        <li class="flex items-center gap-3 group cursor-pointer" @click="activeCategories = []">
+                            <div class="w-4 h-4 border transition-all"
+                                 :class="activeCategories.length === 0 ? 'bg-lime-400 border-lime-400' : 'border-white/20'"></div>
+                            <span class="text-xs uppercase tracking-tight transition-colors"
+                                  :class="activeCategories.length === 0 ? 'text-lime-400 font-bold' : 'text-slate-400 group-hover:text-lime-400'">
+                                Tất cả danh mục
+                            </span>
+                        </li>
+                        @foreach($categories as $cat)
+                        <li class="flex items-center gap-3 group cursor-pointer" @click="activeCategories.includes('{{ $cat->ma_danh_muc }}') ? activeCategories = activeCategories.filter(id => id !== '{{ $cat->ma_danh_muc }}') : activeCategories.push('{{ $cat->ma_danh_muc }}')">
+                            <div class="w-4 h-4 border transition-all"
+                                 :class="activeCategories.includes('{{ $cat->ma_danh_muc }}') ? 'bg-lime-400 border-lime-400' : 'border-white/20'"></div>
+                            <span class="text-xs uppercase tracking-tight transition-colors"
+                                  :class="activeCategories.includes('{{ $cat->ma_danh_muc }}') ? 'text-lime-400 font-bold' : 'text-slate-400 group-hover:text-lime-400'">
+                                {{ $cat->ten_danh_muc }}
+                            </span>
                         </li>
                         @endforeach
                     </ul>
@@ -414,12 +443,22 @@
                         <button
                             class="group flex items-center gap-3 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 transition-all duration-300 hover:border-lime-400 hover:bg-lime-400/10"
                         >
-                            <div class="w-10 h-10 flex items-center justify-center bg-white rounded-md p-1">
-                                <img
-                                    src="{{ $brand->logo_url }}"
-                                    alt="{{ $brand->ten_thuong_hieu }}"
-                                    class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110"
-                                >
+                            <div class="w-10 h-10 flex items-center justify-center rounded-xl p-1 overflow-hidden shrink-0 border border-white/10 relative {{ !empty($brand->logo_url) ? 'bg-white' : 'bg-white/5' }}">
+                                @if(!empty($brand->logo_url))
+                                    <img
+                                        src="{{ $brand->logo_url }}"
+                                        alt="{{ $brand->ten_thuong_hieu }}"
+                                        class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                        onerror="this.style.display='none'; this.parentNode.classList.remove('bg-white'); this.parentNode.classList.add('bg-white/5'); this.nextElementSibling.style.display='flex';"
+                                    >
+                                    <span class="text-xs font-black uppercase text-lime-400 hidden">
+                                        {{ substr($brand->ten_thuong_hieu, 0, 1) }}
+                                    </span>
+                                @else
+                                    <span class="text-xs font-black uppercase text-lime-400 flex">
+                                        {{ substr($brand->ten_thuong_hieu, 0, 1) }}
+                                    </span>
+                                @endif
                             </div>
 
                             <div class="flex flex-col text-left">
@@ -432,7 +471,7 @@
                 </div>
             </div>
                 
-                <button class="w-full py-4 border border-lime-400 text-lime-400 text-xs font-bold uppercase tracking-widest hover:bg-lime-400/10 transition-all flex items-center justify-center gap-2">
+                <button @click="activeCategories = []" class="w-full py-4 border border-lime-400 text-lime-400 text-xs font-bold uppercase tracking-widest hover:bg-lime-400/10 transition-all flex items-center justify-center gap-2">
                     <i data-lucide="trash-2" class="w-4 h-4"></i> Xóa Bộ Lọc
                 </button>
             </div>
@@ -441,20 +480,21 @@
         <!-- Main Grid -->
         <div class="flex-1 space-y-12">
 
-            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
                 <div>
-                    <h2 class="text-2xl font-black uppercase tracking-tight text-white">
+                    <h2 class="text-3xl font-black uppercase tracking-tight text-white flex items-center gap-3">
+                        <span class="w-2.5 h-8 bg-lime-400 inline-block"></span>
                         Danh sách Sản phẩm
                     </h2>
                     <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">
-                        Có tất cả {{ count($products) }} sản phẩm
+                        Có tất cả {{ count($products) }} sản phẩm đang sẵn có
                     </p>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <span class="text-xs uppercase text-slate-500 font-bold">Sort:</span>
-                    <div class="flex items-center gap-1 text-xs text-lime-400 font-bold uppercase cursor-pointer">
-                        Newest First
+                <div class="flex items-center gap-2 bg-white/5 px-4 py-2 border border-white/10 rounded-xl">
+                    <span class="text-[10px] uppercase text-slate-400 font-black tracking-wider">Sắp xếp:</span>
+                    <div class="flex items-center gap-1 text-[10px] text-lime-400 font-black uppercase cursor-pointer tracking-wider">
+                        Mới nhất
                         <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </div>
                 </div>
@@ -466,55 +506,57 @@
                 @endphp
 
                 @if($categoryProducts->count() > 0)
-                    <section class="category-section mb-14" data-category="{{ $category->ma_danh_muc }}">
-                        <div class="flex items-center justify-between mb-5">
-                            <div>
-                                <h3 class="text-lg font-black uppercase tracking-widest text-white">
+                    <section class="category-section mb-16" data-category="{{ $category->ma_danh_muc }}" x-show="activeCategories.length === 0 || activeCategories.includes('{{ $category->ma_danh_muc }}')" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
+                        <!-- Solid Category Header Bar (VNTech themed) -->
+                        <div class="flex items-center justify-between bg-lime-400 text-black px-6 py-3.5 rounded-2xl mb-8 shadow-lg shadow-lime-400/10 border border-lime-500/20">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-black text-lime-400 text-[10px] font-black px-2.5 py-1 uppercase tracking-widest rounded-lg">
+                                    VNTech
+                                </span>
+                                <h3 class="font-['Space_Grotesk'] text-base md:text-lg font-black uppercase tracking-wider">
                                     {{ $category->ten_danh_muc }}
                                 </h3>
-                                <div class="mt-2 h-[2px] w-16 bg-lime-400"></div>
                             </div>
-
-                            <span class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold">
-                                {{ $categoryProducts->count() }} sản phẩm
-                            </span>
+                            
+                            <a href="#" class="text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity flex items-center gap-1.5 border-b-2 border-black/80 pb-0.5">
+                                Tất cả sản phẩm <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                            </a>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 product-list">
+                        <!-- Responsive Product Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 product-list">
                             @foreach($categoryProducts as $product)
-                                <div class="product-item group bg-slate-900/80 border border-white/10 rounded-2xl overflow-hidden hover:border-lime-400/50 hover:-translate-y-1 transition-all duration-300 flex flex-col">
-
+                                <div class="product-item group bg-[#111313]/60 border border-white/5 hover:border-lime-400/30 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col relative">
+                                    
+                                    <!-- Product Image Box -->
                                     <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}"
-                                    class="aspect-square bg-slate-950 overflow-hidden relative block">
+                                       class="aspect-square bg-slate-950/80 flex items-center justify-center p-6 border-b border-white/5 overflow-hidden">
                                         <img
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
+                                            class="w-full h-full object-contain group-hover:scale-105 transition-all duration-700"
                                             src="{{ $product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
                                             alt="{{ $product->ten_san_pham }}"
                                         >
                                     </a>
 
-                                    <div class="p-5 flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <h5 class="font-black uppercase text-sm text-white text-center line-clamp-1 group-hover:text-lime-400 transition-colors">
-                                                {{ $product->ten_san_pham }}
-                                            </h5>
-
-                                            <p class="text-xs text-slate-500 text-center mt-3 line-clamp-2">
+                                    <!-- Product Info Details (Centered) -->
+                                    <div class="p-5 flex-1 flex flex-col justify-between items-center text-center gap-4">
+                                        <div class="space-y-2 text-center">
+                                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}">
+                                                <h5 class="font-['Space_Grotesk'] font-bold text-xs md:text-sm text-slate-200 group-hover:text-lime-400 transition-colors uppercase line-clamp-2 leading-snug text-center">
+                                                    {{ $product->ten_san_pham }}
+                                                </h5>
+                                            </a>
+                                            <p class="text-[10px] text-slate-500 line-clamp-2 text-center">
                                                 {{ $product->mo_ta_ngan }}
                                             </p>
                                         </div>
 
-                                        <div class="pt-5 space-y-4">
-                                            <div class="text-center">
-                                                <span class="text-lime-400 font-black text-2xl">
-                                                    {{ number_format($product->gia_thap_nhat, 0, ',', '.') }}₫
+                                        <div class="space-y-1 text-center">
+                                            <div class="flex items-baseline justify-center gap-1.5 w-full">
+                                                <span class="text-lime-400 font-bold text-sm md:text-base text-center">
+                                                    Chỉ từ {{ number_format($product->gia_thap_nhat, 0, ',', '.') }}₫
                                                 </span>
                                             </div>
-
-                                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}"
-                                            class="block w-full rounded-xl py-3 bg-lime-400 text-black font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
-                                                Xem chi tiết
-                                            </a>
                                         </div>
                                     </div>
                                 </div>
