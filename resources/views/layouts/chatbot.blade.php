@@ -1,4 +1,3 @@
-{{-- VNTech AI Chatbot Widget - Nhúng vào layouts/app.blade.php trước </body> --}}
 <div id="vntech-chatbot-widget" class="fixed bottom-6 right-6 z-[9999] font-inter antialiased">
 
     {{-- Floating Action Button (FAB) --}}
@@ -18,10 +17,10 @@
         </svg>
     </button> 
 
-    {{-- Chat Window --}}
+    {{-- Chat Window - fixed theo màn hình, không phụ thuộc vị trí widget --}}
     <div id="chatbot-window"
-         class="absolute bottom-20 right-0 w-[380px] max-w-[calc(100vw-24px)] h-[540px] rounded-2xl flex flex-col overflow-hidden shadow-2xl border border-white/10 bg-[#0e1010]/95 backdrop-blur-xl
-                opacity-0 scale-95 translate-y-4 pointer-events-none transition-all duration-300 ease-out">
+         class="fixed top-1/2 -translate-y-1/2 right-[96px] w-[420px] max-w-[calc(100vw-24px)] h-[580px] rounded-2xl flex flex-col overflow-hidden shadow-2xl border border-white/10 bg-[#0e1010]/95 backdrop-blur-xl
+                opacity-0 scale-95 pointer-events-none transition-all duration-300 ease-out">
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#0e1010]/80 shrink-0">

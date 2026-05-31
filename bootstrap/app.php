@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->validateCsrfTokens(except: [
             'momo/ipn',
-            'chat',
+            // 'chat',
         ]);
         $middleware->alias([
             'admin' => isAdmin::class,

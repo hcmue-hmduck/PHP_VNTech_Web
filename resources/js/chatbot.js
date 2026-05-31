@@ -11,8 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const messages = document.getElementById("chatbot-messages");
     const iconChat = document.getElementById("icon-chat");
     const iconClose = document.getElementById("icon-close");
+    const widget = document.getElementById("vntech-chatbot-widget");
 
     const STORAGE_KEY = "vntech_conversation_id";
+    const POS_KEY = "vntech_chatbot_pos";
     const WELCOME_MESSAGE = "Chào mừng đến với **VNTech**! 👋\nEm là trợ lý AI tư vấn phần cứng và công nghệ. Anh/chị cần tìm kiếm sản phẩm hay cần tư vấn gì ạ?";
 
     function showWelcomeMessage() {
@@ -35,6 +37,79 @@ document.addEventListener("DOMContentLoaded", function () {
         breaks: true,
         gfm: true,
     });
+
+    // ── Kéo thả widget (chỉ lên/xuống, cố định bên phải) ───
+    (function initDrag() {
+        const MARGIN = 24;
+
+        // Phục hồi vị trí bottom đã lưu, hoặc dùng mặc định
+        const savedBottom = localStorage.getItem(POS_KEY);
+        const initBottom = savedBottom !== null
+            ? Math.min(Math.max(MARGIN, Number(savedBottom)), window.innerHeight - widget.offsetHeight - MARGIN)
+            : MARGIN;
+
+        // Widget luôn cố định bên phải, chỉ thay đổi bottom
+        widget.style.position = 'fixed';
+        widget.style.right  = MARGIN + 'px';
+        widget.style.bottom = initBottom + 'px';
+
+        let isDragging = false;
+        let startY     = 0;
+        let startBottom = 0;
+        const DRAG_THRESHOLD = 5;
+
+        toggleBtn.addEventListener('mousedown', onDragStart);
+        toggleBtn.addEventListener('touchstart', onDragStart, { passive: true });
+
+        function onDragStart(e) {
+            const point = e.touches ? e.touches[0] : e;
+            startY = point.clientY;
+            startBottom = parseFloat(widget.style.bottom) || MARGIN;
+            isDragging = false;
+
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup',   onDragEnd);
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('touchend',  onDragEnd);
+        }
+
+        function onDragMove(e) {
+            const point = e.touches ? e.touches[0] : e;
+            const dy = Math.abs(point.clientY - startY);
+
+            if (!isDragging && dy < DRAG_THRESHOLD) return;
+
+            if (!isDragging) {
+                isDragging = true;
+                widget.style.transition = 'none';
+                toggleBtn.style.cursor  = 'grabbing';
+            }
+
+            if (e.cancelable) e.preventDefault();
+
+            // Kéo lên => clientY giảm => bottom tăng (và ngược lại)
+            const delta  = startY - point.clientY;
+            const maxBottom = window.innerHeight - widget.offsetHeight - MARGIN;
+            const newBottom = Math.max(MARGIN, Math.min(maxBottom, startBottom + delta));
+
+            widget.style.bottom = newBottom + 'px';
+        }
+
+        function onDragEnd() {
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('mouseup',   onDragEnd);
+            document.removeEventListener('touchmove', onDragMove);
+            document.removeEventListener('touchend',  onDragEnd);
+
+            widget.style.transition = '';
+            toggleBtn.style.cursor  = 'pointer';
+
+            if (!isDragging) return; // click thường → bỏ qua
+
+            // Lưu vị trí bottom vào localStorage
+            localStorage.setItem(POS_KEY, parseFloat(widget.style.bottom));
+        }
+    })();
 
     // ── Khởi tạo: load lịch sử cũ nếu có ───────────────────
     loadHistory();
