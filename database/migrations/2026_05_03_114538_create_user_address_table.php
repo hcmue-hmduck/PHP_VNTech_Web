@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_address', function (Blueprint $collection) {
+            $collection->string('ma_dia_chi')->index();
             $collection->string('ma_nguoi_dung')->index();
             $collection->string('ho_ten');
             $collection->string('so_dien_thoai');

@@ -42,15 +42,29 @@
                 Hồ sơ cá nhân
             </h1>
             <p class="text-gray-400 mt-2 uppercase tracking-wide text-sm">
-                Quản lý thông tin tài khoản, sổ địa chỉ và theo dõi đơn hàng của bạn.
+                Quản lý thông tin tài khoản và danh sách địa chỉ của bạn.
             </p>
         </header>
 
         <!-- Thông báo thành công / lỗi -->
         @if(session('success'))
-        <div class="mb-8 max-w-3xl mx-auto p-4 rounded-lg bg-neon-green/10 border border-neon-green/30 text-neon-green text-sm flex items-center gap-3">
+        <div class="mb-8 max-w-3xl mx-auto p-4 rounded-lg bg-neon-green/10 border border-neon-green/30 text-neon-green text-sm flex items-center gap-3 animate-fadeInUp">
             <i data-lucide="check-circle" class="w-5 h-5 flex-shrink-0"></i>
             <span>{{ session('success') }}</span>
+        </div>
+        @endif
+
+        @if($errors->any())
+        <div class="mb-8 max-w-3xl mx-auto p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex flex-col gap-1.5 animate-fadeInUp">
+            <div class="flex items-center gap-3 font-bold">
+                <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0"></i>
+                <span>Có lỗi xảy ra:</span>
+            </div>
+            <ul class="list-disc list-inside pl-8 text-xs space-y-0.5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
         @endif
 
@@ -87,21 +101,18 @@
                 <a href="{{ route('user.view', ['tab' => 'addresses']) }}" 
                    class="w-full text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 {{ $tab === 'addresses' ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,102,0.2)]' : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white' }}">
                     <i data-lucide="map-pin" class="w-4 h-4"></i>
-                    <span>Sổ địa chỉ</span>
+                    <span>Danh sách địa chỉ</span>
                 </a>
-                <a href="{{ route('user.view', ['tab' => 'orders']) }}" 
-                   class="w-full text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 {{ $tab === 'orders' ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,102,0.2)]' : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white' }}">
-                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                    <span>Lịch sử đơn hàng</span>
-                </a>
+
             </div>
 
             <!-- Vùng nội dung bên phải -->
             <div class="lg:col-span-3 space-y-8">
                 <!-- TAB 1: THÔNG TIN CÁ NHÂN -->
                 @if($tab === 'profile')
-                <form action="#" method="POST" class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp">
+                <form action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" enctype="multipart/form-data" class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp">
                     @csrf
+                    @method('PUT')
                     <div class="flex flex-col gap-8">
                         <!-- Title & Header -->
                         <div class="border-b border-white/5 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -123,18 +134,21 @@
                             <!-- Cột Trái: Avatar -->
                             <div class="flex flex-col items-center gap-4 w-full md:w-1/4">
                                 <div class="relative">
-                                    @if(!empty($realUser->avatar_url))
-                                        <img src="{{ $realUser->avatar_url }}" alt="Avatar" class="w-32 h-32 rounded-full border-2 border-neon-green/40 object-cover shadow-[0_0_20px_rgba(0,255,102,0.1)]">
-                                    @else
-                                        <div class="w-32 h-32 rounded-full bg-neon-green/10 border-2 border-neon-green/30 flex items-center justify-center text-neon-green font-space text-4xl font-bold shadow-[0_0_20px_rgba(0,255,102,0.1)]">
-                                            {{ strtoupper(substr($realUser->ho_ten ?? 'U', 0, 1)) }}
-                                        </div>
-                                    @endif
+                                    <img id="avatar-preview" 
+                                         src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : '' }}" 
+                                         alt="Avatar" 
+                                         class="w-32 h-32 rounded-full border-2 border-neon-green/40 object-cover shadow-[0_0_20px_rgba(0,255,102,0.1)] {{ empty($realUser->avatar_url) ? 'hidden' : '' }}">
+                                    
+                                    <div id="avatar-placeholder" 
+                                         class="w-32 h-32 rounded-full bg-neon-green/10 border-2 border-neon-green/30 flex items-center justify-center text-neon-green font-space text-4xl font-bold shadow-[0_0_20px_rgba(0,255,102,0.1)] {{ !empty($realUser->avatar_url) ? 'hidden' : '' }}">
+                                        {{ strtoupper(substr($realUser->ho_ten ?? 'U', 0, 1)) }}
+                                    </div>
+                                    
                                     <!-- Nút upload ảnh nhỏ dạng camera ở góc dưới bên phải -->
                                     <div class="absolute bottom-1 right-1">
                                         <label class="w-8 h-8 rounded-full bg-[#121414] border border-white/10 hover:border-neon-green text-gray-400 hover:text-neon-green flex items-center justify-center cursor-pointer transition-all duration-300 shadow-lg hover:shadow-[0_0_10px_rgba(0,255,102,0.3)]">
                                             <i data-lucide="camera" class="w-4 h-4"></i>
-                                            <input type="file" name="avatar" class="hidden" accept="image/*" onchange="this.form.submit()">
+                                            <input type="file" name="avatar_url" class="hidden" accept="image/*" onchange="previewAvatar(event)">
                                         </label>
                                     </div>
                                 </div>
@@ -179,8 +193,9 @@
 
                 <!-- TAB: ĐỔI MẬT KHẨU -->
                 @if($tab === 'change-password')
-                <form action="#" method="POST" class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp">
+                <form action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp">
                     @csrf
+                    @method('PUT')
                     <div class="flex flex-col gap-8">
                         <!-- Title & Header -->
                         <div class="border-b border-white/5 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -203,7 +218,12 @@
                                 <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
                                     <i data-lucide="lock" class="w-3 h-3"></i> Mật khẩu cũ
                                 </label>
-                                <input type="password" name="old_password" placeholder="Nhập mật khẩu hiện tại" class="bg-[#121414]/80 border border-white/5 text-white placeholder-gray-600 rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-neon-green/50 transition-colors w-full">
+                                <div class="relative">
+                                    <input type="password" id="old_password" name="old_password" required placeholder="Nhập mật khẩu hiện tại" class="bg-[#121414]/80 border border-white/5 text-white placeholder-gray-600 rounded-lg py-3 pl-4 pr-10 text-sm focus:outline-none focus:border-neon-green/50 transition-colors w-full">
+                                    <button type="button" onclick="togglePasswordVisibility('old_password', this)" class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-white transition-colors">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Mật khẩu mới -->
@@ -211,7 +231,12 @@
                                 <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
                                     <i data-lucide="shield-check" class="w-3 h-3"></i> Mật khẩu mới
                                 </label>
-                                <input type="password" name="password" placeholder="Nhập mật khẩu mới" class="bg-[#121414]/80 border border-white/5 text-white placeholder-gray-600 rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-neon-green/50 transition-colors w-full">
+                                <div class="relative">
+                                    <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu mới" class="bg-[#121414]/80 border border-white/5 text-white placeholder-gray-600 rounded-lg py-3 pl-4 pr-10 text-sm focus:outline-none focus:border-neon-green/50 transition-colors w-full">
+                                    <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-white transition-colors">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Xác nhận mật khẩu mới -->
@@ -219,22 +244,73 @@
                                 <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
                                     <i data-lucide="shield-alert" class="w-3 h-3"></i> Xác nhận mật khẩu mới
                                 </label>
-                                <input type="password" name="password_confirmation" placeholder="Xác nhận lại mật khẩu mới" class="bg-[#121414]/80 border border-white/5 text-white placeholder-gray-600 rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-neon-green/50 transition-colors w-full">
+                                <div class="relative">
+                                    <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Xác nhận lại mật khẩu mới" class="bg-[#121414]/80 border border-white/5 text-white placeholder-gray-600 rounded-lg py-3 pl-4 pr-10 text-sm focus:outline-none focus:border-neon-green/50 transition-colors w-full">
+                                    <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-white transition-colors">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </form>
                 @endif
 
-                <!-- TAB 2: SỔ ĐỊA CHỈ -->
+                <!-- TAB 2: DANH SÁCH ĐỊA CHỈ -->
                 @if($tab === 'addresses')
-                <div class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp">
+                <div class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp"
+                     x-data="{
+                         openEdit: false,
+                         editingAddress: { ho_ten: '', so_dien_thoai: '', dia_chi_chi_tiet: '', is_default: false, _id: '' },
+                         provinces: [],
+                         editProvince: '',
+                         editWard: '',
+                         editWards: [],
+                         async init() {
+                             try {
+                                 const res = await fetch('https://provinces.open-api.vn/api/v2/p/');
+                                 this.provinces = await res.json();
+                             } catch (e) { console.error('Lỗi tải tỉnh/thành', e); }
+                         },
+                         async openEditModal(address) {
+                             this.editingAddress = {
+                                 ho_ten: address.ho_ten,
+                                 so_dien_thoai: address.so_dien_thoai,
+                                 dia_chi_chi_tiet: address.dia_chi_chi_tiet,
+                                 is_default: !!address.is_default,
+                                 _id: address._id || address.ma_dia_chi
+                             };
+                             this.openEdit = true;
+                             const matching = this.provinces.find(p => p.name === address.tinh_thanh);
+                             if (matching) {
+                                 this.editProvince = matching.code;
+                                 await this.fetchEditWards();
+                                 const ward = this.editWards.find(w => w.name === address.phuong_xa);
+                                 this.editWard = ward ? ward.code : '';
+                             } else {
+                                 this.editProvince = '';
+                                 this.editWards = [];
+                                 this.editWard = '';
+                             }
+                             this.$nextTick(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); });
+                         },
+                         async fetchEditWards() {
+                             this.editWards = [];
+                             this.editWard = '';
+                             if (!this.editProvince) return;
+                             try {
+                                 const res = await fetch(`https://provinces.open-api.vn/api/v2/p/${this.editProvince}?depth=2`);
+                                 const data = await res.json();
+                                 this.editWards = data.wards || [];
+                             } catch (e) { console.error('Lỗi tải phường/xã', e); }
+                         }
+                     }">
                     <div class="flex flex-col gap-8">
                         <!-- Header -->
                         <div class="border-b border-white/5 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
                                 <h3 class="text-xl font-bold uppercase text-white tracking-tight flex items-center gap-3">
-                                    <i data-lucide="map-pinned" class="text-neon-green"></i> Sổ địa chỉ
+                                    <i data-lucide="map-pinned" class="text-neon-green"></i> Danh sách địa chỉ
                                 </h3>
                                 <p class="text-gray-500 text-xs mt-1 uppercase tracking-wider">Quản lý các địa chỉ nhận hàng của bạn</p>
                             </div>
@@ -253,6 +329,25 @@
                                                 Mặc định
                                             </span>
                                             @endif
+                                        </div>
+                                        <div class="flex items-center gap-1 flex-shrink-0 relative z-10">
+                                            <button type="button"
+                                                    @click="openEditModal({{ Js::from($address) }})"
+                                                    class="p-1.5 text-gray-500 hover:text-neon-green hover:bg-white/5 rounded transition-all inline-flex"
+                                                    title="Chỉnh sửa">
+                                                <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                            <form action="{{ route('user-address.destroy', $address->ma_dia_chi) }}"
+                                                  method="POST"
+                                                  onsubmit="return confirm('Bạn có chắc muốn xóa địa chỉ này?');"
+                                                  class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-white/5 rounded transition-all"
+                                                        title="Xóa">
+                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
                                     <div class="space-y-1 text-xs text-gray-400 font-mono">
@@ -278,8 +373,124 @@
                             @endforelse
                         </div>
 
+                        <!-- Form chỉnh sửa inline (Alpine.js) -->
+                        <div x-show="openEdit" x-transition class="bg-[#121414]/60 border border-neon-green/25 rounded-xl p-6 mt-4" x-cloak>
+                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
+                                <h4 class="text-sm font-bold uppercase text-white tracking-wider flex items-center gap-2">
+                                    <i data-lucide="edit" class="text-neon-green w-4 h-4"></i> Chỉnh sửa địa chỉ
+                                </h4>
+                                <button type="button" @click="openEdit = false"
+                                   class="text-gray-400 hover:text-white transition-colors" title="Đóng">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <form :action="'/user-address/' + editingAddress._id + '/edit'" method="POST">
+                                @csrf
+                                @method('PUT')
+
+                                {{-- Họ tên & SĐT --}}
+                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                    <div>
+                                        <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Họ và Tên</label>
+                                        <input type="text" name="ho_ten" required
+                                               x-model="editingAddress.ho_ten"
+                                               class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-neon-green focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Số Điện Thoại</label>
+                                        <input type="text" name="so_dien_thoai" required
+                                               x-model="editingAddress.so_dien_thoai"
+                                               class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white font-mono focus:border-neon-green focus:outline-none">
+                                    </div>
+                                </div>
+
+                                {{-- Tỉnh/TP & Phường/Xã --}}
+                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                    <div>
+                                        <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Tỉnh / Thành Phố</label>
+                                        <select x-model="editProvince" @change="fetchEditWards()"
+                                                class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-neon-green focus:outline-none appearance-none cursor-pointer">
+                                            <option value="" class="bg-gray-900 text-gray-400">-- Chọn Tỉnh/TP --</option>
+                                            <template x-for="p in provinces" :key="p.code">
+                                                <option :value="p.code" x-text="p.name" class="bg-gray-900 text-white"></option>
+                                            </template>
+                                        </select>
+                                        <input type="hidden" name="tinh_thanh" :value="provinces.find(p => String(p.code) === String(editProvince))?.name || ''">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Phường / Xã</label>
+                                        <select x-model="editWard" :disabled="!editProvince"
+                                                class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-neon-green focus:outline-none appearance-none cursor-pointer disabled:opacity-40">
+                                            <option value="" class="bg-gray-900 text-gray-400">-- Chọn Phường/Xã --</option>
+                                            <template x-for="w in editWards" :key="w.code">
+                                                <option :value="w.code" x-text="w.name" class="bg-gray-900 text-white"></option>
+                                            </template>
+                                        </select>
+                                        <input type="hidden" name="phuong_xa" :value="editWards.find(w => String(w.code) === String(editWard))?.name || ''">
+                                    </div>
+                                </div>
+                                <input type="hidden" name="quan_huyen" value="">
+
+                                {{-- Địa chỉ chi tiết --}}
+                                <div class="mb-3">
+                                    <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Địa chỉ chi tiết</label>
+                                    <input type="text" name="dia_chi_chi_tiet" required
+                                           x-model="editingAddress.dia_chi_chi_tiet"
+                                           class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-neon-green focus:outline-none">
+                                </div>
+
+                                {{-- Đặt làm mặc định --}}
+                                <div class="flex items-center gap-2 mb-4">
+                                    <input type="checkbox" name="is_default" value="1" id="edit_is_default"
+                                           x-model="editingAddress.is_default"
+                                           class="w-4 h-4 accent-neon-green cursor-pointer">
+                                    <label for="edit_is_default" class="text-xs text-gray-400 cursor-pointer font-bold uppercase tracking-wider">Đặt làm địa chỉ mặc định</label>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button type="button" @click="openEdit = false"
+                                       class="w-full py-3 border border-white/10 hover:border-white/20 text-gray-400 hover:text-white font-bold text-[10px] tracking-widest uppercase rounded-lg transition-all text-center">
+                                        Hủy bỏ
+                                    </button>
+                                    <button type="submit"
+                                            class="w-full py-3 bg-neon-green hover:opacity-90 text-black font-black text-[10px] tracking-widest uppercase rounded-lg active:scale-[0.98] transition-all">
+                                        Lưu thay đổi
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    <div class="mt-8 border-t border-white/5 pt-8">
+
                         <!-- Form thêm địa chỉ mới (có thể thu gọn) -->
-                        <div x-data="{ open: false }">
+                        <div x-data="{ 
+                            open: false,
+                            provinces: [],
+                            wards: [],
+                            selectedProvince: '',
+                            selectedWard: '',
+                            async init() {
+                                try {
+                                    const res = await fetch('https://provinces.open-api.vn/api/v2/p/');
+                                    this.provinces = await res.json();
+                                } catch (e) {
+                                    console.error('Lỗi tải danh mục Tỉnh/Thành', e);
+                                }
+                            },
+                            async fetchWards() {
+                                this.wards = [];
+                                this.selectedWard = '';
+                                if (!this.selectedProvince) return;
+
+                                try {
+                                    const res = await fetch(`https://provinces.open-api.vn/api/v2/p/${this.selectedProvince}?depth=2`);
+                                    const data = await res.json();
+                                    this.wards = data.wards || [];
+                                } catch (e) {
+                                    console.error('Lỗi tải danh mục Phường/Xã', e);
+                                }
+                            }
+                        }">
                             <button type="button" @click="open = !open"
                                 class="w-full py-3 border border-dashed border-white/15 hover:border-neon-green/40 text-gray-500 hover:text-neon-green text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="plus" class="w-3.5 h-3.5" :class="open ? 'rotate-45' : ''" style="transition: transform 0.2s"></i>
@@ -298,88 +509,71 @@
                                       class="bg-[#121414]/60 border border-white/10 rounded-xl p-6">
                                     @csrf
 
-                                    <!-- Họ tên & SĐT -->
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                        <div class="flex flex-col gap-1.5">
-                                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Họ và Tên</label>
+                                    {{-- Họ tên & SĐT --}}
+                                    <div class="grid grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Họ và Tên</label>
                                             <input type="text" name="ho_ten" required placeholder="Nguyễn Văn A"
-                                                   class="w-full px-3 py-2.5 text-sm bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-neon-green/50 focus:outline-none transition-colors">
+                                                   class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-neon-green focus:outline-none">
                                         </div>
-                                        <div class="flex flex-col gap-1.5">
-                                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Số điện thoại</label>
+                                        <div>
+                                            <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Số Điện Thoại</label>
                                             <input type="text" name="so_dien_thoai" required placeholder="0900 000 000"
-                                                   class="w-full px-3 py-2.5 text-sm bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-neon-green/50 focus:outline-none transition-colors font-mono">
+                                                   class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-neon-green focus:outline-none font-mono">
                                         </div>
                                     </div>
 
-                                    <!-- Dropdown Tỉnh/TP & Phường/Xã via API -->
-                                     <div
-                                         x-data="{
-                                             provinces: [],
-                                             wards: [],
-                                             selectedProvince: '',
-                                             selectedWard: '',
-                                             async init() {
-                                                 try {
-                                                     const res = await fetch('https://provinces.open-api.vn/api/v2/p/');
-                                                     this.provinces = await res.json();
-                                                 } catch (e) {
-                                                     console.error('Lỗi tải danh mục Tỉnh/Thành', e);
-                                                 }
-                                             },
-                                             async fetchWards() {
-                                                 this.wards = [];
-                                                 this.selectedWard = '';
-                                                 if (!this.selectedProvince) return;
+                                    <div class="grid grid-cols-2 gap-3 mb-3">
+                                        {{-- Tỉnh / Thành Phố --}}
+                                        <div>
+                                            <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Tỉnh / Thành Phố</label>
+                                            <select x-model="selectedProvince"
+                                                    @change="fetchWards()"
+                                                    class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-neon-green focus:outline-none appearance-none cursor-pointer">
+                                                <option value="" class="bg-gray-900 text-gray-400">-- Chọn Tỉnh/TP --</option>
+                                                <template x-for="p in provinces" :key="p.code">
+                                                    <option :value="p.code" x-text="p.name" class="bg-gray-900 text-white"></option>
+                                                </template>
+                                            </select>
+                                            <input type="hidden" name="tinh_thanh" :value="provinces.find(p => String(p.code) === String(selectedProvince))?.name || ''">
+                                        </div>
 
-                                                 try {
-                                                     const res = await fetch(`https://provinces.open-api.vn/api/v2/p/${this.selectedProvince}?depth=2`);
-                                                     const data = await res.json();
-                                                     this.wards = data.wards || [];
-                                                 } catch (e) {
-                                                     console.error('Lỗi tải danh mục Phường/Xã', e);
-                                                 }
-                                             }
-                                         }"
-                                     >
-                                         <div class="grid grid-cols-2 gap-3 mb-3">
-                                             {{-- Tỉnh / Thành Phố --}}
-                                             <div>
-                                                 <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Tỉnh / Thành Phố</label>
-                                                 <select x-model="selectedProvince"
-                                                         @change="fetchWards()"
-                                                         class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-neon-green/50 focus:outline-none appearance-none cursor-pointer">
-                                                     <option value="" class="bg-gray-900 text-gray-400">-- Chọn Tỉnh/TP --</option>
-                                                     <template x-for="p in provinces" :key="p.code">
-                                                         <option :value="p.code" x-text="p.name" class="bg-gray-900 text-white"></option>
-                                                     </template>
-                                                 </select>
-                                                 <input type="hidden" name="tinh_thanh" :value="provinces.find(p => String(p.code) === String(selectedProvince))?.name || ''">
-                                             </div>
+                                        {{-- Phường / Xã --}}
+                                        <div>
+                                            <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Phường / Xã</label>
+                                            <select x-model="selectedWard"
+                                                    :disabled="!selectedProvince"
+                                                    class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-neon-green focus:outline-none appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                                                <option value="" class="bg-gray-900 text-gray-400">-- Chọn Phường/Xã --</option>
+                                                <template x-for="w in wards" :key="w.code">
+                                                    <option :value="w.code" x-text="w.name" class="bg-gray-900 text-white"></option>
+                                                </template>
+                                            </select>
+                                            <input type="hidden" name="phuong_xa" :value="wards.find(w => String(w.code) === String(selectedWard))?.name || ''">
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="quan_huyen" value="">
 
-                                             {{-- Phường / Xã --}}
-                                             <div>
-                                                 <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Phường / Xã</label>
-                                                 <select x-model="selectedWard"
-                                                         :disabled="!selectedProvince"
-                                                         class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-neon-green/50 focus:outline-none appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-                                                     <option value="" class="bg-gray-900 text-gray-400">-- Chọn Phường/Xã --</option>
-                                                     <template x-for="w in wards" :key="w.code">
-                                                         <option :value="w.code" x-text="w.name" class="bg-gray-900 text-white"></option>
-                                                     </template>
-                                                 </select>
-                                                 <input type="hidden" name="phuong_xa" :value="wards.find(w => String(w.code) === String(selectedWard))?.name || ''">
-                                             </div>
-                                         </div>
-                                         <input type="hidden" name="quan_huyen" value="">
-                                     </div>
-                                    <!-- Địa chỉ chi tiết -->
-                                    <div class="flex flex-col gap-1.5 mb-5">
-                                        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Địa chỉ chi tiết</label>
+                                    <div class="mb-3">
+                                        <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Địa chỉ chi tiết</label>
                                         <input type="text" name="dia_chi_chi_tiet" required placeholder="Số nhà, tên đường..."
-                                               class="w-full px-3 py-2.5 text-sm bg-white/[0.03] border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-neon-green/50 focus:outline-none transition-colors">
+                                               class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-neon-green focus:outline-none">
                                     </div>
 
+                                    <!-- Đặt làm mặc định -->
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <label class="flex items-center gap-2.5 cursor-pointer group select-none text-[11px] text-gray-400">
+                                            <div class="relative w-4 h-4 border border-white/20 rounded bg-white/[0.02] flex items-center justify-center transition-all duration-300 group-hover:border-neon-green/50">
+                                                <input type="checkbox" name="is_default" value="1" class="peer absolute inset-0 opacity-0 cursor-pointer z-10">
+                                                <div class="absolute inset-0 rounded-[3px] bg-neon-green text-black flex items-center justify-center scale-0 peer-checked:scale-100 transition-transform duration-200">
+                                                    <svg class="w-3 h-3 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <span class="group-hover:text-white transition-colors">Đặt làm địa chỉ mặc định</span>
+                                        </label>
+                                    </div>
                                     <button type="submit"
                                             class="w-full py-3 bg-neon-green hover:opacity-90 text-black font-black text-[10px] tracking-widest uppercase rounded-lg active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(0,255,102,0.2)]">
                                         Lưu địa chỉ
@@ -391,79 +585,7 @@
                 </div>
                 @endif
 
-                <!-- TAB 3: LỊCH SỬ ĐƠN HÀNG -->
-                @if($tab === 'orders')
-                <div class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp">
-                    <div class="border-b border-white/5 pb-4 mb-6">
-                        <h3 class="text-xl font-bold uppercase text-white tracking-tight flex items-center gap-3">
-                            <i data-lucide="receipt" class="text-neon-green"></i> Lịch sử mua hàng
-                        </h3>
-                        <p class="text-gray-500 text-xs mt-1 uppercase tracking-wider">Danh sách các đơn đặt hàng của bạn trên hệ thống</p>
-                    </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-separate border-spacing-0">
-                            <thead>
-                                <tr class="text-[10px] text-gray-500 uppercase tracking-[0.2em] border-b border-white/5">
-                                    <th class="px-4 py-3 font-bold border-b border-white/5">Mã đơn</th>
-                                    <th class="px-4 py-3 font-bold border-b border-white/5">Ngày đặt</th>
-                                    <th class="px-4 py-3 font-bold border-b border-white/5">Tổng tiền</th>
-                                    <th class="px-4 py-3 font-bold border-b border-white/5">Trạng thái</th>
-                                    <th class="px-4 py-3 font-bold text-right border-b border-white/5">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-xs font-mono">
-                                @forelse($orders as $order)
-                                <tr class="hover:bg-white/5 transition-colors group">
-                                    <td class="px-4 py-4 text-neon-green font-bold">#{{ $order->ma_don_hang }}</td>
-                                    <td class="px-4 py-4 text-gray-400">{{ $order->created_at ? $order->created_at->format('d/m/Y') : 'N/A' }}</td>
-                                    <td class="px-4 py-4 text-white font-bold">{{ number_format($order->tong_thanh_toan, 0, ',', '.') }}đ</td>
-                                    <td class="px-4 py-4">
-                                        @if($order->trang_thai === 'da_nhan_hang')
-                                            <span class="px-2 py-0.5 rounded text-[8px] font-bold border bg-neon-green/10 text-neon-green border-neon-green/20">
-                                                HOÀN TẤT
-                                            </span>
-                                        @elseif($order->trang_thai === 'cho_xac_nhan')
-                                            <span class="px-2 py-0.5 rounded text-[8px] font-bold border bg-red-500/10 text-red-500 border-red-500/20 animate-pulse">
-                                                CHỜ XÁC NHẬN
-                                            </span>
-                                        @elseif($order->trang_thai === 'cho_thanh_toan')
-                                            <span class="px-2 py-0.5 rounded text-[8px] font-bold border bg-yellow-500/10 text-yellow-400 border-yellow-500/20">
-                                                CHỜ THANH TOÁN
-                                            </span>
-                                        @elseif($order->trang_thai === 'da_huy')
-                                            <span class="px-2 py-0.5 rounded text-[8px] font-bold border bg-gray-500/10 text-gray-400 border-gray-500/20">
-                                                ĐÃ HỦY
-                                            </span>
-                                        @else
-                                            <span class="px-2 py-0.5 rounded text-[8px] font-bold border bg-blue-500/10 text-blue-400 border-blue-500/20">
-                                                ĐANG XỬ LÝ
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-4 text-right">
-                                        <a href="{{ route('order_detail.view', ['ma_don_hang' => $order->ma_don_hang]) }}" 
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-white/10 hover:border-neon-green/40 bg-white/[0.02] hover:bg-neon-green/5 text-gray-300 hover:text-neon-green rounded text-[10px] font-bold uppercase tracking-widest transition-all duration-300 group">
-                                            <span>Chi tiết</span>
-                                            <i data-lucide="chevron-right" class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                        <div class="flex flex-col items-center justify-center gap-3">
-                                            <i data-lucide="shopping-cart" class="w-10 h-10 text-gray-700"></i>
-                                            <span class="italic">Bạn chưa thực hiện đơn đặt hàng nào</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                @endif
             </div>
         </div>
     </main>
@@ -477,5 +599,37 @@
             lucide.createIcons();
         }
     });
+
+    function previewAvatar(event) {
+        const input = event.target;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('avatar-preview');
+                const placeholder = document.getElementById('avatar-placeholder');
+                
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                if (placeholder) {
+                    placeholder.classList.add('hidden');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i>';
+        } else {
+            input.type = 'password';
+            btn.innerHTML = '<i data-lucide="eye" class="w-4 h-4"></i>';
+        }
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
 </script>
 @endsection

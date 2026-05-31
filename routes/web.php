@@ -48,8 +48,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'viewCart'])->name('cart.view');
 
     Route::get('/user', [UserController::class, 'viewUserInfo'])->name('user.view');
+    Route::put('/user/{user}/edit', [UserController::class, 'editUserInfo'])->name('user.update');
     
     Route::post('/user-address', [UserAddressController::class, 'storeAddress'])->name('user-address.store');
+    Route::put('/user-address/{user_address}/edit', [UserAddressController::class, 'updateAddress'])->name('user-address.update');
+    Route::post('user-address/{user_address}/destroy', [UserAddressController::class, 'destroyAddress'])->name('user-address.destroy');
+    Route::get('/user-address/{ma_dia_chi}/select', [UserAddressController::class, 'selectAddressGet'])->name('user-address.select');
 
     Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('payment.view');
     Route::post('/prepare-payment', [PaymentController::class, 'preparePayment'])->name('payment.prepare');
@@ -94,10 +98,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/flash-sales/{flash_sales}/edit', [FlashSalesController::class, 'viewEditFlashSalesAdmin'])->name('admin.flashsales.edit');
     Route::put('/flash-sales/{flash_sales}', [FlashSalesController::class, 'updateEditFlashSalesAdmin'])->name('admin.flashsales.update');
 
-    // Route::get('/vouchers', [VoucherController::class, 'viewVoucherAdmin'])->name('admin.voucher.view');
-    // Route::get('/voucher/create', [VoucherController::class, 'viewCreateVoucherAdmin'])->name('admin.voucher.create');
-    // Route::post('/vouchers', [VoucherController::class, 'storeCreateVoucherAdmin'])->name('admin.voucher.store');
-    // Route::get('/voucher/{voucher}/edit', [VoucherController::class, 'viewEditVoucherAdmin'])->name('admin.voucher.edit');
-    // Route::put('/voucher/{voucher}', [VoucherController::class, 'updateEditVoucherAdmin'])->name('admin.voucher.update');
-    // Route::put('/voucher/{voucher}/delete', [VoucherController::class, 'deleteVoucherAdmin'])->name('admin.voucher.delete');
+    Route::get('/vouchers', [VoucherController::class, 'viewVoucherAdmin'])->name('admin.voucher.view');
+    Route::get('/voucher/create', [VoucherController::class, 'viewCreateVoucherAdmin'])->name('admin.voucher.create');
+    Route::post('/vouchers', [VoucherController::class, 'storeCreateVoucherAdmin'])->name('admin.voucher.store');
+    Route::get('/voucher/{voucher}/edit', [VoucherController::class, 'viewEditVoucherAdmin'])->name('admin.voucher.edit');
+    Route::put('/voucher/{voucher}', [VoucherController::class, 'updateEditVoucherAdmin'])->name('admin.voucher.update');
+    Route::put('/voucher/{voucher}/delete', [VoucherController::class, 'deleteVoucherAdmin'])->name('admin.voucher.delete');
 });

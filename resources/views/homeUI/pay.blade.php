@@ -41,6 +41,8 @@
     .primary-glow {
         text-shadow: 0 0 15px rgba(163, 230, 53, 0.5);
     }
+
+    [x-cloak] { display: none !important; }
 </style>
 @endpush
 
@@ -123,7 +125,71 @@
         <div class="lg:col-span-8 space-y-8">
             
             <!-- PHẦN 1: QUẢN LÝ ĐỊA CHỈ GIAO HÀNG -->
-            <section class="glass-panel p-8 relative overflow-hidden group shadow-[0_0_30px_rgba(0,0,0,0.12)]">
+            <section class="glass-panel p-8 relative overflow-hidden group shadow-[0_0_30px_rgba(0,0,0,0.12)]"
+                     x-data="{
+                         showList: false,
+                         showAddForm: false,
+                         openEdit: false,
+                         editingAddress: { ho_ten: '', so_dien_thoai: '', dia_chi_chi_tiet: '', is_default: false, _id: '' },
+                         provinces: [],
+                         editProvince: '',
+                         editWard: '',
+                         editWards: [],
+                         async init() {
+                             try {
+                                 const res = await fetch('https://provinces.open-api.vn/api/v2/p/');
+                                 this.provinces = await res.json();
+                             } catch (e) { console.error('Lỗi tải tỉnh/thành', e); }
+                         },
+                         async openEditModal(address) {
+                             this.editingAddress = {
+                                 ho_ten: address.ho_ten,
+                                 so_dien_thoai: address.so_dien_thoai,
+                                 dia_chi_chi_tiet: address.dia_chi_chi_tiet,
+                                 is_default: !!address.is_default,
+                                 _id: address._id || address.ma_dia_chi
+                             };
+                             this.openEdit = true;
+                             this.showList = false;
+                             this.showAddForm = false;
+                             const matching = this.provinces.find(p => p.name === address.tinh_thanh);
+                             if (matching) {
+                                 this.editProvince = matching.code;
+                                 await this.fetchEditWards();
+                                 const ward = this.editWards.find(w => w.name === address.phuong_xa);
+                                 this.editWard = ward ? ward.code : '';
+                             } else {
+                                 this.editProvince = '';
+                                 this.editWards = [];
+                                 this.editWard = '';
+                             }
+                             this.$nextTick(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); });
+                         },
+                         async fetchEditWards() {
+                             this.editWards = [];
+                             this.editWard = '';
+                             if (!this.editProvince) return;
+                             try {
+                                 const res = await fetch(`https://provinces.open-api.vn/api/v2/p/${this.editProvince}?depth=2`);
+                                 const data = await res.json();
+                                 this.editWards = data.wards || [];
+                             } catch (e) { console.error('Lỗi tải phường/xã', e); }
+                         },
+                         toggleAddForm() {
+                             this.showAddForm = !this.showAddForm;
+                             if (this.showAddForm) {
+                                 this.openEdit = false;
+                                 this.showList = false;
+                             }
+                         },
+                         toggleList() {
+                             this.showList = !this.showList;
+                             if (this.showList) {
+                                 this.showAddForm = false;
+                                 this.openEdit = false;
+                             }
+                         }
+                     }">
                 <div class="absolute top-0 left-0 w-1 h-full bg-lime-400"></div>
                 <div class="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
                     <div class="w-10 h-10 rounded-full bg-lime-400/10 flex items-center justify-center">
@@ -136,7 +202,14 @@
                 </div>
 
                 @php
-                    $defaultAddress = $user_address->firstWhere('is_default', true) ?? $user_address->first();
+                    $selectedAddressId = session('selected_address_id');
+                    $defaultAddress = null;
+                    if ($selectedAddressId) {
+                        $defaultAddress = $user_address->firstWhere('ma_dia_chi', $selectedAddressId);
+                    }
+                    if (!$defaultAddress) {
+                        $defaultAddress = $user_address->firstWhere('is_default', true) ?? $user_address->first();
+                    }
                     $hasAddress = $user_address->isNotEmpty();
                     $fullAddress = $defaultAddress
                         ? $formatAddress($defaultAddress->dia_chi_chi_tiet, $defaultAddress->phuong_xa, $defaultAddress->quan_huyen, $defaultAddress->tinh_thanh)
@@ -144,7 +217,7 @@
                 @endphp
 
                 @if($hasAddress && $defaultAddress)
-                <div x-data="{ showList: false }">
+                <div>
                     {{-- Card địa chỉ đang chọn --}}
                     <div class="space-y-4 bg-white/5 p-6 rounded-xl border border-white/10 mb-4">
                         <div class="flex justify-between items-start">
@@ -156,11 +229,11 @@
                                 <p id="disp_sdt" class="text-gray-400 text-sm font-mono mb-1">{{ $defaultAddress->so_dien_thoai }}</p>
                                 <p id="disp_dc" class="text-gray-300 text-sm">{{ $fullAddress }}</p>
                             </div>
-                            <button type="button" @click="showList = !showList"
+                            <button type="button" @click="toggleList()"
                                 class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-lime-400 border border-white/10 hover:border-lime-400/40 px-3 py-2 rounded-lg transition-all flex-shrink-0">
                                 <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
                                 <span x-text="showList ? 'Đóng' : 'Đổi địa chỉ'"></span>
-                            </button>
+                             </button>
                         </div>
                     </div>
 
@@ -171,26 +244,11 @@
                             @php
                                 $addrFull = $formatAddress($addr->dia_chi_chi_tiet, $addr->phuong_xa, $addr->quan_huyen, $addr->tinh_thanh);
                             @endphp
-                        <div class="flex items-center gap-3 p-3 rounded-xl border border-white/10 hover:border-lime-400/40 hover:bg-white/5 cursor-pointer group transition-all"
-                            @click="document.getElementById('disp_ho_ten').textContent = {{ Js::from($addr->ho_ten) }};
-                            document.getElementById('disp_sdt').textContent = {{ Js::from($addr->so_dien_thoai) }};
-                            document.getElementById('disp_dc').textContent = {{ Js::from($addrFull) }};
-                            
-                            let inputHoTen = document.getElementById('sel_ho_ten');
-                            let inputSdt = document.getElementById('sel_sdt');
-                            let inputDc = document.getElementById('sel_dc');
-                            
-                            inputHoTen.value = {{ Js::from($addr->ho_ten) }};
-                            inputSdt.value = {{ Js::from($addr->so_dien_thoai) }};
-                            inputDc.value = {{ Js::from($addrFull) }};
-                            
-                            // Kích hoạt event giả lập để ép các thư viện nhận diện dữ liệu mới
-                            inputHoTen.dispatchEvent(new Event('input'));
-                            inputSdt.dispatchEvent(new Event('input'));
-                            inputDc.dispatchEvent(new Event('input'));
-                            
-                            showList = false;">
-                            <div class="flex-1 min-w-0">
+                        <div class="relative flex items-center gap-3 p-3 rounded-xl border border-white/10 hover:border-lime-400/40 hover:bg-white/5 cursor-pointer group transition-all">
+                            {{-- Link select phủ toàn bộ card để xử lý thuần PHP --}}
+                            <a href="{{ route('user-address.select', $addr->ma_dia_chi) }}" class="absolute inset-0 z-0 rounded-xl"></a>
+
+                            <div class="flex-1 min-w-0 relative z-10 pointer-events-none">
                                 <div class="flex items-center gap-2 mb-0.5">
                                     <span class="text-white text-sm font-bold group-hover:text-lime-400 transition-colors">{{ $addr->ho_ten }}</span>
                                     @if($addr->is_default)
@@ -200,9 +258,115 @@
                                 <p class="text-gray-500 text-xs font-mono">{{ $addr->so_dien_thoai }}</p>
                                 <p class="text-gray-400 text-xs truncate">{{ $addrFull }}</p>
                             </div>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 group-hover:text-lime-400 flex-shrink-0 transition-colors"></i>
+                            <div class="flex items-center gap-1 flex-shrink-0 relative z-10" @click.stop>
+                                <button type="button"
+                                        @click="openEditModal({{ Js::from($addr) }})"
+                                        class="p-1.5 text-gray-500 hover:text-lime-400 hover:bg-white/5 rounded transition-all inline-flex"
+                                        title="Chỉnh sửa">
+                                    <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <form action="{{ route('user-address.destroy', $addr->ma_dia_chi) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Bạn có chắc muốn xóa địa chỉ này?');"
+                                      class="inline">
+                                    @csrf
+                                    <button type="submit"
+                                            class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-white/5 rounded transition-all"
+                                            title="Xóa">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                         @endforeach
+                    </div>
+
+                    {{-- Form chỉnh sửa inline (Alpine.js) --}}
+                    <div x-show="openEdit" x-transition class="mt-4 bg-white/[0.03] border border-lime-400/20 rounded-xl p-5" x-cloak>
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
+                            <h4 class="text-sm font-bold uppercase text-white tracking-wider flex items-center gap-2">
+                                <i data-lucide="edit" class="text-lime-400 w-4 h-4"></i> Chỉnh sửa địa chỉ
+                            </h4>
+                            <button type="button" @click="openEdit = false"
+                               class="text-gray-400 hover:text-white transition-colors" title="Đóng">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <form :action="'/user-address/' + editingAddress._id + '/edit'" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            {{-- Họ tên & SĐT --}}
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Họ và Tên</label>
+                                    <input type="text" name="ho_ten" required
+                                           x-model="editingAddress.ho_ten"
+                                           class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-lime-400 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Số Điện Thoại</label>
+                                    <input type="text" name="so_dien_thoai" required
+                                           x-model="editingAddress.so_dien_thoai"
+                                           class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white font-mono focus:border-lime-400 focus:outline-none">
+                                </div>
+                            </div>
+
+                            {{-- Tỉnh/TP & Phường/Xã --}}
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Tỉnh / Thành Phố</label>
+                                    <select x-model="editProvince" @change="fetchEditWards()"
+                                            class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-lime-400 focus:outline-none appearance-none cursor-pointer">
+                                        <option value="" class="bg-gray-900 text-gray-400">-- Chọn Tỉnh/TP --</option>
+                                        <template x-for="p in provinces" :key="p.code">
+                                            <option :value="p.code" x-text="p.name" class="bg-gray-900 text-white"></option>
+                                        </template>
+                                    </select>
+                                    <input type="hidden" name="tinh_thanh" :value="provinces.find(p => String(p.code) === String(editProvince))?.name || ''">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Phường / Xã</label>
+                                    <select x-model="editWard" :disabled="!editProvince"
+                                            class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:border-lime-400 focus:outline-none appearance-none cursor-pointer disabled:opacity-40">
+                                        <option value="" class="bg-gray-900 text-gray-400">-- Chọn Phường/Xã --</option>
+                                        <template x-for="w in editWards" :key="w.code">
+                                            <option :value="w.code" x-text="w.name" class="bg-gray-900 text-white"></option>
+                                        </template>
+                                    </select>
+                                    <input type="hidden" name="phuong_xa" :value="editWards.find(w => String(w.code) === String(editWard))?.name || ''">
+                                </div>
+                            </div>
+                            <input type="hidden" name="quan_huyen" value="">
+
+                            {{-- Địa chỉ chi tiết --}}
+                            <div class="mb-3">
+                                <label class="block text-[10px] text-gray-500 uppercase tracking-widest mb-1">Địa chỉ chi tiết</label>
+                                <input type="text" name="dia_chi_chi_tiet" required
+                                       x-model="editingAddress.dia_chi_chi_tiet"
+                                       class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-lime-400 focus:outline-none">
+                            </div>
+
+                            {{-- Đặt làm mặc định --}}
+                            <div class="flex items-center gap-2 mb-4">
+                                <input type="checkbox" name="is_default" value="1" id="edit_is_default"
+                                       x-model="editingAddress.is_default"
+                                       class="w-4 h-4 accent-lime-400 cursor-pointer">
+                                <label for="edit_is_default" class="text-xs text-gray-400 cursor-pointer">Đặt làm địa chỉ mặc định</label>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <button type="button" @click="openEdit = false"
+                                   class="w-full py-2.5 border border-white/10 hover:border-white/20 text-gray-400 hover:text-white font-bold text-[10px] tracking-widest uppercase rounded-lg transition-all text-center">
+                                    Hủy bỏ
+                                </button>
+                                <button type="submit"
+                                        class="w-full py-2.5 bg-lime-400 hover:bg-lime-300 text-black font-black text-[10px] tracking-widest uppercase rounded-lg active:scale-[0.98] transition-all">
+                                    Lưu thay đổi
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 @else
@@ -213,20 +377,20 @@
                 @endif
 
                 {{-- Form thêm địa chỉ mới --}}
-                <div x-data="{ open: false }">
-                    <button type="button" @click="open = !open"
+                <div>
+                    <button type="button" @click="toggleAddForm()"
                         class="w-full py-2.5 border border-dashed border-white/15 hover:border-lime-400/40 text-gray-500 hover:text-lime-400 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="plus" class="w-3 h-3" :class="open ? 'rotate-45' : ''" style="transition: transform 0.2s"></i>
-                        <span x-text="open ? 'Hủy' : 'Thêm địa chỉ mới'"></span>
+                        <i data-lucide="plus" class="w-3 h-3" :class="showAddForm ? 'rotate-45' : ''" style="transition: transform 0.2s"></i>
+                        <span x-text="showAddForm ? 'Hủy' : 'Thêm địa chỉ mới'"></span>
                     </button>
 
-                    <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                    <div x-show="showAddForm" x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 translate-y-0"
                          x-transition:leave-end="opacity-0 -translate-y-2"
-                         class="mt-2">
+                         class="mt-2" x-cloak>
                         <form action="{{ route('user-address.store') }}" method="POST" class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
                             @csrf
                             <div class="grid grid-cols-2 gap-3 mb-3">
@@ -306,6 +470,22 @@
                                 <input type="text" name="dia_chi_chi_tiet" required placeholder="Số nhà, tên đường..."
                                        class="w-full px-3 py-2 text-xs bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:border-lime-400 focus:outline-none">
                             </div>
+
+                            <!-- Đặt làm mặc định -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <label class="flex items-center gap-2.5 cursor-pointer group select-none text-[11px] text-gray-400">
+                                    <div class="relative w-4 h-4 border border-white/20 rounded bg-white/[0.02] flex items-center justify-center transition-all duration-300 group-hover:border-lime-400/50">
+                                        <input type="checkbox" name="is_default" value="1" class="peer absolute inset-0 opacity-0 cursor-pointer z-10">
+                                        <div class="absolute inset-0 rounded-[3px] bg-lime-400 text-black flex items-center justify-center scale-0 peer-checked:scale-100 transition-transform duration-200">
+                                            <svg class="w-3 h-3 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <span class="group-hover:text-white transition-colors">Đặt làm địa chỉ mặc định</span>
+                                </label>
+                            </div>
+
                             <button type="submit" class="w-full py-2.5 bg-lime-400 hover:bg-lime-300 text-black font-black text-[10px] tracking-widest uppercase rounded-lg active:scale-[0.98] transition-all">
                                 LƯU ĐỊA CHỈ
                             </button>
