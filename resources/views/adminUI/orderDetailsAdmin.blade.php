@@ -74,7 +74,7 @@
                       </div>
                       <div>
                         <p class="font-bold text-white">{{ $order->ho_ten_nguoi_nhan }}</p>
-                        <p class="text-xs text-gray-500 mt-1">Mã KH: {{ substr($order->ma_nguoi_dung, -8) }}</p>
+                        <p class="text-xs text-gray-500 mt-1">Mã KH: {{ $order->ma_nguoi_dung }}</p>
                       </div>
                     </div>
                     <div class="flex items-center gap-4">

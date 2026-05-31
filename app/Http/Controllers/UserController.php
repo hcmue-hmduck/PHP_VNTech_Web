@@ -49,7 +49,7 @@ class UserController extends Controller
             'email'         => 'nullable|string',
             'so_dien_thoai' => 'nullable|string',
             'password'      => 'nullable|string',
-            'avatar'    => 'nullable|image|max:5120',
+            'avatar'        => 'nullable|image|max:5120',
             'bio'           => 'nullable|string',
         ]);
 

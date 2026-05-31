@@ -108,7 +108,7 @@
                         </div>
                         <div class="w-10 h-10 rounded-full border-2 border-lime-400/30 overflow-hidden group-hover:border-lime-400 transition-all shadow-[0_0_15px_rgba(0,229,91,0.1)]">
                             <img src="{{ Auth::user()->avatar_url }}" 
-                                 class="w-full h-full object-cover" 
+                                 class="w-full h-full object-contain" 
                                   alt="Avatar">
                         </div>
                     </button>

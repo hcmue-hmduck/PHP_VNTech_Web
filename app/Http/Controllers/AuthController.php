@@ -96,6 +96,9 @@ class AuthController extends Controller
                 'vai_tro' => 'user',
                 'trang_thai' => 'active',
             ]);
+            
+            $foundUser->ma_nguoi_dung = $foundUser->_id;
+            $foundUser->save();
         }
 
         Auth::login($foundUser);

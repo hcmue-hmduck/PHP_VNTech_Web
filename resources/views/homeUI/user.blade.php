@@ -75,7 +75,7 @@
                 <!-- User Quick Info -->
                 <div class="flex items-center gap-3 pb-4 mb-4 border-b border-white/10">
                     @if(!empty($realUser->avatar_url))
-                        <img src="{{ $realUser->avatar_url }}" alt="Avatar" class="w-12 h-12 rounded-full border border-neon-green/30 object-cover">
+                        <img src="{{ $realUser->avatar_url }}" alt="Avatar" class="w-12 h-12 rounded-full border border-neon-green/30 object-contain">
                     @else
                         <div class="w-12 h-12 rounded-full bg-neon-green/10 border border-neon-green/30 flex items-center justify-center text-neon-green font-space text-xl font-bold flex-shrink-0">
                             {{ strtoupper(substr($realUser->ho_ten ?? 'U', 0, 1)) }}
@@ -137,7 +137,7 @@
                                     <img id="avatar-preview" 
                                          src="{{ $realUser->avatar_url }}" 
                                          alt="Avatar" 
-                                         class="w-32 h-32 rounded-full border-2 border-neon-green/40 object-cover shadow-[0_0_20px_rgba(0,255,102,0.1)] {{ empty($realUser->avatar_url) ? 'hidden' : '' }}">
+                                         class="w-32 h-32 rounded-full border-2 border-neon-green/40 object-contain shadow-[0_0_20px_rgba(0,255,102,0.1)] {{ empty($realUser->avatar_url) ? 'hidden' : '' }}">
                                     
                                     <div id="avatar-placeholder" 
                                          class="w-32 h-32 rounded-full bg-neon-green/10 border-2 border-neon-green/30 flex items-center justify-center text-neon-green font-space text-4xl font-bold shadow-[0_0_20px_rgba(0,255,102,0.1)] {{ !empty($realUser->avatar_url) ? 'hidden' : '' }}">

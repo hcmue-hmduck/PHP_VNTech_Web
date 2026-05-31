@@ -113,7 +113,7 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 @if(!empty($u->avatar_url))
-                                    <img src="{{ $u->avatar_url }}" alt="Avatar" class="w-10 h-10 rounded-full border border-white/10 object-cover">
+                                    <img src="{{ $u->avatar_url }}" alt="Avatar" class="w-10 h-10 rounded-full border border-white/10 object-contain">
                                 @else
                                     <div class="w-10 h-10 rounded-full border border-white/10 bg-white/5 flex items-center justify-center font-bold text-white uppercase text-sm">
                                         {{ mb_substr($u->ho_ten ?? 'U', 0, 1) }}
