@@ -40,7 +40,10 @@
     <header class="fixed top-0 w-full flex items-center px-8 h-20 bg-slate-950/80 backdrop-blur-2xl z-50 border-b border-white/10 shadow-[0_0_20px_rgba(0,255,102,0.1)]">
         <!-- Left: Logo -->
         <div class="flex-1 flex items-center">
-            <a class="text-2xl font-black italic tracking-tighter text-lime-400 font-space uppercase" id="nav-logo" href="/">VNTech</a>
+            <a class="flex items-center gap-2 text-2xl font-black italic tracking-tighter text-lime-400 font-space uppercase" id="nav-logo" href="/">
+                <img src="{{ asset('vntech_logo.ico') }}" alt="VNTech Logo" class="w-8 h-8 rounded-full border border-lime-400/30 object-cover" />
+                <span>VNTech</span>
+            </a>
         </div>
 
         <!-- Center: Navigation Links -->
@@ -175,7 +178,10 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-white/5">
                 <!-- Column 1: Brand Info -->
                 <div class="space-y-4">
-                    <span class="text-3xl font-black text-lime-400 font-space uppercase italic tracking-tighter">VNTech</span>
+                    <div class="flex items-center gap-2">
+                        <img src="{{ asset('vntech_logo.ico') }}" alt="VNTech Logo" class="w-9 h-9 rounded-full border border-lime-400/30 object-cover" />
+                        <span class="text-3xl font-black text-lime-400 font-space uppercase italic tracking-tighter">VNTech</span>
+                    </div>
                     <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
                         Nhà cung cấp máy tính, laptop và linh kiện phần cứng thế hệ mới hàng đầu. Mang lại hiệu năng đỉnh cao cho mọi tác vụ gaming và thiết kế chuyên nghiệp.
                     </p>

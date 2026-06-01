@@ -76,7 +76,7 @@
                         <img 
                             alt="VNTech Logo" 
                             className="w-full h-full object-cover rounded-full" 
-                            src="https://lh3.googleusercontent.com/aida/ADBb0uhanRuLJfnvA2jjEGxpLSacersyQ3FNxZGF9MNqkePAdiYmnbGs6zM1qzw_PTIAS7HsGtzUCOabNl13qMn9IaEqlWyGlAwE1k2DDWQohWP1ZsC_xOSY9voC4cWC58skHBix4UcNj70mU-ddPjdgyrRiVGq3zE19TWt8fkxRUxSB6jgqYcGyJAxtCay_kI6odunrqMDYwkJWH9zOdSQ463u-lsxeow54m7ip0o7lMA4JG5weFKGPG8TQwMU6"
+                            src="{{ asset('vntech_logo.ico') }}" 
                         />
                     </div>
                     <div class="flex flex-col">
