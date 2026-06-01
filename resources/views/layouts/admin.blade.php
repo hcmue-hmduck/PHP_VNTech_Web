@@ -80,8 +80,8 @@
                         />
                     </div>
                     <div class="flex flex-col">
-                        <h1 class="font-display text-lg font-bold tracking-tight text-white uppercase leading-none">VNTech Admin</h1>
-                        <p class="text-[10px] font-mono text-neon-green opacity-70 tracking-widest uppercase mt-1">v2.0.4 Terminal</p>
+                        <h1 class="font-display text-lg font-bold tracking-tight text-white uppercase leading-none">Trang quản trị</h1>
+                        <p class="text-[10px] font-mono text-neon-green opacity-70 tracking-widest uppercase mt-1">VNTech Admin</p>
                     </div>
                 </div>
 
