@@ -153,9 +153,60 @@
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         lucide.createIcons();
+
+        // Global SweetAlert2 Toast configuration
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            background: '#0f172a', // slate-900
+            color: '#ffffff',
+            customClass: {
+                popup: 'border border-white/10 rounded-2xl shadow-2xl backdrop-blur-md',
+                htmlContainer: 'font-space text-xs font-bold uppercase tracking-wider !text-white',
+                timerProgressBar: 'bg-lime-400'
+            },
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        window.showToast = function(message, type = 'success') {
+            Toast.fire({
+                icon: type,
+                html: message
+            });
+        };
     </script>
+
+    @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                window.showToast("{{ session('success') }}", 'success');
+            });
+        </script>
+    @endif
+    @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                window.showToast("{{ session('error') }}", 'error');
+            });
+        </script>
+    @endif
+    @if($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                window.showToast("{!! implode('<br>', $errors->all()) !!}", 'error');
+            });
+        </script>
+    @endif
+
     @stack('scripts')
 </body>
 </html>

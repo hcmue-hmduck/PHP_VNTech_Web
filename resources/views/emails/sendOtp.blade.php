@@ -14,7 +14,7 @@
                     <!-- Header Banner -->
                     <tr>
                         <td align="center" style="background: linear-gradient(135deg, #0f172a, #1e293b); padding: 40px 20px; border-bottom: 3px solid #00e55b;">
-                            <h1 style="color: #00e55b; margin: 0; font-size: 28px; font-weight: 800; tracking-wide: 0.1em; text-transform: uppercase;">
+                            <h1 style="color: #00e55b; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">
                                 VN Tech
                             </h1>
                             <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">

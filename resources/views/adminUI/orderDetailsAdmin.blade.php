@@ -3,19 +3,7 @@
 
 @section('content')
 <div class="space-y-8 animate-fadeIn">
-    <!-- Session Messages -->
-    @if(session('success'))
-        <div class="flex items-center gap-3 p-4 bg-neon-green/10 border border-neon-green/20 rounded-xl text-neon-green">
-            <i data-lucide="check-circle-2" class="size-5"></i>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500">
-            <i data-lucide="alert-circle" class="size-5"></i>
-            <span class="text-sm font-medium">{{ session('error') }}</span>
-        </div>
-    @endif
+
 
     <!-- Top Action Bar -->
     <div class="flex items-center justify-between border-b border-white/5 pb-6">
@@ -28,10 +16,20 @@
     <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
         <div>
             <div class="mb-2 flex items-center gap-3">
-                <span class="border border-neon-green/30 bg-neon-green/10 px-3 py-1 font-mono text-[10px] tracking-widest text-neon-green">#{{ $order->ma_don_hang }}</span>
-                <span class="text-xs text-gray-500">Khởi tạo: {{ $order->created_at->format('d/m/Y - H:i') }}</span>
+                @if($order->phuong_thuc_thanh_toan === 'momo')
+                    <span class="inline-flex items-center gap-1.5 border border-pink-500/30 bg-pink-500/10 px-3 py-1 rounded-md font-mono text-[10px] font-bold tracking-widest text-pink-400 uppercase">
+                      <span class="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span>
+                      Thanh toán qua chuyển khoản
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 border border-blue-500/30 bg-blue-500/10 px-3 py-1 rounded-md font-mono text-[10px] font-bold tracking-widest text-blue-400 uppercase">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                      Thanh toán khi nhận hàng
+                    </span>
+                @endif
+                <span class="text-xs text-gray-500 font-medium">Khởi tạo: {{ $order->created_at->format('d/m/Y - H:i') }}</span>
             </div>
-            <h2 class="font-display text-4xl font-bold tracking-tight text-white">Đơn hàng #{{ $order->ma_don_hang }}</h2>
+            <h2 class="font-display text-4xl font-bold tracking-tight text-white">Chi tiết Đơn hàng #{{ $order->ma_don_hang }}</h2>
         </div>
 
         <div class="space-y-1">
@@ -61,57 +59,99 @@
         </div>
     </div>
 
-    <!-- Customer Summary & Price Summary -->
-    <div class="grid grid-cols-1 gap-0 overflow-hidden rounded-xl border border-white/5 glass-panel lg:grid-cols-2">
-        <!-- Customer Info -->
-        <div class="border-b border-white/5 p-8 lg:border-b-0 lg:border-r">
+    <!-- Customer Info & Payment Summary (Side-by-Side Grid) -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <!-- Customer Info Card (Vertically Stacked Fields) -->
+        <div class="glass-panel border border-white/5 rounded-xl p-8">
             <h4 class="mb-6 font-display text-xs font-bold uppercase tracking-[0.25em] text-neon-green">Thông Tin Khách Hàng</h4>
             <div class="space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-16">
-                    <div class="flex items-center gap-4">
-                      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green">
-                        <i data-lucide="user" class="size-5"></i>
-                      </div>
-                      <div>
-                        <p class="font-bold text-white">{{ $order->ho_ten_nguoi_nhan }}</p>
-                        <p class="text-xs text-gray-500 mt-1">Mã KH: {{ $order->ma_nguoi_dung }}</p>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green">
-                        <i data-lucide="smartphone" class="size-5"></i>
-                      </div>
-                      <p class="text-sm text-gray-300 font-mono">{{ $order->so_dien_thoai_nhan }}</p>
-                    </div>
-                </div>
+                <!-- Họ tên -->
                 <div class="flex items-center gap-4">
-                  <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green flex-shrink-0">
+                    <i data-lucide="user" class="size-5"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 font-medium">Người nhận</p>
+                    <p class="font-bold text-white mt-0.5">{{ $order->ho_ten_nguoi_nhan }}</p>
+                    <p class="text-[10px] text-gray-500 font-mono mt-0.5">Mã KH: {{ $order->ma_nguoi_dung }}</p>
+                  </div>
+                </div>
+                
+                <!-- SĐT -->
+                <div class="flex items-center gap-4 border-t border-white/5 pt-6">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green flex-shrink-0">
+                    <i data-lucide="smartphone" class="size-5"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 font-medium">Số điện thoại</p>
+                    <p class="font-bold text-white mt-0.5 font-mono">{{ $order->so_dien_thoai_nhan }}</p>
+                  </div>
+                </div>
+                
+                <!-- Địa chỉ -->
+                <div class="flex items-start gap-4 border-t border-white/5 pt-6">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green flex-shrink-0 mt-0.5">
                     <i data-lucide="map-pin" class="size-5"></i>
                   </div>
-                  <p class="text-sm text-gray-300">{{ $order->dia_chi_giao_hang }}</p>
+                  <div>
+                    <p class="text-xs text-gray-500 font-medium">Địa chỉ nhận hàng</p>
+                    <p class="text-sm text-gray-300 mt-1 leading-relaxed">{{ $order->dia_chi_giao_hang }}</p>
+                  </div>
                 </div>
+
+                <!-- Ghi chú (nếu có) -->
                 @if($order->ghi_chu)
-                <div class="flex items-center gap-4">
-                  <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green">
+                <div class="flex items-start gap-4 border-t border-white/5 pt-6">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-full bg-neon-green/10 text-neon-green flex-shrink-0 mt-0.5">
                     <i data-lucide="file-text" class="size-5"></i>
                   </div>
-                  <p class="text-sm text-gray-400 italic">"{{ $order->ghi_chu }}"</p>
+                  <div>
+                    <p class="text-xs text-gray-500 font-medium">Ghi chú đơn hàng</p>
+                    <p class="text-sm text-gray-400 italic mt-1">"{{ $order->ghi_chu }}"</p>
+                  </div>
                 </div>
                 @endif
             </div>
         </div>
 
-        <!-- Price Summary -->
-        <div class="flex flex-col items-center justify-center bg-white/[0.01] p-8 text-center">
-            <p class="mb-2 text-xs uppercase tracking-widest text-gray-500">Tổng Giá Trị</p>
-            <h3 class="font-display text-5xl font-bold tracking-tight text-neon-green neon-text-glow">{{ number_format($order->tong_thanh_toan, 0, ',', '.') }}đ</h3>
-            <p class="mt-2 flex items-center gap-2 text-[10px] font-medium text-neon-green/80">
-                <i data-lucide="check-circle-2" class="size-3.5"></i> Đã bao gồm thuế GTGT (10%)
-            </p>
+        <!-- Price Summary Card (Vertical Layout) -->
+        <div class="glass-panel border border-white/5 rounded-xl p-8 flex flex-col justify-between">
+            <div class="w-full space-y-4">
+                <h4 class="mb-6 font-display text-xs font-bold uppercase tracking-[0.25em] text-neon-green">Thông Tin Thanh Toán</h4>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-400">Tổng tiền hàng:</span>
+                    <span class="font-bold text-white font-mono">{{ number_format($order->tong_tien_hang, 0, ',', '.') }}đ</span>
+                </div>
+                
+                @if(($order->gia_tri_giam_voucher ?? 0) > 0)
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-red-400 font-medium">Khuyến mãi (Voucher):</span>
+                    <span class="font-bold text-red-400 font-mono">-{{ number_format($order->gia_tri_giam_voucher, 0, ',', '.') }}đ</span>
+                </div>
+                @endif
+                
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-400">Phí vận chuyển:</span>
+                    <span class="font-bold text-white font-mono">{{ number_format($order->phi_van_chuyen ?? 0, 0, ',', '.') }}đ</span>
+                </div>
+                
+                <div class="border-t border-white/5 pt-4 flex items-center justify-between">
+                    <span class="text-sm font-bold text-white">Tổng thanh toán:</span>
+                    <span class="font-display text-3xl font-bold text-neon-green neon-text-glow font-mono">{{ number_format($order->tong_thanh_toan, 0, ',', '.') }}đ</span>
+                </div>
+            </div>
             
-            <button onclick="window.print()" class="mt-8 flex items-center gap-3 bg-neon-green px-10 py-4 font-display text-sm font-bold uppercase tracking-widest text-black hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(0,229,91,0.2)]">
-                <i data-lucide="file-text" class="size-4"></i> In Hóa Đơn Đơn Hàng
-            </button>
+            @if($order->trang_thai === 'da_nhan_hang')
+                <button data-url="{{ route('admin.order.print', $order->ma_don_hang) }}" onclick="printOrderInvoice(this.getAttribute('data-url'))" class="mt-8 w-full flex items-center justify-center gap-3 bg-neon-green px-10 py-4 font-display text-sm font-bold uppercase tracking-widest text-black hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(0,229,91,0.2)]">
+                    <i data-lucide="printer" class="size-4"></i> In Hóa Đơn Đơn Hàng
+                </button>
+            @else
+                <div class="mt-8 w-full py-4 text-center border border-white/5 bg-white/[0.01] rounded-lg text-xs text-gray-500">
+                    <i data-lucide="info" class="inline size-3.5 mr-1 align-text-bottom text-gray-400"></i>
+                    In hóa đơn khả dụng khi đơn hàng đã hoàn thành
+                </div>
+            @endif
         </div>
     </div>
 
@@ -165,3 +205,11 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function printOrderInvoice(url) {
+        window.open(url, '_blank');
+    }
+</script>
+@endpush

@@ -18,20 +18,17 @@
         </div>
         <div class="relative z-10 space-y-8 max-w-5xl">
             <div class="inline-block px-4 py-1 border border-lime-400/30 rounded-full bg-lime-400/10 text-lime-400 text-xs font-bold tracking-[0.2em] uppercase mb-4 transition-all hover:bg-lime-400/20" id="hero-badge">
-                NEXT GEN HARDWARE HAS ARRIVED
+                PHẦN CỨNG THẾ HỆ MỚI ĐÃ RA MẮT
             </div>
             <h1 class="font-['Space_Grotesk'] text-[72px] md:text-[90px] uppercase italic tracking-tighter leading-none glow-text font-bold" id="hero-title">
-                UNLEASH THE <span class="text-lime-400">VNTECH</span> VORTEX
+                BỨT PHÁ SỨC MẠNH CÙNG <span class="text-lime-400">VNTECH</span>
             </h1>
             <p class="text-lg text-slate-400 max-w-2xl mx-auto" id="hero-description">
-                Experience elite-tier performance with the new VNTech ecosystem. Engineered for those who demand precision and power in every frame.
+                Trải nghiệm hiệu năng đỉnh cao cùng hệ sinh thái VNTech mới. Thiết kế tối ưu cho mọi tác vụ đồ họa và chiến game mượt mà.
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4" id="hero-actions">
-                <button class="bg-lime-400 text-black px-10 py-4 rounded-none font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,229,91,0.4)]" id="btn-explore">
-                    Explore Lineup
-                </button>
-                <button class="border border-lime-400 text-lime-400 px-10 py-4 rounded-none font-bold uppercase tracking-widest hover:bg-lime-400/10 transition-all" id="btn-tech-specs">
-                    Technical Specs
+                <button onclick="document.getElementById('product-grid-section').scrollIntoView({ behavior: 'smooth' })" class="bg-lime-400 text-black px-10 py-4 rounded-none font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,229,91,0.4)]" id="btn-explore">
+                    Khám Phá Sản Phẩm
                 </button>
             </div>
         </div>
@@ -426,10 +423,10 @@
                 
                 <div>
                     <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">Khoảng giá</h4>
-                    <input class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-lime-400" max="5000" min="0" step="100" type="range"/>
+                    <input class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-lime-400" max="100000000" min="0" step="1000000" type="range"/>
                     <div class="flex justify-between mt-2 text-[10px] font-mono text-slate-500">
-                        <span>$0</span>
-                        <span>$5,000+</span>
+                        <span>0đ</span>
+                        <span>100.000.000đ+</span>
                     </div>
                 </div>
 
@@ -551,12 +548,16 @@
                                             </p>
                                         </div>
 
-                                        <div class="space-y-1 text-center">
+                                        <div class="space-y-3 text-center w-full">
                                             <div class="flex items-baseline justify-center gap-1.5 w-full">
                                                 <span class="text-lime-400 font-bold text-sm md:text-base text-center">
                                                     Chỉ từ {{ number_format($product->gia_thap_nhat, 0, ',', '.') }}₫
                                                 </span>
                                             </div>
+                                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" 
+                                               class="inline-flex items-center justify-center gap-2 w-full py-2 bg-lime-400 hover:bg-lime-500 text-black font-black uppercase text-[10px] tracking-widest transition-all duration-300 rounded-xl hover:scale-[1.03] active:scale-[0.97] shadow-[0_0_15px_rgba(163,230,53,0.1)]">
+                                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Mua ngay
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -643,19 +644,19 @@
     <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 bg-slate-950/90 backdrop-blur-lg border-t border-lime-400/20 md:hidden px-4" id="mobile-nav">
         <button class="flex flex-col items-center justify-center text-lime-400">
             <i data-lucide="bolt" class="w-6 h-6"></i>
-            <span class="text-[8px] font-bold uppercase mt-1">Home</span>
+            <span class="text-[8px] font-bold uppercase mt-1">Trang chủ</span>
         </button>
         <button class="flex flex-col items-center justify-center text-slate-500">
             <i data-lucide="gamepad-2" class="w-6 h-6"></i>
-            <span class="text-[8px] font-bold uppercase mt-1">Shop</span>
+            <span class="text-[8px] font-bold uppercase mt-1">Cửa hàng</span>
         </button>
         <button class="flex flex-col items-center justify-center text-slate-500">
             <i data-lucide="shopping-cart" class="w-6 h-6"></i>
-            <span class="text-[8px] font-bold uppercase mt-1">Cart</span>
+            <span class="text-[8px] font-bold uppercase mt-1">Giỏ hàng</span>
         </button>
         <button class="flex flex-col items-center justify-center text-slate-500">
             <i data-lucide="user" class="w-6 h-6"></i>
-            <span class="text-[8px] font-bold uppercase mt-1">User</span>
+            <span class="text-[8px] font-bold uppercase mt-1">Tài khoản</span>
         </button>
     </nav>
 </div>

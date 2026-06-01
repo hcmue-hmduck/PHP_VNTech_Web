@@ -1,80 +1,72 @@
 @extends('layouts.app')
 
+@section('title', 'Xác thực OTP')
+
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center px-4 py-12">
-    <div class="w-full max-w-md animate-fadeInUp">
-        <!-- Card Container -->
-        <div class="bg-gray-900/50 backdrop-blur-xl border border-neon-green/20 rounded-2xl p-8 shadow-2xl">
+<div class="min-h-screen relative overflow-hidden bg-[#121414] flex flex-col items-center justify-center p-6 py-12">
+    <!-- Background Decorative Elements -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#00ff66]/5 rounded-full blur-[120px]"></div>
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-[#00ff66]/10 rounded-full blur-[100px]"></div>
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png')"></div>
+    </div>
+
+    <!-- Main OTP Card -->
+    <div class="w-full max-w-[480px] relative z-10">
+        <div class="bg-slate-900/40 backdrop-blur-md p-10 md:p-12 border border-white/10 shadow-2xl relative overflow-hidden group">
+            <!-- Decorative Glow -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-[#00ff66]/10 blur-3xl pointer-events-none"></div>
             
             <!-- Header -->
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neon-green/10 border border-neon-green/30 mb-4">
-                    <i data-lucide="mail-check" class="w-8 h-8 text-neon-green"></i>
-                </div>
-                <h1 class="font-space text-3xl font-bold text-gray-100 uppercase tracking-tight mb-2">
-                    Xác thực OTP
-                </h1>
-                <p class="text-gray-400 text-sm">
-                    Nhập mã 6 chữ số được gửi đến email của bạn
+            <div class="text-center mb-10">
+                <h2 class="text-4xl md:text-5xl font-black font-space tracking-tighter text-lime-400 uppercase mb-2 glow-text">
+                    Xác Thực OTP
+                </h2>
+                <div class="h-0.5 w-12 bg-lime-400 mx-auto mb-2 opacity-50"></div>
+                <p class="text-zinc-400 text-xs uppercase tracking-widest font-space font-medium mt-4">
+                    Nhập mã 6 chữ số gửi đến email của bạn
                 </p>
             </div>
 
-            <!-- Error Messages -->
-            @if($errors->any())
-            <div class="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex flex-col gap-1.5 animate-fadeInUp">
-                <div class="flex items-center gap-2 font-bold">
-                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-                    <span>Có lỗi xảy ra:</span>
-                </div>
-                <ul class="list-disc list-inside pl-2 text-xs space-y-0.5">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
-
-            <!-- Success Message -->
-            @if(session('success'))
-            <div class="mb-6 p-4 rounded-lg bg-neon-green/10 border border-neon-green/30 text-neon-green text-sm flex items-center gap-3 animate-fadeInUp">
-                <i data-lucide="check-circle" class="w-4 h-4 flex-shrink-0"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-            @endif
 
             <!-- OTP Form -->
             <form method="POST" action="{{ route('verify.otp') }}" class="space-y-6">
                 @csrf
 
-                <!-- OTP Input Container -->
-                <div class="space-y-3">
-                    <label class="block text-sm font-space font-bold text-gray-300 uppercase tracking-wide">
+                <!-- OTP Input -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-space font-bold tracking-[0.2em] uppercase text-zinc-500 ml-1">
                         Mã OTP
                     </label>
-                    
-                    <!-- Single Input for OTP (6 digits) -->
-                    <input 
-                        type="text" 
-                        name="otp" 
-                        maxlength="6" 
-                        inputmode="numeric" 
-                        placeholder="000000"
-                        value="{{ old('otp') }}"
-                        class="w-full px-4 py-3 bg-gray-800/50 border border-neon-green/30 rounded-lg text-center font-space text-2xl font-bold text-neon-green placeholder-gray-600 focus:outline-none focus:border-neon-green focus:ring-2 focus:ring-neon-green/20 transition-all duration-300 tracking-widest"
-                        required
-                    >
-                    <p class="text-xs text-gray-500 text-center">
-                        Nhập 6 chữ số từ email của bạn
-                    </p>
+                    <div class="relative group/field">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="key-round" class="text-zinc-600 group-focus-within/field:text-lime-400 transition-colors w-5 h-5"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            name="otp" 
+                            maxlength="6" 
+                            inputmode="numeric" 
+                            placeholder="000000"
+                            value="{{ old('otp') }}"
+                            class="w-full bg-slate-950/80 border border-white/5 py-4 pl-12 pr-4 text-center font-space text-2xl font-bold tracking-[0.25em] text-lime-400 placeholder-zinc-700 focus:outline-none focus:border-lime-400/50 focus:bg-slate-950 transition-all @error('otp') border-red-500 @enderror"
+                            required
+                            autofocus
+                        />
+                        <div class="absolute bottom-0 left-0 h-[1px] bg-lime-400 w-0 group-focus-within/field:w-full transition-all duration-500"></div>
+                    </div>
+                    @error('otp')
+                        <p class="text-red-500 text-[10px] font-bold uppercase tracking-wider mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Email Display (Optional) -->
                 @if(session('register_email'))
-                <div class="p-3 rounded-lg bg-gray-800/30 border border-gray-700/50">
-                    <p class="text-xs text-gray-400 uppercase tracking-wide font-space font-bold mb-1">
-                        Email xác thực
+                <div class="p-4 bg-slate-950/60 border border-white/5 space-y-1">
+                    <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-space font-bold">
+                        Email Đăng Ký
                     </p>
-                    <p class="text-sm text-gray-300 break-all">
+                    <p class="text-sm font-space text-zinc-300 break-all font-semibold">
                         {{ session('register_email') }}
                     </p>
                 </div>
@@ -83,19 +75,18 @@
                 <!-- Submit Button -->
                 <button 
                     type="submit"
-                    class="w-full px-4 py-3 bg-gradient-to-r from-neon-green to-emerald-400 text-gray-950 font-space font-bold uppercase tracking-wider rounded-lg hover:shadow-[0_0_20px_rgba(0,255,102,0.4)] transition-all duration-300 hover:scale-105 active:scale-95"
+                    class="w-full bg-lime-400 text-slate-950 py-5 font-space font-black text-sm tracking-[0.25em] uppercase shadow-[0_0_20px_rgba(0,255,102,0.3)] hover:shadow-[0_0_40px_rgba(0,255,102,0.4)] hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                 >
-                    <span class="flex items-center justify-center gap-2">
-                        <i data-lucide="check" class="w-5 h-5"></i>
-                        Xác thực OTP
-                    </span>
+                    <span class="relative z-10">Xác Thực OTP</span>
+                    <i data-lucide="check" class="relative z-10 w-5 h-5"></i>
+                    <div class="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </button>
 
                 <!-- Resend OTP Link -->
                 <div class="text-center pt-2">
-                    <p class="text-sm text-gray-400">
+                    <p class="text-xs font-space font-bold uppercase tracking-wider text-zinc-500">
                         Không nhận được mã?
-                        <button type="button" onclick="document.getElementById('resend-form').submit();" class="text-neon-green hover:text-emerald-400 font-bold transition-colors duration-300 bg-none border-none cursor-pointer p-0">
+                        <button type="button" onclick="document.getElementById('resend-form').submit();" class="text-lime-400 hover:text-white transition-colors duration-300 bg-transparent border-none cursor-pointer p-0 ml-1">
                             Gửi lại
                         </button>
                     </p>
@@ -109,30 +100,30 @@
             </form>
 
             <!-- Back to Register -->
-            <div class="mt-6 pt-6 border-t border-gray-700/50">
-                <a href="{{ route('register') }}" class="flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-gray-300 transition-colors duration-300">
+            <div class="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-xs font-space font-bold uppercase tracking-wider text-zinc-500">
+                <a href="{{ route('register') }}" class="flex items-center gap-2 hover:text-zinc-300 transition-colors">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span>Quay lại đăng ký</span>
+                    <span>Đăng ký</span>
                 </a>
+                
+                <!-- Countdown -->
+                <div class="flex items-center gap-1.5">
+                    <span>Hết hạn:</span>
+                    <span id="otp-timer" class="text-lime-400 font-bold">05:00</span>
+                </div>
             </div>
 
-            <!-- Timer (Optional - for frontend countdown) -->
-            <div class="mt-4 text-center">
-                <p class="text-xs text-gray-500 font-space">
-                    Mã OTP hết hạn trong: <span id="otp-timer" class="text-neon-green font-bold">5:00</span>
-                </p>
-            </div>
         </div>
 
         <!-- Footer Info -->
-        <div class="mt-6 text-center text-xs text-gray-500 space-y-1">
+        <div class="mt-6 text-center text-[10px] uppercase font-bold tracking-widest text-zinc-600 space-y-1 font-space">
             <p>Mã OTP có hiệu lực trong 5 phút</p>
             <p>Không chia sẻ mã OTP với bất kỳ ai</p>
         </div>
     </div>
 </div>
 
-<!-- Timer Script (Optional) -->
+<!-- Timer Script -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const timerElement = document.getElementById('otp-timer');
@@ -143,12 +134,12 @@
         const updateTimer = () => {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
-            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
             if (timeLeft <= 0) {
                 timerElement.textContent = 'Hết hạn';
                 timerElement.classList.add('text-red-500');
-                timerElement.classList.remove('text-neon-green');
+                timerElement.classList.remove('text-lime-400');
             } else {
                 timeLeft--;
                 setTimeout(updateTimer, 1000);

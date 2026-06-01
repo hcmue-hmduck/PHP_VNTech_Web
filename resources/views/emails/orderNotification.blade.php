@@ -5,7 +5,8 @@
     <title>Thông báo đơn hàng VN Tech</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333333;">
-    @php
+    <?php
+        /** @var \App\Models\Order $order */
         use App\OrderStatus;
 
         $trangThaiText = match($order->trang_thai) {
@@ -26,7 +27,9 @@
             OrderStatus::CANCELLED->value         => '#ef4444', // Đỏ
             default                              => '#6b7280', // Xám
         };
-    @endphp
+
+        $badgeStyle = "display: inline-block; background-color: " . $badgeColor . "; color: #ffffff; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase;";
+    ?>
 
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f6f9fc; padding: 40px 0;">
         <tr>
@@ -37,7 +40,7 @@
                     <!-- Header Banner -->
                     <tr>
                         <td align="center" style="background: linear-gradient(135deg, #0f172a, #1e293b); padding: 40px 20px; border-bottom: 3px solid #00e55b;">
-                            <h1 style="color: #00e55b; margin: 0; font-size: 28px; font-weight: 800; tracking-wide: 0.1em; text-transform: uppercase;">
+                            <h1 style="color: #00e55b; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">
                                 VN Tech
                             </h1>
                             <p style="color: #94a3b8; margin: 5px 0 0 0; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">
@@ -67,7 +70,7 @@
                                 <tr>
                                     <td style="color: #64748b; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Trạng thái hiện tại:</td>
                                     <td style="border-bottom: 1px solid #e2e8f0;">
-                                        <span style="display: inline-block; background-color: {{ $badgeColor }}; color: #ffffff; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                                        <span <?php echo 'style="' . $badgeStyle . '"'; ?>>
                                             {{ $trangThaiText }}
                                         </span>
                                     </td>

@@ -185,6 +185,12 @@
                     <i data-lucide="wallet-cards" class="w-4 h-4"></i>
                     Thanh toán MoMo
                 </a>
+                @elseif($order->trang_thai === OrderStatus::DELIVERED->value)
+                <a href="{{ route('admin.order.print', ['ma_don_hang' => $order->ma_don_hang]) }}" target="_blank"
+                   class="flex items-center gap-2 bg-neon-green text-black px-8 py-3 font-bold text-sm tracking-widest uppercase hover:opacity-90 transition-all duration-300 shadow-[0_0_20px_rgba(0,255,102,0.3)]">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    In hoá đơn
+                </a>
                 @else
                 <button class="bg-neon-green text-black px-8 py-3 font-bold text-sm tracking-widest uppercase hover:glow-sm transition-all duration-300">
                     Theo dõi đơn hàng
@@ -217,8 +223,11 @@
                     </h3>
                     
                     <div class="relative">
-                        <div class="absolute top-6 left-12 right-12 h-[2px] bg-white/5 hidden md:block"></div>
-                        <div id="order-progress-line" class="absolute top-6 left-12 h-[2px] bg-neon-green shadow-[0_0_15px_#00FF66] hidden md:block" :style="{ width: '{{ $progressWidth }}%' }"></div>
+                        <!-- Bounded Progress Track aligned with icon centers (12.5% to 87.5%) -->
+                        <div class="absolute top-6 left-[12.5%] right-[12.5%] h-[2px] hidden md:block">
+                            <div class="absolute inset-0 bg-white/5"></div>
+                            <div id="order-progress-line" class="absolute inset-y-0 left-0 bg-neon-green shadow-[0_0_15px_#00FF66] transition-all duration-500" :style="{ width: '{{ $progressWidth }}%' }"></div>
+                        </div>
 
                         <div class="relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-4">
                             @foreach($steps as $idx => $step)

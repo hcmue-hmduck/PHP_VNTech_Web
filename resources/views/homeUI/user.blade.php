@@ -46,27 +46,7 @@
             </p>
         </header>
 
-        <!-- Thông báo thành công / lỗi -->
-        @if(session('success'))
-        <div class="mb-8 max-w-3xl mx-auto p-4 rounded-lg bg-neon-green/10 border border-neon-green/30 text-neon-green text-sm flex items-center gap-3 animate-fadeInUp">
-            <i data-lucide="check-circle" class="w-5 h-5 flex-shrink-0"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-        @endif
 
-        @if($errors->any())
-        <div class="mb-8 max-w-3xl mx-auto p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex flex-col gap-1.5 animate-fadeInUp">
-            <div class="flex items-center gap-3 font-bold">
-                <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0"></i>
-                <span>Có lỗi xảy ra:</span>
-            </div>
-            <ul class="list-disc list-inside pl-8 text-xs space-y-0.5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
 
         <!-- Layout chính -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">

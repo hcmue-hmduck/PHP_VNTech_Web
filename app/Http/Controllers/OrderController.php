@@ -32,6 +32,13 @@ class OrderController extends Controller
         return view('adminUI.orderDetailsAdmin', compact('order', 'orderItems'));
     }
 
+    public function printInvoice(Request $request)
+    {
+        $order = Order::where('ma_don_hang', $request->ma_don_hang)->firstOrFail();
+        $orderItems = OrderItem::where('ma_don_hang', $request->ma_don_hang)->with('variant.product')->get();
+        return view('printInvoice', compact('order', 'orderItems'));
+    }
+
     public function updateAdminOrderStatus(Request $request)
     {
         $order = Order::where('ma_don_hang', $request->ma_don_hang)->first();

@@ -12,7 +12,8 @@
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.27",
         "laravel/tinker": "^2.9",
-        "mongodb/laravel-mongodb": "^5.0"
+        "mongodb/laravel-mongodb": "^5.0",
+        "predis/predis": "^3.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

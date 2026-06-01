@@ -88,6 +88,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/order', [OrderController::class, 'viewAdminOrder'])->name('admin.order.index');
     Route::get('/order/{ma_don_hang}', [OrderController::class, 'viewAdminOrderDetail'])->name('admin.order.view');
     Route::post('/order/{ma_don_hang}/status', [OrderController::class, 'updateAdminOrderStatus'])->name('admin.order.updateStatus');
+    Route::get('/order/{ma_don_hang}/print', [OrderController::class, 'printInvoice'])->name('admin.order.print');
 
     Route::get('/brands_categories', [Brands_CategoriesAdminController::class, 'viewBrandsCategories'])->name('admin.brandscategories.index');
     
