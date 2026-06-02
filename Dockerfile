@@ -31,6 +31,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 # Install MongoDB extension
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
+# Install Redis extension for Laravel Redis-backed cache/session
+RUN pecl install redis && docker-php-ext-enable redis
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

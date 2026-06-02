@@ -26,7 +26,7 @@ class OrderNotificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Notification Mail',
+            subject: 'Cập nhật đơn hàng - VN Tech',
         );
     }
 

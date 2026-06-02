@@ -10,11 +10,14 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendOtpMail extends Mailable
+class sendNewPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(private readonly string $email, private readonly string $otp) {}
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(private readonly string $email, private readonly string $newPassword) {}
 
     /**
      * Get the message envelope.
@@ -22,7 +25,7 @@ class SendOtpMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mã xác thực OTP - VN Tech',
+            subject: 'Cấp lại mật khẩu - VN Tech',
         );
     }
 
@@ -32,10 +35,10 @@ class SendOtpMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.sendOtp',
+            view: 'emails.sendNewPassword',
             with: [
                 'email' => $this->email,
-                'otp' => $this->otp
+                'newPassword' => $this->newPassword,
             ]
         );
     }

@@ -86,7 +86,7 @@
                             Ghi nhớ thiết bị
                         </span>
                     </label>
-                    <a href="#" class="text-[11px] font-bold font-space uppercase tracking-wider text-lime-400/70 hover:text-lime-400 transition-colors">
+                    <a href="{{route('password.forgot')}}" class="text-[11px] font-bold font-space uppercase tracking-wider text-lime-400/70 hover:text-lime-400 transition-colors">
                         Quên mật khẩu ?
                     </a>
                 </div>

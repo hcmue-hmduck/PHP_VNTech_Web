@@ -22,7 +22,7 @@
                     <div class="h-0.5 w-12 bg-lime-400 mx-auto mt-2 opacity-50"></div>
                 </div>
 
-                <form class="space-y-6" action="{{ route('register') }}" method="POST">
+                <form class="space-y-6" action="{{ route('otp.send', ['flow' => 'register']) }}" method="POST">
                     @csrf
 
                     <!-- Full Name -->

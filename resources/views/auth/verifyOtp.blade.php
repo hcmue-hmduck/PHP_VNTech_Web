@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Xác thực OTP')
+@section('title', $title ?? 'Xác thực OTP')
 
 @section('content')
-<div class="min-h-screen relative overflow-hidden bg-[#121414] flex flex-col items-center justify-center p-6 py-12">
+<div class="min-h-screen relative overflow-hidden bg-[#121414] flex flex-col items-center justify-center p-6">
     <!-- Background Decorative Elements -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#00ff66]/5 rounded-full blur-[120px]"></div>
@@ -20,17 +20,14 @@
             <!-- Header -->
             <div class="text-center mb-10">
                 <h2 class="text-4xl md:text-5xl font-black font-space tracking-tighter text-lime-400 uppercase mb-2 glow-text">
-                    Xác Thực OTP
+                    {{ $title ?? 'Xác Thực OTP' }}
                 </h2>
                 <div class="h-0.5 w-12 bg-lime-400 mx-auto mb-2 opacity-50"></div>
-                <p class="text-zinc-400 text-xs uppercase tracking-widest font-space font-medium mt-4">
-                    Nhập mã 6 chữ số gửi đến email của bạn
-                </p>
             </div>
 
 
             <!-- OTP Form -->
-            <form method="POST" action="{{ route('verify.otp') }}" class="space-y-6">
+            <form method="POST" action="{{ $sendAction ?? '#' }}" class="space-y-6">
                 @csrf
 
                 <!-- OTP Input -->
@@ -61,13 +58,13 @@
                 </div>
 
                 <!-- Email Display (Optional) -->
-                @if(session('register_email'))
+                @if(!empty($email))
                 <div class="p-4 bg-slate-950/60 border border-white/5 space-y-1">
                     <p class="text-[9px] text-zinc-500 uppercase tracking-widest font-space font-bold">
-                        Email Đăng Ký
+                        Email xác thực
                     </p>
                     <p class="text-sm font-space text-zinc-300 break-all font-semibold">
-                        {{ session('register_email') }}
+                        {{ $email }}
                     </p>
                 </div>
                 @endif
@@ -77,7 +74,7 @@
                     type="submit"
                     class="w-full bg-lime-400 text-slate-950 py-5 font-space font-black text-sm tracking-[0.25em] uppercase shadow-[0_0_20px_rgba(0,255,102,0.3)] hover:shadow-[0_0_40px_rgba(0,255,102,0.4)] hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                 >
-                    <span class="relative z-10">Xác Thực OTP</span>
+                    <span class="relative z-10">Xác thực OTP</span>
                     <i data-lucide="check" class="relative z-10 w-5 h-5"></i>
                     <div class="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                 </button>
@@ -86,7 +83,7 @@
                 <div class="text-center pt-2">
                     <p class="text-xs font-space font-bold uppercase tracking-wider text-zinc-500">
                         Không nhận được mã?
-                        <button type="button" onclick="document.getElementById('resend-form').submit();" class="text-lime-400 hover:text-white transition-colors duration-300 bg-transparent border-none cursor-pointer p-0 ml-1">
+                        <button type="button" id="resend-button" onclick="resendOtp();" class="text-lime-400 hover:text-white transition-colors duration-300 bg-transparent border-none cursor-pointer p-0 ml-1">
                             Gửi lại
                         </button>
                     </p>
@@ -95,64 +92,83 @@
             </form>
 
             <!-- Resend OTP Form (Outside main form) -->
-            <form method="POST" action="{{ route('resend.otp') }}" style="display: none;" id="resend-form">
+            <form method="POST" action="{{ $resendAction ?? '#' }}" style="display: none;" id="resend-form">
                 @csrf
             </form>
 
-            <!-- Back to Register -->
-            <div class="mt-8 pt-6 border-t border-white/5 flex items-center justify-between text-xs font-space font-bold uppercase tracking-wider text-zinc-500">
-                <a href="{{ route('register') }}" class="flex items-center gap-2 hover:text-zinc-300 transition-colors">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    <span>Đăng ký</span>
-                </a>
-                
-                <!-- Countdown -->
-                <div class="flex items-center gap-1.5">
-                    <span>Hết hạn:</span>
-                    <span id="otp-timer" class="text-lime-400 font-bold">05:00</span>
+            <!-- Resend Cooldown (1 minute) -->
+            <div class="mt-8 pt-6 border-t border-white/5 flex items-center justify-center text-xs font-space font-bold uppercase tracking-wider text-zinc-500">
+                <div class="flex items-center gap-2">
+                    <span id="resend-label" style="display:none">Gửi lại sau</span>
+                    <span id="otp-timer" class="text-lime-400 font-bold"></span>
                 </div>
             </div>
 
         </div>
 
         <!-- Footer Info -->
-        <div class="mt-6 text-center text-[10px] uppercase font-bold tracking-widest text-zinc-600 space-y-1 font-space">
-            <p>Mã OTP có hiệu lực trong 5 phút</p>
+        <div class="mt-4 text-center text-[10px] uppercase font-bold tracking-widest text-zinc-600 space-y-1 font-space">
             <p>Không chia sẻ mã OTP với bất kỳ ai</p>
         </div>
     </div>
 </div>
 
-<!-- Timer Script -->
-<script>
+        <!-- Timer Script -->
+        <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const COOLDOWN_KEY = 'otp_resend_expiry';
         const timerElement = document.getElementById('otp-timer');
-        if (!timerElement) return;
+        const resendButton = document.getElementById('resend-button');
+        if (!timerElement || !resendButton) return;
 
-        let timeLeft = 5 * 60; // 5 minutes in seconds
+        function setExpiry(seconds) {
+            const expiry = Date.now() + seconds * 1000;
+            localStorage.setItem(COOLDOWN_KEY, String(expiry));
+        }
 
-        const updateTimer = () => {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        function getRemaining() {
+            const raw = localStorage.getItem(COOLDOWN_KEY);
+            if (!raw) return 0;
+            const remaining = Math.ceil((parseInt(raw, 10) - Date.now()) / 1000);
+            return remaining > 0 ? remaining : 0;
+        }
 
-            if (timeLeft <= 0) {
-                timerElement.textContent = 'Hết hạn';
-                timerElement.classList.add('text-red-500');
-                timerElement.classList.remove('text-lime-400');
+        function updateTimer() {
+            const remaining = getRemaining();
+            const label = document.getElementById('resend-label');
+            if (remaining <= 0) {
+                localStorage.removeItem(COOLDOWN_KEY);
+                timerElement.textContent = '';
+                resendButton.disabled = false;
+                resendButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                if (label) label.style.display = 'none';
             } else {
-                timeLeft--;
+                const minutes = Math.floor(remaining / 60).toString().padStart(2, '0');
+                const seconds = (remaining % 60).toString().padStart(2, '0');
+                timerElement.textContent = `${minutes}:${seconds}`;
+                resendButton.disabled = true;
+                resendButton.classList.add('opacity-50', 'cursor-not-allowed');
+                if (label) label.style.display = 'inline';
                 setTimeout(updateTimer, 1000);
             }
-        };
+        }
 
+        // Called when user clicks resend
+        window.resendOtp = function() {
+            if (getRemaining() > 0) return;
+            setExpiry(60); // 1 minute cooldown
+            // submit the hidden resend form
+            document.getElementById('resend-form').submit();
+            updateTimer();
+        }
+
+        // Initialize timer on load
         updateTimer();
 
         // Auto-focus on OTP input
         const otpInput = document.querySelector('input[name="otp"]');
         if (otpInput) {
             otpInput.focus();
-            // Only allow numbers
             otpInput.addEventListener('input', function(e) {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });

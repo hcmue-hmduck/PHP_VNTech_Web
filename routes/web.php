@@ -31,19 +31,22 @@ Route::get('/chat/history', [AiController::class, 'history'])->name('chat.histor
 Route::post('/chat', [AiController::class, 'chat'])->name('chat');
 Route::post('/chat/clear', [AiController::class, 'clear'])->name('chat.clear');
 
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-    Route::get('/verify-otp', [AuthController::class, 'showVerifyOtpForm'])->name('show.verify.otp');
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.forgot');
 
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
-    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('resend.otp');
 
     Route::get('/login/google', [AuthController::class, 'redirectToGoogle'])->name('google.login');
     Route::get('/login/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
+
+    Route::prefix('otp/{flow}')->group(function () {
+    Route::get('/', [AuthController::class, 'showOtpForm'])->name('otp.show');
+    Route::post('/send', [AuthController::class, 'sendOtp'])->name('otp.send');
+    Route::post('/resend', [AuthController::class, 'resendOtp'])->name('otp.resend');
+    Route::post('/verify', [AuthController::class, 'verifyOtp'])->name('otp.verify');
+});
 });
 
 Route::middleware('auth')->group(function () {
@@ -56,7 +59,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/user', [UserController::class, 'viewUserInfo'])->name('user.view');
     Route::put('/user/{user}/edit', [UserController::class, 'editUserInfo'])->name('user.update');
-    
+    Route::post('/user/email/change/request', [UserController::class, 'requestEmailChange'])->name('user.email.change.request');
+    Route::get('/user/email/change/verify', [UserController::class, 'showVerifyChangeEmailOtp'])->name('user.email.change.verify.show');
+    Route::post('/user/email/change/verify', [UserController::class, 'verifyChangeEmailOtp'])->name('user.email.change.verify');
+    Route::post('/user/email/change/resend', [UserController::class, 'resendChangeEmailOtp'])->name('user.email.change.resend');
+
     Route::post('/user-address', [UserAddressController::class, 'storeAddress'])->name('user-address.store');
     Route::put('/user-address/{user_address}/edit', [UserAddressController::class, 'updateAddress'])->name('user-address.update');
     Route::post('user-address/{user_address}/destroy', [UserAddressController::class, 'destroyAddress'])->name('user-address.destroy');
@@ -75,7 +82,7 @@ Route::middleware('auth')->group(function () {
 
 
 
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
 
     Route::get('/products', [ProductAdminController::class, 'viewProductAdmin'])->name('admin.products.index');
@@ -91,10 +98,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function() {
     Route::get('/order/{ma_don_hang}/print', [OrderController::class, 'printInvoice'])->name('admin.order.print');
 
     Route::get('/brands_categories', [Brands_CategoriesAdminController::class, 'viewBrandsCategories'])->name('admin.brandscategories.index');
-    
+
     Route::post('/brands_categories/brand', [Brands_CategoriesAdminController::class, 'storeCreateBrand'])->name('admin.brandscategories.brand.store');
     Route::put('/brands_categories/brand/{brand}', [Brands_CategoriesAdminController::class, 'updateEditBrand'])->name('admin.brandscategories.brand.update');
-    
+
     Route::post('/brands_categories/category', [Brands_CategoriesAdminController::class, 'storeCreateCategory'])->name('admin.brandscategories.category.store');
     Route::put('/brands_categories/category/{category}', [Brands_CategoriesAdminController::class, 'updateEditCategory'])->name('admin.brandscategories.category.update');
 

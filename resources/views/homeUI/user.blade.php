@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Hồ sơ cá nhân | VNTech')
 
@@ -77,6 +77,11 @@
                    class="w-full text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 {{ $tab === 'change-password' ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,102,0.2)]' : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white' }}">
                     <i data-lucide="key-round" class="w-4 h-4"></i>
                     <span>Đổi mật khẩu</span>
+                </a>
+                <a href="{{ route('user.view', ['tab' => 'change-email']) }}" 
+                   class="w-full text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 {{ $tab === 'change-email' ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,102,0.2)]' : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white' }}">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    <span>Đổi email</span>
                 </a>
                 <a href="{{ route('user.view', ['tab' => 'addresses']) }}" 
                    class="w-full text-left px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-3 {{ $tab === 'addresses' ? 'bg-neon-green text-black shadow-[0_0_15px_rgba(0,255,102,0.2)]' : 'bg-transparent text-gray-400 hover:bg-white/5 hover:text-white' }}">
@@ -204,6 +209,9 @@
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </button>
                                 </div>
+                                @error('old_password')
+                                    <p class="text-red-500 text-xs font-semibold">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Mật khẩu mới -->
@@ -217,6 +225,9 @@
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </button>
                                 </div>
+                                @error('password')
+                                    <p class="text-red-500 text-xs font-semibold">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Xác nhận mật khẩu mới -->
@@ -230,6 +241,36 @@
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                @endif
+
+                <!-- TAB: ĐỔI EMAIL -->
+                @if($tab === 'change-email')
+                <form action="{{ route('user.email.change.request') }}" method="POST" class="bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl p-8 animate-fadeInUp">
+                    @csrf
+                    <div class="flex flex-col gap-8">
+                        <div class="border-b border-white/5 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-xl font-bold uppercase text-white tracking-tight flex items-center gap-3">
+                                    <i data-lucide="mail" class="text-neon-green"></i> Đổi email
+                                </h3>
+                                <p class="text-gray-500 text-xs mt-1 uppercase tracking-wider">Nhập email mới để tiếp tục xác thực OTP</p>
+                            </div>
+                            <button type="submit" class="flex items-center gap-1.5 border border-neon-green/30 hover:border-neon-green bg-neon-green/10 hover:bg-neon-green text-neon-green hover:text-black px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(0,255,102,0.1)] hover:shadow-[0_0_15px_rgba(0,255,102,0.3)]">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                                <span>Cập nhật</span>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-6 w-full">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+                                    <i data-lucide="mail" class="w-3 h-3"></i> Email mới
+                                </label>
+                                <input type="email" name="new_email" value="{{ old('new_email') }}" required placeholder="Nhập email mới" class="bg-[#121414]/80 border border-white/5 text-white placeholder-gray-600 rounded-lg py-3 px-4 text-sm font-mono focus:outline-none focus:border-neon-green/50 transition-colors w-full">
                             </div>
                         </div>
                     </div>
