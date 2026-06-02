@@ -50,4 +50,8 @@ return [
         'ipn_url' => env('MOMO_IPN_URL'),
     ],
 
+    'brevo' => [
+        'key' => env('BREVO_API_KEY'),
+    ],
+
 ];
