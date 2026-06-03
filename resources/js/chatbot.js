@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
         bubble.className =
             "text-[13px] leading-relaxed px-4 py-3 rounded-2xl " +
             (role === "user"
-                ? "bg-lime-400 text-black font-medium rounded-tr-sm shadow-[0_0_12px_rgba(163,230,53,0.2)]"
+                ? "bg-brand-500 text-white font-medium rounded-tr-sm shadow-[0_0_12px_rgba(255,79,0,0.25)]"
                 : role === "error"
                   ? "bg-red-500/10 text-red-400 border border-red-500/20 rounded-tl-sm"
                   : "bg-white/5 text-slate-200 border border-white/10 rounded-tl-sm");
@@ -306,9 +306,9 @@ document.addEventListener("DOMContentLoaded", function () {
         wrapper.className = "self-start max-w-[82%] chat-msg-in";
         wrapper.innerHTML = `
             <div class="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-5 py-3.5 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-lime-400" style="animation:typing-bounce 1.4s infinite;animation-delay:0s"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-lime-400" style="animation:typing-bounce 1.4s infinite;animation-delay:.2s"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-lime-400" style="animation:typing-bounce 1.4s infinite;animation-delay:.4s"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500" style="animation:typing-bounce 1.4s infinite;animation-delay:0s"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500" style="animation:typing-bounce 1.4s infinite;animation-delay:.2s"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500" style="animation:typing-bounce 1.4s infinite;animation-delay:.4s"></span>
             </div>`;
         messages.appendChild(wrapper);
         scrollBottom();

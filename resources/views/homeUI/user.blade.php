@@ -47,13 +47,7 @@
             <div class="lg:col-span-3 lg:sticky lg:top-24 flex flex-col gap-2 h-fit bg-white p-5 border border-neutral-200/60 rounded-3xl shadow-sm">
                 <!-- User Profile Intro -->
                 <div class="flex items-center gap-3 pb-4 mb-4 border-b border-neutral-100 select-none">
-                    @if(!empty($realUser->avatar_url))
-                        <img src="{{ $realUser->avatar_url }}" alt="Avatar" class="w-12 h-12 rounded-full border border-neutral-200 object-contain shrink-0">
-                    @else
-                        <div class="w-12 h-12 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-[#ff5c00] font-display text-xl font-bold flex-shrink-0">
-                            {{ strtoupper(substr($realUser->ho_ten ?? 'U', 0, 1)) }}
-                        </div>
-                    @endif
+                    <img src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : asset('AvatarDefault.jpg') }}" alt="Avatar" class="w-12 h-12 rounded-full border border-neutral-200 object-cover shrink-0">
                     <div class="overflow-hidden">
                         <h4 class="text-neutral-900 font-display font-bold text-sm truncate uppercase tracking-tight">{{ $realUser->ho_ten ?? 'Khách hàng' }}</h4>
                         <p class="text-neutral-400 text-xs truncate font-mono">{{ $realUser->email }}</p>
@@ -102,11 +96,10 @@
                             <div class="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-neutral-100">
                                 <img id="avatar-preview" 
                                      alt="Profile Picture" 
-                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 {{ !empty($realUser->avatar_url) ? '' : 'hidden' }}" 
-                                     src="{{ $realUser->avatar_url ?? '' }}" />
+                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                                     src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : asset('AvatarDefault.jpg') }}" />
                                 <div id="avatar-placeholder" 
-                                     class="w-full h-full bg-orange-50 flex items-center justify-center text-[#ff5c00] font-display font-black text-4xl {{ !empty($realUser->avatar_url) ? 'hidden' : '' }}">
-                                    {{ strtoupper(substr($realUser->ho_ten ?? 'U', 0, 1)) }}
+                                     class="w-full h-full bg-orange-50 flex items-center justify-center text-[#ff5c00] font-display font-black text-4xl hidden">
                                 </div>
                             </div>
                             <label class="absolute bottom-0 right-0 bg-[#ff5c00] hover:bg-[#e04f00] text-white p-2.5 rounded-full shadow-lg hover:scale-110 active:scale-90 transition-transform cursor-pointer">
@@ -162,181 +155,189 @@
                             </button>
                         </div>
 
-                        <form id="main-profile-form" action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        <form id="main-profile-form" action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
 
-                            <div class="flex flex-col gap-2">
-                                <label for="fullName" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
-                                    Họ và tên
-                                </label>
-                                <input
-                                    id="fullName"
-                                    name="ho_ten"
-                                    type="text"
-                                    required
-                                    :disabled="!isEditing"
-                                    class="w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold focus:outline-none"
-                                    :class="isEditing 
-                                        ? 'border-neutral-350 focus:border-[#ff5c00] focus:ring-2 focus:ring-[#ff5c00]/10 bg-white text-neutral-800' 
-                                        : 'border-neutral-100 bg-neutral-50 text-neutral-500 cursor-not-allowed'"
-                                    value="{{ old('ho_ten', $realUser->ho_ten) }}"
-                                />
-                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                                <div class="flex flex-col gap-2">
+                                    <label for="fullName" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
+                                        Họ và tên
+                                    </label>
+                                    <input
+                                        id="fullName"
+                                        name="ho_ten"
+                                        type="text"
+                                        required
+                                        :disabled="!isEditing"
+                                        class="w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-semibold focus:outline-none"
+                                        :class="isEditing 
+                                            ? 'border-neutral-350 focus:border-[#ff5c00] focus:ring-2 focus:ring-[#ff5c00]/10 bg-white text-neutral-800' 
+                                            : 'border-neutral-100 bg-neutral-50 text-neutral-500 cursor-not-allowed'"
+                                        value="{{ old('ho_ten', $realUser->ho_ten) }}"
+                                    />
+                                </div>
 
-                            <div class="flex flex-col gap-2">
-                                <label for="phone" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
-                                    Số điện thoại
-                                </label>
-                                <input
-                                    id="phone"
-                                    name="so_dien_thoai"
-                                    type="tel"
-                                    required
-                                    :disabled="!isEditing"
-                                    class="w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-mono font-bold focus:outline-none"
-                                    :class="isEditing 
-                                        ? 'border-neutral-350 focus:border-[#ff5c00] focus:ring-2 focus:ring-[#ff5c00]/10 bg-white text-neutral-800' 
-                                        : 'border-neutral-100 bg-neutral-50 text-neutral-500 cursor-not-allowed'"
-                                    value="{{ old('so_dien_thoai', $realUser->so_dien_thoai) }}"
-                                />
-                            </div>
+                                <div class="flex flex-col gap-2">
+                                    <label for="phone" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
+                                        Số điện thoại
+                                    </label>
+                                    <input
+                                        id="phone"
+                                        name="so_dien_thoai"
+                                        type="tel"
+                                        required
+                                        :disabled="!isEditing"
+                                        class="w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-mono font-bold focus:outline-none"
+                                        :class="isEditing 
+                                            ? 'border-neutral-350 focus:border-[#ff5c00] focus:ring-2 focus:ring-[#ff5c00]/10 bg-white text-neutral-800' 
+                                            : 'border-neutral-100 bg-neutral-50 text-neutral-500 cursor-not-allowed'"
+                                        value="{{ old('so_dien_thoai', $realUser->so_dien_thoai) }}"
+                                    />
+                                </div>
 
-                            <div class="flex flex-col gap-2 md:col-span-2">
-                                <label for="email" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
-                                    Địa chỉ Email
-                                </label>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    disabled
-                                    class="w-full px-4 py-3 rounded-xl border border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed text-sm font-mono focus:outline-none"
-                                    value="{{ old('email', $realUser->email) }}"
-                                />
-                            </div>
+                                <div class="flex flex-col gap-2 md:col-span-2">
+                                    <label for="email" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
+                                        Địa chỉ Email
+                                    </label>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        required
+                                        disabled
+                                        class="w-full px-4 py-3 rounded-xl border border-neutral-100 bg-neutral-50 text-neutral-400 cursor-not-allowed text-sm font-mono focus:outline-none"
+                                        value="{{ old('email', $realUser->email) }}"
+                                    />
+                                </div>
 
-                            <div class="flex flex-col gap-2 md:col-span-2">
-                                <label for="bio" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
-                                    Tiểu sử (Bio)
-                                </label>
-                                <textarea
-                                    id="bio"
-                                    name="bio"
-                                    rows="3"
-                                    :disabled="!isEditing"
-                                    class="w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-medium leading-relaxed focus:outline-none min-h-[100px]"
-                                    :class="isEditing 
-                                        ? 'border-neutral-350 focus:border-[#ff5c00] focus:ring-2 focus:ring-[#ff5c00]/10 bg-white text-neutral-800' 
-                                        : 'border-neutral-100 bg-neutral-50 text-neutral-500 cursor-not-allowed'"
-                                >{{ old('bio', $realUser->bio) }}</textarea>
-                            </div>
+                                <div class="flex flex-col gap-2 md:col-span-2">
+                                    <label for="bio" class="font-bold text-xs text-neutral-500 uppercase tracking-wider select-none">
+                                        Tiểu sử (Bio)
+                                    </label>
+                                    <textarea
+                                        id="bio"
+                                        name="bio"
+                                        rows="3"
+                                        :disabled="!isEditing"
+                                        class="w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm font-medium leading-relaxed focus:outline-none min-h-[100px]"
+                                        :class="isEditing 
+                                            ? 'border-neutral-350 focus:border-[#ff5c00] focus:ring-2 focus:ring-[#ff5c00]/10 bg-white text-neutral-800' 
+                                            : 'border-neutral-100 bg-neutral-50 text-neutral-500 cursor-not-allowed'"
+                                    >{{ old('bio', $realUser->bio) }}</textarea>
+                                </div>
 
-                            <div class="md:col-span-2 flex justify-end mt-4" x-show="isEditing || hasNewAvatar" x-cloak>
-                                <button
-                                    id="btn-save-profile" 
-                                    type="submit"
-                                    class="bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm px-8 py-3 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-2"
-                                >
-                                    <i data-lucide="save" class="w-4 h-4"></i>
-                                    Lưu thay đổi
-                                </button>
+                                <div class="md:col-span-2 flex justify-end mt-4" x-show="isEditing || hasNewAvatar" x-cloak>
+                                    <button
+                                        id="btn-save-profile" 
+                                        type="submit"
+                                        class="bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm px-8 py-3 rounded-xl transition-all active:scale-95 shadow-sm flex items-center gap-2"
+                                    >
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        Lưu thay đổi
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </section>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                         <!-- TAB: ĐỔI EMAIL -->
-                        <form action="{{ route('user.email.change.request') }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
-                            @csrf
-                            <div class="border-b border-neutral-100 pb-4">
-                                <h3 class="text-lg font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
-                                    <i data-lucide="mail" class="text-[#ff5c00] w-5 h-5"></i>
-                                    <span>Thay đổi địa chỉ Email</span>
-                                </h3>
-                                <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật địa chỉ email và xác thực OTP bảo vệ tài khoản</p>
-                            </div>
+                        <div>
+                            <form action="{{ route('user.email.change.request') }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-8 rounded-3xl shadow-sm">
+                                @csrf
+                                <div class="space-y-6">
+                                    <div class="border-b border-neutral-100 pb-4">
+                                        <h3 class="text-lg font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
+                                            <i data-lucide="mail" class="text-[#ff5c00] w-5 h-5"></i>
+                                            <span>Thay đổi địa chỉ Email</span>
+                                        </h3>
+                                        <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật địa chỉ email và xác thực OTP bảo vệ tài khoản</p>
+                                    </div>
 
-                            <div class="flex flex-col gap-2">
-                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                    <i data-lucide="mail" class="w-3.5 h-3.5"></i> Email mới
-                                </label>
-                                <input type="email" name="new_email" value="{{ old('new_email', $realUser->email) }}" required placeholder="Nhập email mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                            </div>
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                            <i data-lucide="mail" class="w-3.5 h-3.5"></i> Email mới
+                                        </label>
+                                        <input type="email" name="new_email" value="{{ old('new_email', $realUser->email) }}" required placeholder="Nhập email mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                                    </div>
 
-                            <button type="submit" class="w-full bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                                <i data-lucide="save" class="w-4 h-4"></i>
-                                <span>Cập nhật email</span>
-                            </button>
-                        </form>
+                                    <button type="submit" class="w-full bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        <span>Cập nhật email</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
 
                         <!-- TAB 2: CHANGE PASSWORD -->
-                        <form action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
-                            @csrf
-                            @method('PUT')
-                            
-                            <div class="border-b border-neutral-100 pb-4">
-                                <h3 class="text-lg font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
-                                    <i data-lucide="key-round" class="text-[#ff5c00] w-5 h-5"></i>
-                                    <span>Thay đổi mật khẩu</span>
-                                </h3>
-                                <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật mật khẩu bảo vệ tài khoản của bạn</p>
-                            </div>
-
-                            <div class="grid grid-cols-1 gap-4 w-full">
-                                <!-- Old Password -->
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                        <i data-lucide="lock" class="w-3.5 h-3.5"></i> Mật khẩu cũ
-                                    </label>
-                                    <div class="relative">
-                                        <input type="password" id="old_password" name="old_password" required placeholder="Nhập mật khẩu hiện tại" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                                        <button type="button" onclick="togglePasswordVisibility('old_password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
-                                            <i data-lucide="eye" class="w-4 h-4"></i>
-                                        </button>
+                        <div>
+                            <form action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-8 rounded-3xl shadow-sm">
+                                @csrf
+                                @method('PUT')
+                                <div class="space-y-6">
+                                    <div class="border-b border-neutral-100 pb-4">
+                                        <h3 class="text-lg font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
+                                            <i data-lucide="key-round" class="text-[#ff5c00] w-5 h-5"></i>
+                                            <span>Thay đổi mật khẩu</span>
+                                        </h3>
+                                        <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật mật khẩu bảo vệ tài khoản của bạn</p>
                                     </div>
-                                    @error('old_password')
-                                        <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
 
-                                <!-- New Password -->
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Mật khẩu mới
-                                    </label>
-                                    <div class="relative">
-                                        <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                                        <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
-                                            <i data-lucide="eye" class="w-4 h-4"></i>
-                                        </button>
+                                    <div class="grid grid-cols-1 gap-4 w-full">
+                                        <!-- Old Password -->
+                                        <div class="flex flex-col gap-2">
+                                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Mật khẩu cũ
+                                            </label>
+                                            <div class="relative">
+                                                <input type="password" id="old_password" name="old_password" required placeholder="Nhập mật khẩu hiện tại" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                                                <button type="button" onclick="togglePasswordVisibility('old_password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
+                                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                            @error('old_password')
+                                                <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <!-- New Password -->
+                                        <div class="flex flex-col gap-2">
+                                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Mật khẩu mới
+                                            </label>
+                                            <div class="relative">
+                                                <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                                                <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
+                                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                            @error('password')
+                                                <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <!-- Confirm Password -->
+                                        <div class="flex flex-col gap-2">
+                                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                                <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Xác nhận mật khẩu mới
+                                            </label>
+                                            <div class="relative">
+                                                <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Xác nhận lại mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                                                <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
+                                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    @error('password')
-                                        <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
 
-                                <!-- Confirm Password -->
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Xác nhận mật khẩu mới
-                                    </label>
-                                    <div class="relative">
-                                        <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Xác nhận lại mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                                        <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
-                                            <i data-lucide="eye" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
+                                    <button type="submit" class="w-full bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        <span>Cập nhật mật khẩu</span>
+                                    </button>
                                 </div>
-                            </div>
-
-                            <button type="submit" class="w-full bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                                <i data-lucide="save" class="w-4 h-4"></i>
-                                <span>Cập nhật mật khẩu</span>
-                            </button>
-                        </form>
-                    </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 @endif

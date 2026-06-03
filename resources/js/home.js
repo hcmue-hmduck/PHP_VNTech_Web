@@ -47,8 +47,8 @@ function initHomePage() {
                 btn.textContent = i;
 
                 btn.className = i === currentPage
-                    ? 'w-10 h-10 rounded-xl border text-xs font-black transition-all bg-lime-400 text-black border-lime-400'
-                    : 'w-10 h-10 rounded-xl border text-xs font-black transition-all bg-white/5 text-slate-400 border-white/10 hover:border-lime-400 hover:text-lime-400';
+                    ? 'w-10 h-10 rounded-xl border text-xs font-black transition-all bg-brand-500 text-white border-brand-500 shadow-[0_4px_12px_rgba(255,79,0,0.15)]'
+                    : 'w-10 h-10 rounded-xl border text-xs font-black transition-all bg-white/5 text-slate-400 border-white/10 hover:border-brand-500 hover:text-brand-500';
 
                 btn.addEventListener('click', function () {
                     renderPage(i);

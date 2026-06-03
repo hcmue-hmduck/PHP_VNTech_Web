@@ -155,10 +155,10 @@
                                     <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Xin chào</span>
                                     <span class="text-xs font-black text-slate-200 mt-1">{{ Auth::user()->ho_ten }}</span>
                                 </div>
-                                <img src="{{ Auth::user()->avatar_url }}" 
+                                <img src="{{ Auth::user()->avatar_url ?: asset('AvatarDefault.jpg') }}" 
                                      alt="Avatar" 
                                      class="w-8 h-8 rounded-full object-cover border border-slate-700 hover:border-brand-500 transition-colors"
-                                     onerror="this.src='https://api.dicebear.com/7.x/adventurer-neutral/svg?seed={{ Auth::user()->email }}'">
+                                     onerror="this.src='/AvatarDefault.jpg';">
                             </button>
 
                             <!-- Dropdown Menu -->

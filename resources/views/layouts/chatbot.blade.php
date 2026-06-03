@@ -3,9 +3,9 @@
     {{-- Floating Action Button (FAB) --}}
     <button id="chatbot-toggle-btn"
             title="Trò chuyện với trợ lý VNTech AI"
-            class="relative w-14 h-14 rounded-full flex items-center justify-center text-black bg-lime-400 hover:bg-lime-300 shadow-[0_0_24px_rgba(163,230,53,0.4)] hover:shadow-[0_0_36px_rgba(163,230,53,0.65)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer">
+            class="relative w-14 h-14 rounded-full flex items-center justify-center text-white bg-brand-500 hover:bg-brand-650 shadow-[0_0_24px_rgba(255,79,0,0.35)] hover:shadow-[0_0_36px_rgba(255,79,0,0.5)] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer">
         {{-- AI badge --}}
-        <span class="absolute -top-1.5 -right-1.5 bg-lime-400 text-black text-[7px] font-black px-1.5 py-0.5 rounded-full border-2 border-[#121414] animate-pulse uppercase tracking-widest">AI</span>
+        <span class="absolute -top-1.5 -right-1.5 bg-brand-500 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full border-2 border-slate-900 animate-pulse uppercase tracking-widest">AI</span>
         {{-- Chat Icon --}}
         <svg id="icon-chat" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -27,18 +27,18 @@
             <div class="flex items-center gap-3">
                 {{-- Avatar + Status --}}
                 <div class="relative w-10 h-10 shrink-0">
-                    <div class="w-full h-full rounded-full bg-lime-400/10 border border-lime-400/40 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-lime-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-full h-full rounded-full bg-brand-500/10 border border-brand-500/40 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                     </div>
-                    <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-lime-400 border-2 border-[#0e1010] animate-pulse"></span>
+                    <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0e1010] animate-pulse"></span>
                 </div>
                 <div class="leading-tight">
                     <h4 class="text-sm font-bold text-white">VNTech Assistant</h4>
-                    <p class="text-[11px] text-lime-400/80 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-lime-400 inline-block animate-pulse"></span>
+                    <p class="text-[11px] text-neutral-400 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
                         Trực tuyến · Hỗ trợ tư vấn AI
                     </p>
                 </div>
@@ -65,10 +65,10 @@
                        id="chatbot-input-field"
                        placeholder="Nhập câu hỏi của bạn..."
                        required
-                       class="flex-1 bg-white/5 border border-white/10 focus:border-lime-400/60 focus:ring-2 focus:ring-lime-400/10 text-white placeholder-slate-500 text-sm px-4 py-2.5 rounded-xl outline-none transition-all duration-200 resize-none">
+                       class="flex-1 bg-white/5 border border-white/10 focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/10 text-white placeholder-slate-500 text-sm px-4 py-2.5 rounded-xl outline-none transition-all duration-200 resize-none">
                 <button type="submit"
                         id="chatbot-send-btn"
-                        class="w-10 h-10 rounded-xl bg-lime-400 hover:bg-lime-300 flex items-center justify-center text-black transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed disabled:scale-100">
+                        class="w-10 h-10 rounded-xl bg-brand-500 hover:bg-brand-600 flex items-center justify-center text-white transition-all duration-200 hover:scale-105 active:scale-95 shrink-0 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed disabled:scale-100">
                     <svg class="w-5 h-5 rotate-45 -translate-x-px translate-y-px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
@@ -83,8 +83,8 @@
     /* Custom scrollbar cho chat window */
     #chatbot-messages::-webkit-scrollbar { width: 4px; }
     #chatbot-messages::-webkit-scrollbar-track { background: transparent; }
-    #chatbot-messages::-webkit-scrollbar-thumb { background: rgba(163,230,53,0.15); border-radius: 99px; }
-    #chatbot-messages::-webkit-scrollbar-thumb:hover { background: rgba(163,230,53,0.3); }
+    #chatbot-messages::-webkit-scrollbar-thumb { background: rgba(255, 79, 0, 0.15); border-radius: 99px; }
+    #chatbot-messages::-webkit-scrollbar-thumb:hover { background: rgba(255, 79, 0, 0.3); }
 
     /* Animation cho tin nhắn mới xuất hiện */
     @keyframes chat-msg-in {
@@ -98,14 +98,14 @@
     .chatbot-markdown ul { list-style: disc; padding-left: 1.15rem; }
     .chatbot-markdown ol { list-style: decimal; padding-left: 1.15rem; }
     .chatbot-markdown li + li { margin-top: 0.2rem; }
-    .chatbot-markdown strong { color: #bef264; font-weight: 700; }
-    .chatbot-markdown a { color: #a3e635; text-decoration: underline; text-underline-offset: 2px; }
+    .chatbot-markdown strong { color: #ffa16c; font-weight: 700; }
+    .chatbot-markdown a { color: #ff7332; text-decoration: underline; text-underline-offset: 2px; }
     .chatbot-markdown code { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.35rem; padding: 0.05rem 0.3rem; font-size: 0.9em; }
     .chatbot-markdown pre { overflow-x: auto; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem; }
     .chatbot-markdown pre code { background: transparent; border: 0; padding: 0; }
     .chatbot-markdown table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
     .chatbot-markdown th, .chatbot-markdown td { border: 1px solid rgba(255,255,255,0.12); padding: 0.35rem 0.5rem; text-align: left; }
-    .chatbot-markdown th { color: #bef264; background: rgba(255,255,255,0.06); }
+    .chatbot-markdown th { color: #ffa16c; background: rgba(255,255,255,0.06); }
 
     /* Typing dots animation */
     @keyframes typing-bounce {

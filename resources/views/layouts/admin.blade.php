@@ -120,7 +120,7 @@
                     
                     <div class="flex items-center gap-3 p-3 bg-surface-high rounded-xl border border-white/5">
                         <div class="size-10 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                            <img src="{{ Auth::user()->avatar_url }}" alt="avatar" class="w-full h-full object-contain">
+                            <img src="{{ Auth::user()->avatar_url ?: asset('AvatarDefault.jpg') }}" alt="avatar" class="w-full h-full object-contain">
                         </div>
                         <div class="flex flex-col flex-1">
                             <span class="text-[9px] text-gray-500 uppercase tracking-widest leading-none">Xin chào,</span>
