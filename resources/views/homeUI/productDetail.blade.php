@@ -291,10 +291,13 @@
                             type="button"
                             onclick="toggleFavorite()"
                             id="wishlist-btn"
-                            class="w-14 h-14 border border-neutral-200 rounded-2xl flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer bg-white text-neutral-400 hover:text-red-500 hover:bg-red-50/20"
+                            class="w-14 h-14 border border-neutral-200 rounded-2xl flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer bg-white text-neutral-400 hover:text-[#FF5C00] hover:bg-orange-50/20"
                             title="Lưu sản phẩm yêu thích"
                         >
-                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            <div class="relative">
+                                <i data-lucide="git-compare" class="w-5 h-5"></i>
+                                <span class="absolute -top-0.5 -right-1.5 w-3 h-3 bg-brand-500 text-white text-[6px] font-black rounded-full flex items-center justify-center leading-none">AI</span>
+                            </div>
                         </button>
                     </div>
 
@@ -694,25 +697,6 @@
     // Buy now redirect
     function submitBuyNow() {
         window.location.href = "{{ route('payment.view', $selectedVariant->ma_bien_the) }}?so_luong=1";
-    }
-
-    // Wishlist favorite toggle
-    let isFavorite = false;
-    function toggleFavorite() {
-        isFavorite = !isFavorite;
-        const btn = document.getElementById('wishlist-btn');
-        if (isFavorite) {
-            btn.innerHTML = '<i data-lucide="heart" class="w-5 h-5 fill-current text-red-500"></i>';
-            btn.className = 'w-14 h-14 border border-red-200 rounded-xl flex items-center justify-center transition-colors shadow-sm active:scale-95 cursor-pointer bg-red-50 text-red-500';
-            alert('Đã thêm sản phẩm vào danh sách yêu thích!');
-        } else {
-            btn.innerHTML = '<i data-lucide="heart" class="w-5 h-5"></i>';
-            btn.className = 'w-14 h-14 border border-gray-200 rounded-xl flex items-center justify-center transition-colors shadow-sm active:scale-95 cursor-pointer bg-white text-gray-400 hover:text-red-500 hover:bg-red-50/35';
-            alert('Đã xóa sản phẩm khỏi danh sách yêu thích!');
-        }
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
     }
 </script>
 @endsection

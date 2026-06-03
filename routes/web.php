@@ -15,6 +15,8 @@ use App\Http\Controllers\FlashSalesController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AiController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\BannerImagesController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('home.index');
 Route::get('/products', [HomeController::class, 'viewHomeProducts'])->name('home.products');
@@ -78,6 +80,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/momo/create/{ma_don_hang}', [PaymentController::class, 'createMomoPayment'])->name('momo.create');
     Route::get('/momo/return', [PaymentController::class, 'momoReturn'])->name('momo.return');
+
+    Route::get('/notifications/read/{ma_thong_bao?}', [NotificationController::class, 'readNotification'])->name('notifications.read');
+    Route::post('/notifications/create', [NotificationController::class, 'createNotification'])->name('notifications.create');
 });
 
 
@@ -122,4 +127,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/users', [UserController::class, 'viewUsersAdmin'])->name('admin.user.view');
     Route::put('/users/{user}/status', [UserController::class, 'updateUserStatus'])->name('admin.user.update');
+
+    Route::get('/banner-image', [BannerImagesController::class, 'viewBanner'])->name('admin.banner.index');
+    Route::get('/banner-image/create', [BannerImagesController::class, 'viewCreateBanner'])->name('admin.banner.create');
+    Route::post('/banner-image', [BannerImagesController::class, 'storeCreateBanner'])->name('admin.banner.store');
+    Route::get('/banner-image/{bannerImage}/edit', [BannerImagesController::class, 'viewUpdateBanner'])->name('admin.banner.edit');
+    Route::put('/banner-image/{bannerImage}', [BannerImagesController::class, 'updateBanner'])->name('admin.banner.update');
+    Route::put('/banner-image/{bannerImage}/delete', [BannerImagesController::class, 'deleteBanner'])->name('admin.banner.delete');
 });

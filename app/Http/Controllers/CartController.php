@@ -8,6 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller {
+    public function cartCount(string $ma_nguoi_dung) {
+        $cart = Cart::where('ma_nguoi_dung', $ma_nguoi_dung)->first();
+        if (!$cart) {
+            return 0;
+        }
+        return CartItem::where('ma_gio_hang', $cart->ma_gio_hang)->count() ?? 0;
+    }
+
     public function viewCart() {
         $user_id = Auth::user()->id;
         $cart = Cart::where('ma_nguoi_dung', $user_id)->first();
@@ -16,7 +24,7 @@ class CartController extends Controller {
             $cartItems = collect();
         } else {
             $cartItems = CartItem::with(['variant.product', 'variant.activeFlashSaleItem.campaign'])
-                ->where('ma_gio_hang', $cart->_id)
+                ->where('ma_gio_hang', $cart->ma_gio_hang)
                 ->get(); 
         }
         
@@ -47,6 +55,8 @@ class CartController extends Controller {
             $card_id = Cart::create([
                 'ma_nguoi_dung' => $user_id,
             ]);
+            $card_id->ma_gio_hang = $card_id->_id;
+            $card_id->save();
         }
 
         $cart_item = CartItem::where('ma_gio_hang', $card_id->_id)->where('ma_bien_the', $ma_bien_the)->first();

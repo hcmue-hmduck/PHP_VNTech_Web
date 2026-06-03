@@ -43,42 +43,74 @@
             'reviewsCount' => (int)($prod->luot_xem * 2.5 + 4),
         ];
     }
+
+    $activeBanners = [];
+    if (isset($banner_images)) {
+        foreach ($banner_images as $b) {
+            if (($b->trang_thai ?? '') !== 'inactive' && ($b->trang_thai ?? '') !== 'deleted') {
+                $activeBanners[] = [
+                    'image' => $b->image_url,
+                    'url' => $b->lien_ket ?? '/products',
+                    'title' => $b->tieu_de,
+                    'desc' => $b->mo_ta
+                ];
+            }
+        }
+    }
 @endphp
 <div class="bg-[#FAF8F2] text-slate-800 font-['Inter'] selection:bg-brand-500/20 selection:text-brand-500 min-h-screen" x-data="{ activeCategories: [] }">
     @vite(['resources/css/home.css'])
 
 
     <!-- HERO BANNER SLIDER with robust layout match -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-8 pt-6" x-data="{
+    <script>
+        window.homeBanners = <?php echo json_encode($activeBanners ?? []); ?>;
+    </script>
+    <section class="max-w-[1400px] mx-auto px-4 sm:px-8 pt-6" x-data="{
         activeSlide: 0,
-        banners: [
-            { image: '/iphone_banner.png', url: '/product-detail/6a16db4f38f4a607df0c0e6f' },
-            { image: '/asus_banner.png', url: '/product-detail/6a16db5038f4a607df0c0e7b' },
-            { image: '/rtx_banner.png', url: '/product-detail/6a16db5338f4a607df0c0e99' }
-        ],
+        banners: window.homeBanners || [],
         init() {
-            setInterval(() => {
-                this.activeSlide = (this.activeSlide + 1) % this.banners.length;
-            }, 8500);
+            if (this.banners.length > 0) {
+                setInterval(() => {
+                    this.activeSlide = (this.activeSlide + 1) % this.banners.length;
+                }, 8500);
+            }
         }
     }">
-        <div class="relative bg-white rounded-[32px] border border-slate-100 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] aspect-[1200/400] md:aspect-[1200/450] flex items-center transition-all duration-500">
+        <div class="relative bg-white rounded-[32px] border border-slate-100 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] w-full h-[400px] sm:h-[520px] md:h-[600px] lg:h-[720px] flex items-center transition-all duration-500">
             <!-- Slides Wrapper -->
             <div class="w-full h-full relative">
                 <template x-for="(banner, index) in banners" :key="index">
                     <div x-show="activeSlide === index"
-                         x-transition:enter="transition ease-out duration-700 absolute inset-0"
-                         x-transition:enter-start="opacity-0 scale-95"
-                         x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-500 absolute inset-0"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
+                         x-transition:enter="transition transform ease-out duration-700 absolute inset-0"
+                         x-transition:enter-start="translate-x-full"
+                         x-transition:enter-end="translate-x-0"
+                         x-transition:leave="transition transform ease-in duration-700 absolute inset-0"
+                         x-transition:leave-start="translate-x-0"
+                         x-transition:leave-end="-translate-x-full"
                          class="w-full h-full">
-                        <a :href="banner.url" class="block w-full h-full group">
+                        <a :href="banner.url" class="block w-full h-full group relative">
                             <img :src="banner.image" 
                                  alt="VNTech Promotion Banner" 
                                  class="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-700" 
                                  referrerpolicy="no-referrer" />
+                            
+                            <!-- Dark Gradient Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-transparent z-10"></div>
+                            
+                            <!-- Banner Text Content Overlay -->
+                            <div class="absolute inset-y-0 left-0 pl-6 sm:pl-12 md:pl-16 pr-8 flex flex-col justify-center z-20 max-w-[80%] sm:max-w-[70%] text-left select-none">
+                                <h3 x-text="banner.title" class="text-base sm:text-2xl md:text-3xl lg:text-4xl font-black text-white uppercase tracking-wide drop-shadow-md leading-tight mb-1 sm:mb-2 md:mb-4"></h3>
+                                <p x-text="banner.desc" class="text-[9px] sm:text-xs md:text-sm text-gray-200 font-medium line-clamp-2 leading-relaxed max-w-xs sm:max-w-md lg:max-w-lg"></p>
+                                <div class="mt-2 sm:mt-4 md:mt-6">
+                                    <span class="inline-flex items-center gap-1.5 sm:gap-2 bg-brand-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-lg">
+                                        <span>Xem ngay</span>
+                                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </div>
                         </a>
                     </div>
                 </template>

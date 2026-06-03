@@ -5,6 +5,7 @@ use App\Models\FlashSales;
 use App\Models\FlashSaleItem;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\BannerImage;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller {
@@ -12,6 +13,7 @@ class HomeController extends Controller {
         $products = Product::where('trang_thai', 'active')->latest()->get();
         $brands = Brand::latest()->get();
         $categories = Category::latest()->get();
+        $banner_images = BannerImage::latest()->get();
 
         $now = now();
         $flashSales = FlashSales::where('trang_thai', 'active')
@@ -25,7 +27,7 @@ class HomeController extends Controller {
                     $query->where('trang_thai', 'active');
                 }
             ])->get();
-        return view('homeUI.home', compact('brands', 'categories', 'products', 'flashSales'));
+        return view('homeUI.home', compact('brands', 'categories', 'products', 'flashSales', 'banner_images'));
     }
 
     public function viewHomeProducts() {

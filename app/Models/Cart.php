@@ -9,6 +9,7 @@ class Cart extends Model {
     use HasFactory;
 
     protected $fillable = [
+        'ma_gio_hang',
         'ma_nguoi_dung',
         'trang_thai',
     ];

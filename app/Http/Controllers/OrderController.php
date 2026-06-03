@@ -12,6 +12,7 @@ use App\Models\CartItem;
 use App\Models\Voucher;
 use App\Models\FlashSaleItem;
 use App\Models\User;
+use App\Models\Notification;
 use App\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -51,6 +52,41 @@ class OrderController extends Controller
                 Mail::to($customer->email)->send(new OrderNotificationMail($order));
             }
 
+            $trangThaiText = '';
+            switch ($order->trang_thai) {
+                case OrderStatus::PENDING_PAYMENT->value:
+                    $trangThaiText = 'đang chờ thanh toán';
+                    break;
+                case OrderStatus::PENDING_CONFIRMATION->value:
+                    $trangThaiText = 'đang chờ xác nhận';
+                    break;
+                case OrderStatus::WAITING_PICKUP->value:
+                    $trangThaiText = 'đã được xác nhận và đang được đóng gói';
+                    break;
+                case OrderStatus::WAITING_DELIVERY->value:
+                    $trangThaiText = 'đang được giao đến bạn';
+                    break;
+                case OrderStatus::DELIVERED->value:
+                    $trangThaiText = 'đã được giao thành công';
+                    break;
+                case OrderStatus::CANCELLED->value:
+                    $trangThaiText = 'đã bị hủy';
+                    break;
+                default:
+                    $trangThaiText = 'đã cập nhật trạng thái mới';
+            }
+
+            $noti = Notification::create([
+                'ma_nguoi_dung' => $order->ma_nguoi_dung,
+                'tieu_de' => 'Cập nhật trạng thái đơn hàng',
+                'noi_dung' => 'Đơn hàng #' . $order->ma_don_hang . ' của bạn ' . $trangThaiText . '.',
+                'loai' => 'order',
+                'duong_dan' => '/orders/' . $order->ma_don_hang,
+                'da_doc'    => false,
+            ]);
+            $noti->ma_thong_bao = $noti->_id;
+            $noti->save();
+
             return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
         }
         return redirect()->back()->with('error', 'Không tìm thấy đơn hàng!');
@@ -88,6 +124,18 @@ class OrderController extends Controller
         $order = Order::create($data);
         $order->ma_don_hang = $order->_id;
         $order->save();
+
+        // Tạo thông báo đặt hàng cho người dùng
+        $noti = Notification::create([
+            'ma_nguoi_dung' => $order->ma_nguoi_dung,
+            'tieu_de' => 'Đặt hàng thành công',
+            'noi_dung' => 'Đơn hàng #' . $order->ma_don_hang . ' đã được tạo thành công. Vui lòng theo dõi trạng thái đơn hàng của bạn.',
+            'loai' => 'order',
+            'duong_dan' => '/orders/' . $order->ma_don_hang,
+            'da_doc'    => false,
+        ]);
+        $noti->ma_thong_bao = $noti->_id;
+        $noti->save();
 
         // Create OrderItems for each cart item
         foreach ($cartItems as $item) {

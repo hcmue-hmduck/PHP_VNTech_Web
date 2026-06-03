@@ -267,43 +267,51 @@
                              </div>
                          </div>
 
-                         <!-- RECIPIENT & BILLING DETAILS -->
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
-                             <div class="space-y-3">
-                                 <h5 class="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
-                                     <i data-lucide="map-pin" class="text-brand-500 w-4 h-4"></i> Thông tin nhận hàng
-                                 </h5>
-                                 <div class="space-y-2 text-xs text-slate-500 leading-relaxed bg-slate-50/50 p-4.5 rounded-2xl border border-slate-200/60">
-                                     <p class="text-slate-800 font-bold text-sm">{{ $o->ho_ten_nguoi_nhan }}</p>
-                                     <p class="font-medium text-xs">Số điện thoại: <span class="font-bold text-slate-700">{{ $o->so_dien_thoai_nhan }}</span></p>
-                                     <p class="font-medium text-xs">Địa chỉ giao hàng: <span class="text-slate-700 font-semibold">{{ $o->dia_chi_giao_hang }}</span></p>
-                                 </div>
-                             </div>
+                          <!-- RECIPIENT & BILLING DETAILS -->
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
+                              <!-- Recipient Card -->
+                              <div class="bg-slate-50/50 p-6 border border-slate-200/60 rounded-3xl text-xs flex flex-col gap-4">
+                                  <h5 class="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5 leading-none">
+                                      <i data-lucide="map-pin" class="text-brand-500 w-4 h-4"></i> Thông tin nhận hàng
+                                  </h5>
+                                  <div class="space-y-3 text-slate-500 leading-relaxed">
+                                      <p class="text-slate-800 font-extrabold text-sm flex items-center gap-2">
+                                          {{ $o->ho_ten_nguoi_nhan }}
+                                      </p>
+                                      <div class="grid grid-cols-1 gap-2.5 pt-2 border-t border-slate-200/50">
+                                          <p class="font-medium text-xs">Số điện thoại: <span class="font-bold text-slate-700">{{ $o->so_dien_thoai_nhan }}</span></p>
+                                          <p class="font-medium text-xs leading-normal">Địa chỉ giao hàng: <span class="text-slate-700 font-semibold">{{ $o->dia_chi_giao_hang }}</span></p>
+                                      </div>
+                                  </div>
+                              </div>
 
-                             <div class="bg-slate-50/50 p-4.5 border border-slate-200/60 rounded-2xl text-xs">
-                                 <h5 class="text-xs font-black uppercase text-slate-500 tracking-wider mb-3 leading-none">Chi tiết thanh toán</h5>
-                                 <div class="space-y-2.5">
-                                     <div class="flex justify-between text-slate-400 font-medium">
-                                         <span>TỔNG TIỀN HÀNG</span>
-                                         <span class="font-bold text-slate-600">{{ number_format((float) ($o->tong_tien_hang ?? 0), 0, ',', '.') }}₫</span>
-                                     </div>
-                                     <div class="flex justify-between text-slate-400 font-medium">
-                                         <span>PHÍ VẬN CHUYỂN</span>
-                                         <span class="font-bold text-slate-600">{{ number_format((float) ($o->phi_van_chuyen ?? 0), 0, ',', '.') }}₫</span>
-                                     </div>
-                                     @if($o->gia_tri_giam_voucher > 0)
-                                     <div class="flex justify-between text-slate-400 font-medium">
-                                         <span>GIẢM VOUCHER</span>
-                                         <span class="text-red-500 font-bold">-{{ number_format((float) ($o->gia_tri_giam_voucher ?? 0), 0, ',', '.') }}₫</span>
-                                     </div>
-                                     @endif
-                                     <div class="pt-2 mt-2 border-t border-slate-200 flex justify-between items-center">
-                                         <span class="font-black text-slate-700 text-xs uppercase tracking-wider">TỔNG THANH TOÁN</span>
-                                         <span class="text-base font-black text-brand-500">{{ number_format((float) ($o->tong_thanh_toan ?? 0), 0, ',', '.') }}₫</span>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
+                              <!-- Billing Details Card -->
+                              <div class="bg-slate-50/50 p-6 border border-slate-200/60 rounded-3xl text-xs flex flex-col gap-4">
+                                  <h5 class="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5 leading-none">
+                                      <i data-lucide="receipt-text" class="text-brand-500 w-4 h-4"></i> Chi tiết thanh toán
+                                  </h5>
+                                  <div class="space-y-3">
+                                      <div class="flex justify-between text-slate-500 font-medium">
+                                          <span class="uppercase tracking-wider">TỔNG TIỀN HÀNG</span>
+                                          <span class="font-black text-slate-700">{{ number_format((float) ($o->tong_tien_hang ?? 0), 0, ',', '.') }}₫</span>
+                                      </div>
+                                      <div class="flex justify-between text-slate-500 font-medium">
+                                          <span class="uppercase tracking-wider">PHÍ VẬN CHUYỂN</span>
+                                          <span class="font-black text-slate-700">{{ number_format((float) ($o->phi_van_chuyen ?? 0), 0, ',', '.') }}₫</span>
+                                      </div>
+                                      @if($o->gia_tri_giam_voucher > 0)
+                                      <div class="flex justify-between text-slate-500 font-medium">
+                                          <span class="uppercase tracking-wider">GIẢM VOUCHER</span>
+                                          <span class="text-rose-500 font-black">-{{ number_format((float) ($o->gia_tri_giam_voucher ?? 0), 0, ',', '.') }}₫</span>
+                                      </div>
+                                      @endif
+                                      <div class="pt-3 mt-1 border-t border-slate-200 flex justify-between items-center">
+                                          <span class="font-black text-slate-800 text-xs uppercase tracking-wider">TỔNG THANH TOÁN</span>
+                                          <span class="text-base font-black text-brand-500">{{ number_format((float) ($o->tong_thanh_toan ?? 0), 0, ',', '.') }}₫</span>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
                     </div>
                 </div>
                 @endforeach

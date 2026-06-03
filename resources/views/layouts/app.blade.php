@@ -81,7 +81,7 @@
                 <div class="flex items-center justify-between gap-4">
                     
                     <!-- Store Branding Header Logo -->
-                    <a href="{{ route('home.index') }}" class="flex items-center gap-2 px-1 focus:ring-2 focus:ring-brand-500 rounded-lg">
+                    <a href="{{ route('home.index') }}" class="flex items-center gap-2 px-1 outline-none">
                         <img src="{{ asset('vntech_logo.ico') }}" alt="VNTech Logo" class="w-9 h-9 rounded-full border border-slate-800 object-cover" />
                         <span class="text-3xl font-display font-black tracking-tighter bg-gradient-to-r from-brand-500 to-brand-600 bg-clip-text text-transparent hover:opacity-90 transition-opacity">
                             VNTech
@@ -106,29 +106,74 @@
                     <!-- User Interaction Cart/Wishlist Utilities -->
                     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                         
-                        <!-- Liked list increment trigger -->
+                        <!-- AI Comparison Trigger -->
                         <button 
-                            class="relative p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition-all duration-300"
-                            title="Danh sách yêu thích"
+                            class="relative p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-brand-500 transition-all duration-300 flex items-center justify-center cursor-pointer"
+                            title="So sánh cấu hình AI"
                         >
-                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            <div class="relative">
+                                <i data-lucide="git-compare" class="w-5 h-5"></i>
+                                <span class="absolute -top-0.5 -right-1.5 w-3 h-3 bg-brand-500 text-white text-[6px] font-black rounded-full flex items-center justify-center leading-none">AI</span>
+                            </div>
                         </button>
 
-                        <button class="relative p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-all duration-300">
-                            <i data-lucide="bell" class="w-5 h-5"></i>
-                            <span class="absolute top-1 right-1 bg-brand-500 text-[9px] w-4 h-4 flex items-center justify-center rounded-full text-white font-bold animate-pulse">2</span>
-                        </button>
+                        <!-- Notifications Dropdown -->
+                        <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                            <button @click="open = !open" class="relative p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-all duration-300 focus:outline-none cursor-pointer">
+                                <i data-lucide="bell" class="w-5 h-5"></i>
+                                @if(isset($unreadCount) && $unreadCount > 0)
+                                    <span class="absolute top-1 right-1 bg-brand-500 text-[9px] w-4 h-4 flex items-center justify-center rounded-full text-white font-bold animate-pulse">{{ $unreadCount }}</span>
+                                @endif
+                            </button>
+ 
+                            <!-- Dropdown Menu -->
+                            <div x-show="open"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                 class="absolute right-0 mt-2 w-80 bg-slate-900 border border-slate-800 shadow-2xl z-[60] py-2 rounded-2xl overflow-hidden text-slate-200"
+                                 style="display: none;">
+                                
+                                <div class="px-4 py-3 border-b border-slate-800/80 flex items-center justify-between">
+                                    <span class="text-xs font-extrabold uppercase tracking-wider">Thông báo</span>
+                                    @if(isset($unreadCount) && $unreadCount > 0)
+                                        <a href="{{ route('notifications.read') }}" class="text-[10px] text-brand-500 hover:text-brand-400 transition-colors font-bold underline decoration-brand-500/30">
+                                            Đọc tất cả ({{ $unreadCount }})
+                                        </a>
+                                    @endif
+                                </div>
 
-                        @php
-                            $cartCount = 0;
-                            if (auth()->check()) {
-                                $cart = \App\Models\Cart::where('ma_nguoi_dung', auth()->id())->first();
-                                if ($cart) {
-                                    $cartCount = \App\Models\CartItem::where('ma_gio_hang', $cart->_id)->count();
-                                }
-                            }
-                        @endphp
-
+                                <div class="max-h-80 overflow-y-auto divide-y divide-slate-850 no-scrollbar">
+                                    @if(isset($notifications) && count($notifications) > 0)
+                                        @foreach($notifications as $notification)
+                                            <a href="{{ route('notifications.read', ['ma_thong_bao' => $notification->ma_thong_bao]) }}" class="flex flex-col gap-1 p-4 hover:bg-slate-800/40 transition-colors">
+                                                <div class="flex items-start justify-between gap-2">
+                                                    <span class="text-xs font-bold leading-tight {{ $notification->da_doc ? 'text-slate-400' : 'text-brand-500' }}">
+                                                        {{ $notification->tieu_de }}
+                                                    </span>
+                                                    @if(!$notification->da_doc)
+                                                        <span class="size-2 rounded-full bg-brand-500 shrink-0 mt-1"></span>
+                                                    @endif
+                                                </div>
+                                                <p class="text-[11px] text-slate-400 leading-normal">{{ $notification->noi_dung }}</p>
+                                                <span class="text-[9px] text-slate-500 mt-1">
+                                                    {{ $notification->created_at ? \Carbon\Carbon::parse($notification->created_at)->locale('vi')->diffForHumans() : '' }}
+                                                </span>
+                                            </a>
+                                        @endforeach
+                                    @else
+                                        <div class="flex flex-col items-center justify-center py-8 px-4 text-center">
+                                            <i data-lucide="bell-off" class="w-8 h-8 text-slate-600 mb-2"></i>
+                                            <p class="text-xs text-slate-500 font-medium">Bạn chưa có thông báo nào</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+        
                         <!-- Shopping Cart Drawer Trigger badge block -->
                         <a href="{{ auth()->check() ? route('cart.view') : route('login') }}"
                            class="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-md hover:shadow-brand-500/20 active:scale-95 transition-all py-2.5 px-3 sm:px-5 rounded-2xl text-white font-display duration-300"
