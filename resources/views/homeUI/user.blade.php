@@ -6,6 +6,9 @@
 @php
     $realUser = $user ?? Auth::user();
     $tab = request()->query('tab', 'profile');
+    if (in_array($tab, ['change-email', 'change-password'])) {
+        $tab = 'profile';
+    }
     
     $addresses = $user_address ?? collect();
     $orders = $orders ?? collect();
@@ -68,16 +71,6 @@
                        class="w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-3 select-none {{ $tab === 'addresses' ? 'bg-[#ff5c00] text-white shadow-sm' : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900' }}">
                         <i data-lucide="map-pin" class="w-5 h-5 shrink-0"></i>
                         <span>Số địa chỉ</span>
-                    </a>
-                    <a href="{{ route('user.view', ['tab' => 'change-email']) }}" 
-                       class="w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-3 select-none {{ $tab === 'change-email' ? 'bg-[#ff5c00] text-white shadow-sm' : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900' }}">
-                        <i data-lucide="mail" class="w-5 h-5 shrink-0"></i>
-                        <span>Đổi email</span>
-                    </a>
-                    <a href="{{ route('user.view', ['tab' => 'change-password']) }}" 
-                       class="w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-3 select-none {{ $tab === 'change-password' ? 'bg-[#ff5c00] text-white shadow-sm' : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900' }}">
-                        <i data-lucide="shield" class="w-5 h-5 shrink-0"></i>
-                        <span>Bảo mật tài khoản</span>
                     </a>
                     
                     <hr class="my-3 border-neutral-100" />
@@ -252,107 +245,100 @@
                             </div>
                         </form>
                     </section>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        <!-- TAB: ĐỔI EMAIL -->
+                        <form action="{{ route('user.email.change.request') }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
+                            @csrf
+                            <div class="border-b border-neutral-100 pb-4">
+                                <h3 class="text-lg font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
+                                    <i data-lucide="mail" class="text-[#ff5c00] w-5 h-5"></i>
+                                    <span>Thay đổi địa chỉ Email</span>
+                                </h3>
+                                <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật địa chỉ email và xác thực OTP bảo vệ tài khoản</p>
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                    <i data-lucide="mail" class="w-3.5 h-3.5"></i> Email mới
+                                </label>
+                                <input type="email" name="new_email" value="{{ old('new_email', $realUser->email) }}" required placeholder="Nhập email mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                            </div>
+
+                            <button type="submit" class="w-full bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <span>Cập nhật email</span>
+                            </button>
+                        </form>
+
+                        <!-- TAB 2: CHANGE PASSWORD -->
+                        <form action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-8 rounded-3xl shadow-sm space-y-6">
+                            @csrf
+                            @method('PUT')
+                            
+                            <div class="border-b border-neutral-100 pb-4">
+                                <h3 class="text-lg font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
+                                    <i data-lucide="key-round" class="text-[#ff5c00] w-5 h-5"></i>
+                                    <span>Thay đổi mật khẩu</span>
+                                </h3>
+                                <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật mật khẩu bảo vệ tài khoản của bạn</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-4 w-full">
+                                <!-- Old Password -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                        <i data-lucide="lock" class="w-3.5 h-3.5"></i> Mật khẩu cũ
+                                    </label>
+                                    <div class="relative">
+                                        <input type="password" id="old_password" name="old_password" required placeholder="Nhập mật khẩu hiện tại" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                                        <button type="button" onclick="togglePasswordVisibility('old_password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                    @error('old_password')
+                                        <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- New Password -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Mật khẩu mới
+                                    </label>
+                                    <div class="relative">
+                                        <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                                        <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                    @error('password')
+                                        <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Xác nhận mật khẩu mới
+                                    </label>
+                                    <div class="relative">
+                                        <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Xác nhận lại mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
+                                        <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-sm py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <span>Cập nhật mật khẩu</span>
+                            </button>
+                        </form>
+                    </div>
+                    </div>
                 </div>
-                @endif
-
-                <!-- TAB 2: CHANGE PASSWORD -->
-                @if($tab === 'change-password')
-                <form action="{{ route('user.update', $realUser->ma_nguoi_dung) }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-10 rounded-3xl shadow-sm space-y-8 animate-[fadeIn_0.4s_ease-out]">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="border-b border-neutral-100 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h3 class="text-xl font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
-                                <i data-lucide="key-round" class="text-[#ff5c00]"></i>
-                                <span>Đổi mật khẩu</span>
-                            </h3>
-                            <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật mật khẩu bảo vệ tài khoản của bạn</p>
-                        </div>
-                        
-                        <button type="submit" class="bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 self-start md:self-center">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            <span>Cập nhật mật khẩu</span>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-6 w-full">
-                        <!-- Old Password -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Mật khẩu cũ
-                            </label>
-                            <div class="relative">
-                                <input type="password" id="old_password" name="old_password" required placeholder="Nhập mật khẩu hiện tại" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                                <button type="button" onclick="togglePasswordVisibility('old_password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
-                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                            @error('old_password')
-                                <p class="text-red-500 text-xs font-semibold">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- New Password -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Mật khẩu mới
-                            </label>
-                            <div class="relative">
-                                <input type="password" id="password" name="password" required placeholder="Nhập mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                                <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
-                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                            @error('password')
-                                <p class="text-red-500 text-xs font-semibold">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- Confirm Password -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Xác nhận mật khẩu mới
-                            </label>
-                            <div class="relative">
-                                <input type="password" id="password_confirmation" name="password_confirmation" required placeholder="Xác nhận lại mật khẩu mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 pl-4 pr-10 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                                <button type="button" onclick="togglePasswordVisibility('password_confirmation', this)" class="absolute inset-y-0 right-3 flex items-center text-neutral-400 hover:text-neutral-700 transition-colors">
-                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                @endif
-
-                <!-- TAB: ĐỔI EMAIL -->
-                @if($tab === 'change-email')
-                <form action="{{ route('user.email.change.request') }}" method="POST" class="bg-white border border-neutral-200/60 p-6 md:p-10 rounded-3xl shadow-sm space-y-8 animate-[fadeIn_0.4s_ease-out]">
-                    @csrf
-                    <div class="border-b border-neutral-100 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h3 class="text-xl font-display font-extrabold text-neutral-900 tracking-tight flex items-center gap-2 select-none">
-                                <i data-lucide="mail" class="text-[#ff5c00]"></i>
-                                <span>Đổi email</span>
-                            </h3>
-                            <p class="text-neutral-500 text-xs font-semibold mt-1">Cập nhật địa chỉ email và xác thực OTP bảo vệ tài khoản</p>
-                        </div>
-                        
-                        <button type="submit" class="bg-[#ff5c00] hover:bg-[#e04f00] text-white font-display font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 self-start md:self-center">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            <span>Cập nhật email</span>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-6 w-full">
-                        <div class="flex flex-col gap-2">
-                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                                <i data-lucide="mail" class="w-3.5 h-3.5"></i> Email mới
-                            </label>
-                            <input type="email" name="new_email" value="{{ old('new_email', $realUser->email) }}" required placeholder="Nhập email mới" class="w-full bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:border-[#ff5c00] focus:bg-white text-sm rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#ff5c00]/20 transition-all text-neutral-800 font-medium focus:outline-none">
-                        </div>
-                    </div>
-                </form>
                 @endif
 
                 <!-- TAB 3: ADDRESSES -->
