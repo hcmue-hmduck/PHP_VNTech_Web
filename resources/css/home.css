@@ -23,7 +23,7 @@ body:hover::-webkit-scrollbar-thumb {
 }
 
 body:hover::-webkit-scrollbar-thumb:hover {
-    background: #00e55b;
+    background: #0058bc;
 }
 
 /* Firefox — luôn mỏng, ẩn khi không hover */

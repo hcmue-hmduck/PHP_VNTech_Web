@@ -66,7 +66,7 @@ class PaymentController extends Controller
     {
         $maDonHang = $request->route('ma_don_hang');
         $order = Order::where('ma_don_hang', $maDonHang)->firstOrFail();
-        if (!$order) return redirect()->route('viewHome');
+        if (!$order) return redirect()->route('home.index');
 
         $partnerCode = config('services.momo.partner_code');
         $requestType = 'captureWallet';

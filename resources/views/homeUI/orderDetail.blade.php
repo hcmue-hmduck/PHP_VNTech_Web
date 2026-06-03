@@ -3,12 +3,14 @@
 @php
     use App\OrderStatus;
 
-    // Logic tự động lấy dữ liệu còn thiếu nếu không được truyền từ Controller
-    if (!isset($orders) && isset($order)) {
-        $orders = \App\Models\Order::where('ma_nguoi_dung', $order->ma_nguoi_dung)->latest()->get();
+    // Retrieve missing order history if not passed directly
+    if (!isset($orders) && auth()->check()) {
+        $orders = \App\Models\Order::where('ma_nguoi_dung', auth()->id())->latest()->get();
+    } elseif (!isset($orders)) {
+        $orders = collect();
     }
     
-    $currentMaDonHang = $order->ma_don_hang ?? null;
+    $currentMaDonHang = $order->ma_don_hang ?? (request('ma_don_hang') ?? null);
 
     $tabsMap = [
         OrderStatus::PENDING_PAYMENT->value    => 'CHỜ THANH TOÁN',
@@ -19,11 +21,11 @@
     ];
 
     $statusBadgeClasses = [
-        OrderStatus::PENDING_PAYMENT->value    => 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
-        OrderStatus::PENDING_CONFIRMATION->value => 'bg-blue-500/10 border-blue-500/30 text-blue-400',
-        OrderStatus::WAITING_PICKUP->value     => 'bg-purple-500/10 border-purple-500/30 text-purple-400',
-        OrderStatus::WAITING_DELIVERY->value   => 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
-        OrderStatus::DELIVERED->value          => 'bg-neon-green/10 border-neon-green/30 text-neon-green',
+        OrderStatus::PENDING_PAYMENT->value    => 'bg-amber-50 border-amber-200 text-amber-700 text-xs',
+        OrderStatus::PENDING_CONFIRMATION->value => 'bg-blue-50 border-blue-200 text-blue-700 text-xs',
+        OrderStatus::WAITING_PICKUP->value     => 'bg-indigo-50 border-indigo-200 text-indigo-700 text-xs',
+        OrderStatus::WAITING_DELIVERY->value   => 'bg-sky-50 border-sky-200 text-sky-700 text-xs',
+        OrderStatus::DELIVERED->value          => 'bg-emerald-50 border-emerald-200 text-emerald-700 text-xs',
     ];
 
     $resolveOrderStatus = function ($order) {
@@ -31,44 +33,28 @@
     };
 
     $defaultStatusText = 'CHỜ XÁC NHẬN';
+
+    $ordersData = [];
+    foreach($orders as $o) {
+        $ordersData[] = [
+            'ma_don_hang' => $o->ma_don_hang,
+            'status' => $tabsMap[$resolveOrderStatus($o)] ?? $defaultStatusText
+        ];
+    }
 @endphp
 
-@section('title', isset($order) ? 'Chi tiết đơn hàng #' . $order->ma_don_hang : 'Lịch sử đơn hàng')
+@section('title', 'Đơn hàng của tôi')
 
 @section('content')
 <style>
-    .grid-bg {
-        background-image: radial-gradient(rgba(0, 255, 102, 0.05) 1px, transparent 1px);
-        background-size: 40px 40px;
-    }
-    .text-neon-green { color: #00FF66; }
-    .bg-neon-green { background-color: #00FF66; }
-    .border-neon-green { border-color: #00FF66; }
-    .active-order-glow {
-        box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
-        border-color: #00FF66 !important;
-    }
-    .glow-sm:hover {
-        box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
-    }
-    .custom-scrollbar::-webkit-scrollbar { height: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #00FF66; border-radius: 10px; }
+    [x-cloak] { display: none !important; }
+    .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #FAF8F2; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 </style>
 
-@php
-    $ordersData = [];
-    if (isset($orders)) {
-        foreach($orders as $o) {
-            $ordersData[] = [
-                'ma_don_hang' => $o->ma_don_hang,
-                'status' => $tabsMap[$resolveOrderStatus($o)] ?? $defaultStatusText
-            ];
-        }
-    }
-@endphp
-
-<div class="grid-bg min-h-screen" 
+<div class="min-h-screen bg-[#FAF8F2] font-sans text-slate-800 flex flex-col relative"
      x-data="{ 
         activeTab: 'TẤT CẢ', 
         orders: {{ json_encode($ordersData) }},
@@ -77,278 +63,252 @@
             return this.orders.some(o => o.status === this.activeTab);
         }
      }">
-    <main class="pt-12 pb-20 px-6 max-w-7xl mx-auto">
-        <!-- Nút quay lại tách biệt, nằm trên và đẩy header xuống dưới -->
-        <div class="mb-6 flex justify-start animate-fadeInUp">
+    <main class="max-w-7xl mx-auto px-4 sm:px-8 pt-10 pb-16 flex-1 w-full">
+        
+        <!-- Tiêu đề chính -->
+        <header class="mb-10 text-center relative flex flex-col items-center justify-center min-h-[60px]">
             <a href="{{ url('/') }}" 
-               class="flex items-center gap-2 px-4 py-2 border border-white/5 bg-white/[0.02] hover:bg-neon-green/5 hover:border-neon-green/40 rounded-lg text-gray-400 hover:text-neon-green text-[11px] font-bold uppercase tracking-widest transition-all duration-300 group shadow-sm">
-                <i data-lucide="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1"></i>
-                <span>Trang chủ</span>
+               class="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-black uppercase tracking-wider transition-all duration-300 group shadow-xs no-underline">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5"></i>
+                <span class="hidden sm:inline">Về trang chủ</span>
             </a>
-        </div>
-
-        <!-- Tiêu đề chính căn giữa tự nhiên, không sợ bị đè chữ -->
-        <header class="mb-12 text-center animate-fadeInUp">
-            <h1 class="font-space text-5xl font-bold text-gray-100 uppercase tracking-tight">
+            <h1 class="font-space text-3xl font-black text-slate-800 uppercase tracking-tight">
                 Đơn hàng của tôi
             </h1>
-            <p class="text-gray-400 mt-2 uppercase tracking-wide text-sm">
-                Quản lý và theo dõi lịch sử đơn đặt hàng của bạn.
+            <p class="text-slate-400 mt-1 uppercase tracking-wider text-xs font-semibold">
+                Quản lý và theo dõi lộ trình các đơn đặt hàng của bạn.
             </p>
         </header>
 
         <!-- Tab Selector -->
-        <div class="mb-12 border-b border-white/5 overflow-x-auto custom-scrollbar">
-            <div class="flex justify-center gap-10 pb-4 min-w-max">
+        <div class="mb-8 border-b border-slate-200/80 overflow-x-auto custom-scrollbar">
+            <div class="flex justify-center gap-8 pb-3 min-w-max">
                 @foreach(['TẤT CẢ', 'CHỜ THANH TOÁN', 'CHỜ XÁC NHẬN', 'CHỜ LẤY HÀNG', 'CHỜ GIAO HÀNG', 'ĐÃ GIAO'] as $tab)
                 <button
                     @click="activeTab = '{{ $tab }}'"
-                    class="whitespace-nowrap text-sm font-bold tracking-widest transition-all duration-300 uppercase relative"
-                    :class="activeTab === '{{ $tab }}' ? 'text-neon-green' : 'text-gray-500 hover:text-gray-300'"
+                    class="whitespace-nowrap text-sm font-black tracking-wider transition-all duration-300 uppercase relative pb-1 cursor-pointer"
+                    :class="activeTab === '{{ $tab }}' ? 'text-brand-500' : 'text-slate-400 hover:text-slate-700'"
                 >
                     {{ $tab }}
-                    <span x-show="activeTab === '{{ $tab }}'" class="absolute -bottom-[18px] left-0 w-full h-[2px] bg-neon-green shadow-[0_0_10px_#00FF66]"></span>
+                    <span x-show="activeTab === '{{ $tab }}'" class="absolute -bottom-[13px] left-0 w-full h-[3px] bg-brand-500 rounded-t-md"></span>
                 </button>
                 @endforeach
             </div>
         </div>
 
-        <!-- Order List Container -->
-        <div class="mb-8 relative">
+        <!-- Orders Vertical Container List -->
+        <div class="space-y-6 relative">
             <!-- Empty State -->
             <div x-show="!hasVisibleOrders" 
                  x-transition:enter="transition opacity duration-300"
-                 class="py-12 flex flex-col items-center justify-center border border-white/5 bg-white/[0.02] rounded-xl">
-                <i data-lucide="package-open" class="w-12 h-12 text-gray-700 mb-4"></i>
-                <p class="text-gray-500 italic text-sm tracking-widest uppercase">Không có đơn hàng nào trong danh mục này</p>
-            </div>
-
-            <!-- Horizontal List -->
-            <div x-show="hasVisibleOrders" class="overflow-x-auto custom-scrollbar pb-4">
-                <div class="flex gap-6 min-w-max px-2">
-                    @isset($orders)
-                        @foreach($orders as $o)
-                        @php
-                            $resolvedStatus = $resolveOrderStatus($o);
-                            $statusText = $tabsMap[$resolvedStatus] ?? $defaultStatusText;
-                            $badgeClass = $statusBadgeClasses[$resolvedStatus] ?? $statusBadgeClasses[OrderStatus::PENDING_CONFIRMATION->value];
-                            $isActive = $currentMaDonHang == $o->ma_don_hang;
-                        @endphp
-                        <a
-                            x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $statusText }}'"
-                            href="{{ route('order_detail.view', ['ma_don_hang' => $o->ma_don_hang]) }}"
-                            class="order-card w-[280px] p-6 rounded-lg cursor-pointer transition-all duration-300 border block {{ $isActive ? 'bg-[#282a2b] border-neon-green active-order-glow' : 'bg-[#1a1c1c] border-white/5 hover:border-neon-green/50' }}"
-                        >
-                            <div class="flex justify-between items-start mb-4">
-                                <h3 class="text-lg font-bold uppercase {{ $isActive ? 'text-neon-green' : 'text-gray-100' }}">
-                                    #...{{ substr($o->ma_don_hang, -8) }}
-                                </h3>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ $badgeClass }}">
-                                    {{ $statusText }}
-                                </span>
-                            </div>
-                            <p class="text-sm text-gray-400">{{ $o->created_at->format('d/m/Y') }}</p>
-                            <p class="mt-4 font-bold text-gray-100">{{ number_format($o->tong_thanh_toan, 0, ',', '.') }} VNĐ</p>
-                        </a>
-                        @endforeach
-                    @endisset
+                 class="py-16 flex flex-col items-center justify-center border border-dashed border-slate-200 bg-white rounded-3xl p-8 shadow-xs">
+                <div class="p-4 bg-slate-50 text-slate-400 rounded-full mb-4">
+                    <i data-lucide="package-open" class="w-10 h-10"></i>
                 </div>
+                <p class="text-slate-400 font-bold text-sm tracking-wider uppercase">Không tìm thấy đơn hàng nào trong danh mục này</p>
             </div>
-        </div>
 
-        <!-- Detail Content -->
-        @if(isset($order))
-        <section 
-            x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $tabsMap[$resolveOrderStatus($order)] ?? $defaultStatusText }}'"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform translate-y-4"
-            x-transition:enter-end="opacity-100 transform translate-y-0"
-            class="w-full bg-[#1a1c1c]/50 border border-white/5 backdrop-blur-md rounded-xl overflow-hidden animate-fadeInUp"
-        >
-            @php $isMomoOrder = strtolower($order->phuong_thuc_thanh_toan ?? '') === 'momo'; @endphp
-            <!-- Detail Header -->
-            <div class="p-8 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
-                    <div class="flex items-center gap-3 mb-1">
-                        <h2 class="text-2xl font-bold text-gray-100 uppercase">Chi tiết #{{ $order->ma_don_hang }}</h2>
-                        <span class="px-3 py-1 bg-neon-green/10 border border-neon-green/30 text-neon-green text-[10px] font-bold rounded uppercase tracking-wider">
-                            {{ ($tabsMap[$resolveOrderStatus($order)] ?? $defaultStatusText) }}
+            <!-- Shopee Vertical Cards List -->
+            @isset($orders)
+                @foreach($orders as $o)
+                @php
+                    $resolvedStatus = $resolveOrderStatus($o);
+                    $statusText = $tabsMap[$resolvedStatus] ?? $defaultStatusText;
+                    $badgeClass = $statusBadgeClasses[$resolvedStatus] ?? $statusBadgeClasses[OrderStatus::PENDING_CONFIRMATION->value];
+                    $items = \App\Models\OrderItem::where('ma_don_hang', $o->ma_don_hang)->with('variant.product')->get();
+                @endphp
+                
+                <div x-data="{ expanded: {{ ($o->ma_don_hang === $currentMaDonHang) ? 'true' : 'false' }} }"
+                     x-show="activeTab === 'TẤT CẢ' || activeTab === '{{ $statusText }}'"
+                     x-transition:enter="transition ease-out duration-300 transform opacity-0 scale-98"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     class="bg-white border border-slate-200/60 rounded-3xl p-5 sm:p-6 shadow-[0_10px_35px_rgba(0,0,0,0.015)] transition-all duration-300 hover:border-brand-500/20 flex flex-col gap-4 text-left"
+                     :class="expanded ? 'border-brand-500/20 ring-1 ring-brand-500/5 shadow-[0_15px_40px_rgba(255,79,0,0.02)]' : ''"
+                >
+                    <!-- Header -->
+                    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-sm font-black text-slate-800 tracking-wider">ĐƠN HÀNG: #{{ $o->ma_don_hang }}</span>
+                            <span class="text-xs text-slate-400 font-bold font-mono">({{ $o->created_at->format('d/m/Y H:i') }})</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-lg text-xs font-black uppercase border {{ $badgeClass }}">
+                            {{ $statusText }}
                         </span>
                     </div>
-                    <p class="text-gray-400 text-sm">
-                        Ngày đặt hàng: <span class="text-gray-100 font-medium">{{ $order->created_at->format('d \T\h\á\n\g m, Y') }}</span>
-                    </p>
-                </div>
-                @if($isMomoOrder && $order->trang_thai === OrderStatus::PENDING_PAYMENT->value)
-                <a href="{{ route('momo.create', ['ma_don_hang' => $order->ma_don_hang]) }}"
-                   class="flex items-center gap-2 bg-neon-green text-black px-8 py-3 font-bold text-sm tracking-widest uppercase hover:opacity-90 transition-all duration-300 shadow-[0_0_20px_rgba(0,255,102,0.3)]">
-                    <i data-lucide="wallet-cards" class="w-4 h-4"></i>
-                    Thanh toán MoMo
-                </a>
-                @elseif($order->trang_thai === OrderStatus::DELIVERED->value)
-                <a href="{{ route('admin.order.print', ['ma_don_hang' => $order->ma_don_hang]) }}" target="_blank"
-                   class="flex items-center gap-2 bg-neon-green text-black px-8 py-3 font-bold text-sm tracking-widest uppercase hover:opacity-90 transition-all duration-300 shadow-[0_0_20px_rgba(0,255,102,0.3)]">
-                    <i data-lucide="printer" class="w-4 h-4"></i>
-                    In hoá đơn
-                </a>
-                @else
-                <button class="bg-neon-green text-black px-8 py-3 font-bold text-sm tracking-widest uppercase hover:glow-sm transition-all duration-300">
-                    Theo dõi đơn hàng
-                </button>
-                @endif
-            </div>
 
-            <div class="p-8 space-y-16">
-                <!-- Shipping Timeline -->
-                @php
-                    $currentStatus = $resolveOrderStatus($order);
-
-                    // 4 bước cố định, map đúng với giá trị DB của Admin
-                    $steps = [
-                        ['id' => OrderStatus::PENDING_CONFIRMATION->value, 'status' => 'CHỜ XÁC NHẬN',  'icon' => 'clipboard-check', 'note' => 'Đơn hàng đang chờ shop xác nhận'],
-                        ['id' => OrderStatus::WAITING_PICKUP->value,     'status' => 'CHỜ LẤY HÀNG',  'icon' => 'package-check',   'note' => 'Shop đang chuẩn bị, chờ đơn vị vận chuyển lấy hàng'],
-                        ['id' => OrderStatus::WAITING_DELIVERY->value,   'status' => 'CHỜ GIAO HÀNG', 'icon' => 'truck',            'note' => 'Đơn hàng đang trên đường giao đến bạn'],
-                        ['id' => OrderStatus::DELIVERED->value,          'status' => 'ĐÃ GIAO',        'icon' => 'badge-check',      'note' => 'Đơn hàng đã giao thành công'],
-                    ];
-                    $statusOrder = array_column($steps, 'id');
-                    // Nếu trạng thái không khớp bất kỳ bước nào (vd: cho_thanh_toan) → không tô
-                    $currentIndex = array_search($currentStatus, $statusOrder);
-                    if ($currentIndex === false) $currentIndex = -1;
-                    $progressWidth = ($currentIndex >= 0) ? ($currentIndex / (count($steps) - 1)) * 100 : 0;
-                @endphp
-
-                <div class="space-y-10">
-                    <h3 class="text-xl mb-8 flex items-center gap-3 uppercase text-gray-100">
-                        <i data-lucide="truck" class="text-neon-green"></i> Lộ trình vận chuyển
-                    </h3>
-                    
-                    <div class="relative">
-                        <!-- Bounded Progress Track aligned with icon centers (12.5% to 87.5%) -->
-                        <div class="absolute top-6 left-[12.5%] right-[12.5%] h-[2px] hidden md:block">
-                            <div class="absolute inset-0 bg-white/5"></div>
-                            <div id="order-progress-line" class="absolute inset-y-0 left-0 bg-neon-green shadow-[0_0_15px_#00FF66] transition-all duration-500" :style="{ width: '{{ $progressWidth }}%' }"></div>
-                        </div>
-
-                        <div class="relative flex flex-col md:flex-row justify-between items-start gap-8 md:gap-4">
-                            @foreach($steps as $idx => $step)
-                                @php
-                                    $isCompleted = $idx <= $currentIndex;
-                                    $isActive = $idx == $currentIndex;
-                                @endphp
-                                <div class="flex flex-row md:flex-col items-center md:items-center gap-4 md:gap-3 flex-1 {{ !$isCompleted && !$isActive ? 'opacity-40' : '' }}">
-                                    <div class="relative">
-                                        @if($isActive)
-                                            <div class="absolute inset-0 rounded-full bg-neon-green/20 animate-ping"></div>
-                                        @endif
-                                        <div class="w-12 h-12 rounded-full flex items-center justify-center z-10 relative border-2 {{
-                                            $isCompleted ? 'bg-neon-green border-neon-green text-black shadow-[0_0_15px_rgba(0,255,102,0.4)]' :
-                                            ($isActive ? 'bg-[#333535] border-neon-green text-neon-green shadow-[0_0_20px_rgba(0,255,102,0.3)]' :
-                                            'bg-[#1a1c1c] border-white/10 text-gray-400')
-                                        }}">
-                                            @if($isCompleted) <i data-lucide="check" class="w-5 h-5"></i> @else <i data-lucide="{{ $step['icon'] }}" class="w-5 h-5"></i> @endif
-                                        </div>
-                                    </div>
-                                    <div class="text-left md:text-center">
-                                        <p class="text-xs font-bold uppercase tracking-tight {{ $isActive || $isCompleted ? 'text-neon-green' : 'text-gray-400' }}">
-                                            {{ $step['status'] }}
-                                        </p>
-                                        <p class="text-[10px] text-gray-400 font-medium mt-0.5">VNTech Protocol</p>
-                                        <p class="text-[10px] italic mt-0.5 {{ $isActive ? 'text-neon-green/80 font-bold' : 'text-gray-500' }}">
-                                            {{ $step['note'] }}
-                                        </p>
-                                    </div>
+                    <!-- Products List inside this order -->
+                    <div class="divide-y divide-slate-100">
+                        @foreach($items as $product)
+                            @php $variant = $product->variant; @endphp
+                            <div class="flex gap-5 py-4 items-center first:pt-0 last:pb-0">
+                                <div class="w-16 h-16 bg-slate-50 border border-slate-150 p-1.5 rounded-xl flex-shrink-0 flex items-center justify-center">
+                                    <img src="{{ $variant->link_anh_bien_the ?? 'https://via.placeholder.com/150' }}" 
+                                         alt="{{ $variant->ten_bien_the ?? $product->ten_san_pham }}" 
+                                         class="w-full h-full object-contain">
                                 </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Selected Products -->
-                <div class="space-y-6">
-                    <h3 class="text-xl flex items-center gap-3 uppercase text-gray-100">
-                        <i data-lucide="shopping-bag" class="text-neon-green"></i> Sản phẩm đã chọn
-                    </h3>
-                    <div class="grid grid-cols-1 gap-4">
-                        @if(isset($orderItems))
-                        @foreach($orderItems as $product)
-                        <div class="flex gap-6 bg-[#282a2b]/50 p-6 border border-white/5 rounded-lg group hover:border-neon-green/30 transition-all duration-300">
-                            @php
-                                $variant = $product->variant;
-                            @endphp
-                            <div class="w-24 h-24 flex-shrink-0 bg-[#333535] rounded overflow-hidden border border-white/5">
-                                <img src="{{ $variant->link_anh_bien_the ?? 'https://via.placeholder.com/150' }}" 
-                                     alt="{{ $variant->ten_bien_the }}" 
-                                     class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
-                            </div>
-                            <div class="flex-grow">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="text-lg text-gray-100 group-hover:text-neon-green transition-colors uppercase font-bold tracking-tight">
+                                <div class="flex-grow min-w-0">
+                                    <h4 class="text-sm font-black text-slate-800 uppercase tracking-tight truncate">
                                         {{ $variant->ten_bien_the ?? $product->ten_san_pham }}
                                     </h4>
-                                    <span class="text-lg text-neon-green font-bold">
-                                        {{ number_format($product->gia_ban, 0, ',', '.') }} VNĐ
+                                    <p class="text-xs text-slate-400 mt-1 uppercase font-bold">
+                                        Số lượng: <span class="text-brand-500 font-black">{{ $product->so_luong }}</span>
+                                    </p>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <span class="text-sm font-black text-slate-850">
+                                        {{ number_format((float) ($product->gia_ban ?? 0), 0, ',', '.') }}₫
                                     </span>
                                 </div>
-                                <div class="mt-4 flex items-center gap-4 border-t border-white/5 pt-4">
-                                    <span class="text-xs text-gray-500 uppercase font-bold">Số lượng: <span class="text-neon-green">{{ $product->so_luong }}</span></span>
-                                </div>
                             </div>
-                        </div>
                         @endforeach
-                        @endif
                     </div>
-                </div>
 
-                <!-- Shipping & Payment Info -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t border-white/10">
-                    <div class="space-y-6">
-                        <h3 class="text-lg flex items-center gap-3 uppercase text-gray-100 leading-none">
-                            <i data-lucide="map-pin" class="text-neon-green"></i> Thông tin nhận hàng
-                        </h3>
-                        <div class="space-y-2 text-sm text-gray-400">
-                            <p class="text-gray-100 font-bold text-base">{{ $order->ho_ten_nguoi_nhan }}</p>
-                            <p>{{ $order->so_dien_thoai_nhan }}</p>
-                            <p>{{ $order->dia_chi_giao_hang }}</p>
+                    <!-- Total Price and Action Buttons -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-slate-100 mt-1">
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xs text-slate-400 uppercase tracking-wider font-bold">Tổng thanh toán:</span>
+                            <span class="text-xl font-black text-brand-500">{{ number_format((float) ($o->tong_thanh_toan ?? 0), 0, ',', '.') }}₫</span>
                         </div>
-                    </div>
+                        <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+                            <!-- Toggle details button -->
+                            <button @click="expanded = !expanded"
+                                    class="flex items-center gap-1.5 px-4 py-2 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 text-slate-500 hover:text-slate-850 text-xs font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer">
+                                <span x-text="expanded ? 'Ẩn chi tiết' : 'Chi tiết lộ trình'"></span>
+                                <i data-lucide="chevron-down" class="w-4 h-4 transition-transform duration-300" :class="expanded ? 'rotate-180' : ''"></i>
+                            </button>
 
-                    <div class="bg-[#333535]/30 p-8 border border-white/5 rounded-xl">
-                        <h3 class="text-lg mb-6 uppercase text-gray-100">Tổng kết thanh toán</h3>
-                        <div class="space-y-4 text-sm">
-                            <div class="flex justify-between text-gray-400">
-                                <span class="uppercase">Tạm tính</span>
-                                <span>{{ number_format($order->tong_tien_hang, 0, ',', '.') }} VNĐ</span>
-                            </div>
-                            <div class="flex justify-between text-gray-400">
-                                <span class="uppercase">Phí vận chuyển</span>
-                                <span>{{ number_format($order->phi_van_chuyen ?? 0, 0, ',', '.') }} VNĐ</span>
-                            </div>
-                            @if($order->gia_tri_giam_voucher > 0)
-                            <div class="flex justify-between text-gray-400">
-                                <span class="uppercase">Giảm giá (Voucher)</span>
-                                <span class="text-neon-green">- {{ number_format($order->gia_tri_giam_voucher, 0, ',', '.') }} VNĐ</span>
-                            </div>
+                            @php $isMomo = strtolower($o->phuong_thuc_thanh_toan ?? '') === 'momo'; @endphp
+                            @if($isMomo && $o->trang_thai === OrderStatus::PENDING_PAYMENT->value)
+                                <a href="{{ route('momo.create', ['ma_don_hang' => $o->ma_don_hang]) }}"
+                                   class="inline-flex items-center justify-center gap-1.5 bg-[#A50064] text-white px-4 py-2 rounded-xl font-black text-xs tracking-wider uppercase hover:opacity-90 active:scale-95 transition-all shadow-xs no-underline">
+                                    <i data-lucide="wallet-cards" class="w-4 h-4"></i>
+                                    Thanh toán MoMo
+                                </a>
+                            @elseif($o->trang_thai === OrderStatus::DELIVERED->value)
+                                <a href="{{ route('admin.order.print', ['ma_don_hang' => $o->ma_don_hang]) }}" target="_blank"
+                                   class="inline-flex items-center justify-center gap-1.5 bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-xl font-black text-xs tracking-wider uppercase hover:shadow-[0_4px_12px_rgba(12,135,235,0.2)] active:scale-95 transition-all shadow-xs no-underline">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    In hoá đơn
+                                </a>
                             @endif
-                            <div class="pt-4 mt-4 border-t border-white/10 flex justify-between items-center">
-                                <span class="font-bold text-gray-100 text-base uppercase">Tổng cộng</span>
-                                <span class="text-2xl text-neon-green">{{ number_format($order->tong_thanh_toan, 0, ',', '.') }} VNĐ</span>
-                            </div>
                         </div>
                     </div>
+
+                    <!-- Collapsible tracking detail block -->
+                    <div x-show="expanded"
+                         x-transition:enter="transition ease-out duration-300 transform opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-200 transform opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         class="pt-5 border-t border-slate-100 space-y-6"
+                         x-cloak
+                    >
+                         <!-- TIMELINE STEPPER -->
+                         @php
+                             $currentStatus = $resolveOrderStatus($o);
+                             $steps = [
+                                 ['id' => OrderStatus::PENDING_CONFIRMATION->value, 'status' => 'CHỜ XÁC NHẬN',  'icon' => 'clipboard-check', 'note' => 'Đang chờ shop duyệt'],
+                                 ['id' => OrderStatus::WAITING_PICKUP->value,     'status' => 'CHỜ LẤY HÀNG',  'icon' => 'package-check',   'note' => 'Shop đang đóng gói'],
+                                 ['id' => OrderStatus::WAITING_DELIVERY->value,   'status' => 'CHỜ GIAO HÀNG', 'icon' => 'truck',            'note' => 'Đang giao tới bạn'],
+                                 ['id' => OrderStatus::DELIVERED->value,          'status' => 'ĐÃ GIAO',        'icon' => 'badge-check',      'note' => 'Giao thành công'],
+                             ];
+                             $statusOrder = array_column($steps, 'id');
+                             $currentIndex = array_search($currentStatus, $statusOrder);
+                             if ($currentIndex === false) $currentIndex = -1;
+                             $progressWidth = ($currentIndex >= 0) ? ($currentIndex / (count($steps) - 1)) * 100 : 0;
+                         @endphp
+                         
+                         <div class="space-y-4">
+                             <h5 class="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+                                 <i data-lucide="truck" class="text-brand-500 w-4 h-4"></i> Lộ trình vận đơn
+                             </h5>
+                             
+                             <div class="relative pt-4 pb-4">
+                                 <!-- Bounded Progress Track -->
+                                 <div class="absolute top-10 left-[12.5%] right-[12.5%] h-[3px] bg-slate-100 hidden md:block rounded-full">
+                                     <div class="absolute inset-y-0 left-0 bg-brand-500 rounded-full transition-all duration-500" :style="{ width: '{{ $progressWidth }}%' }"></div>
+                                 </div>
+
+                                 <div class="relative flex flex-col md:flex-row justify-between items-start gap-6 md:gap-4">
+                                     @foreach($steps as $idx => $step)
+                                         @php
+                                             $isCompleted = $idx <= $currentIndex;
+                                             $isActive = $idx == $currentIndex;
+                                         @endphp
+                                         <div class="flex flex-row md:flex-col items-center gap-3 flex-1 w-full {{ !$isCompleted && !$isActive ? 'opacity-40' : '' }}">
+                                             <div class="relative shrink-0">
+                                                 @if($isActive)
+                                                     <div class="absolute inset-0 rounded-full bg-brand-500/20 animate-ping"></div>
+                                                 @endif
+                                                 <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 relative border-2 transition-all {{
+                                                     $isCompleted ? 'bg-brand-500 border-brand-500 text-white shadow-xs' :
+                                                     ($isActive ? 'bg-white border-brand-500 text-brand-500 shadow-sm' :
+                                                     'bg-white border-slate-200 text-slate-400')
+                                                 }}">
+                                                     @if($isCompleted && !$isActive) 
+                                                         <i data-lucide="check" class="w-4 h-4"></i> 
+                                                     @else 
+                                                         <i data-lucide="{{ $step['icon'] }}" class="w-4 h-4"></i> 
+                                                     @endif
+                                                 </div>
+                                             </div>
+                                             <div class="text-left md:text-center">
+                                                 <p class="text-xs font-black uppercase tracking-wider {{ $isActive || $isCompleted ? 'text-brand-500' : 'text-slate-500' }}">
+                                                     {{ $step['status'] }}
+                                                 </p>
+                                                 <p class="text-[10px] text-slate-400 font-semibold mt-0.5 leading-none">VNTech Logistics</p>
+                                                 <p class="text-[10px] mt-1 font-semibold leading-relaxed {{ $isActive ? 'text-brand-500 font-extrabold' : 'text-slate-400' }}">
+                                                     {{ $step['note'] }}
+                                                 </p>
+                                             </div>
+                                         </div>
+                                     @endforeach
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- RECIPIENT & BILLING DETAILS -->
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+                             <div class="space-y-3">
+                                 <h5 class="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+                                     <i data-lucide="map-pin" class="text-brand-500 w-4 h-4"></i> Thông tin nhận hàng
+                                 </h5>
+                                 <div class="space-y-2 text-xs text-slate-500 leading-relaxed bg-slate-50/50 p-4.5 rounded-2xl border border-slate-200/60">
+                                     <p class="text-slate-800 font-bold text-sm">{{ $o->ho_ten_nguoi_nhan }}</p>
+                                     <p class="font-medium text-xs">Số điện thoại: <span class="font-bold text-slate-700">{{ $o->so_dien_thoai_nhan }}</span></p>
+                                     <p class="font-medium text-xs">Địa chỉ giao hàng: <span class="text-slate-700 font-semibold">{{ $o->dia_chi_giao_hang }}</span></p>
+                                 </div>
+                             </div>
+
+                             <div class="bg-slate-50/50 p-4.5 border border-slate-200/60 rounded-2xl text-xs">
+                                 <h5 class="text-xs font-black uppercase text-slate-500 tracking-wider mb-3 leading-none">Chi tiết thanh toán</h5>
+                                 <div class="space-y-2.5">
+                                     <div class="flex justify-between text-slate-400 font-medium">
+                                         <span>TỔNG TIỀN HÀNG</span>
+                                         <span class="font-bold text-slate-600">{{ number_format((float) ($o->tong_tien_hang ?? 0), 0, ',', '.') }}₫</span>
+                                     </div>
+                                     <div class="flex justify-between text-slate-400 font-medium">
+                                         <span>PHÍ VẬN CHUYỂN</span>
+                                         <span class="font-bold text-slate-600">{{ number_format((float) ($o->phi_van_chuyen ?? 0), 0, ',', '.') }}₫</span>
+                                     </div>
+                                     @if($o->gia_tri_giam_voucher > 0)
+                                     <div class="flex justify-between text-slate-400 font-medium">
+                                         <span>GIẢM VOUCHER</span>
+                                         <span class="text-red-500 font-bold">-{{ number_format((float) ($o->gia_tri_giam_voucher ?? 0), 0, ',', '.') }}₫</span>
+                                     </div>
+                                     @endif
+                                     <div class="pt-2 mt-2 border-t border-slate-200 flex justify-between items-center">
+                                         <span class="font-black text-slate-700 text-xs uppercase tracking-wider">TỔNG THANH TOÁN</span>
+                                         <span class="text-base font-black text-brand-500">{{ number_format((float) ($o->tong_thanh_toan ?? 0), 0, ',', '.') }}₫</span>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                    </div>
                 </div>
-            </div>
-        </section>
-        @else
-        <!-- Placeholder khi chưa chọn đơn hàng -->
-        <section class="w-full bg-[#1a1c1c]/30 border border-white/5 border-dashed rounded-xl overflow-hidden py-32 flex flex-col items-center justify-center animate-fadeInUp">
-            <div class="relative mb-6">
-                <div class="absolute inset-0 bg-neon-green/20 blur-xl rounded-full"></div>
-                <i data-lucide="mouse-pointer-click" class="w-16 h-16 text-neon-green relative z-10 animate-bounce"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-100 uppercase tracking-widest mb-2">Chưa chọn đơn hàng</h2>
-            <p class="text-gray-500 text-sm tracking-wider uppercase">Hãy chọn một đơn hàng từ danh sách bên trên để xem chi tiết</p>
-        </section>
-        @endif
+                @endforeach
+            @endisset
+        </div>
     </main>
 </div>
 @endsection

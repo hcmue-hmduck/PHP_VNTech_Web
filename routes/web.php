@@ -16,15 +16,14 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AiController;
 
-Route::get('/', [HomeController::class, 'viewHome'])->name('viewHome');
+Route::get('/', [HomeController::class, 'viewHome'])->name('home.index');
+Route::get('/products', [HomeController::class, 'viewHomeProducts'])->name('home.products');
+Route::get('/news', [HomeController::class, 'viewHomeNews'])->name('home.news');
+Route::view('/support', 'homeUI.support')->name('support');
+Route::view('/contact', 'homeUI.contact')->name('contact');
+Route::get('/product-detail/{ma_san_pham}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 
 Route::post('/momo/ipn', [PaymentController::class, 'momoIpn'])->name('momo.ipn');
-
-Route::get('/product-detail/{ma_don_hang}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
-
-Route::view('/ho-tro', 'homeUI.support')->name('support');
-Route::view('/chinh-sach', 'homeUI.policy')->name('policy');
-Route::view('/lien-he', 'homeUI.contact')->name('contact');
 
 // chatbot
 Route::get('/chat/history', [AiController::class, 'history'])->name('chat.history');
@@ -67,6 +66,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/user-address', [UserAddressController::class, 'storeAddress'])->name('user-address.store');
     Route::put('/user-address/{user_address}/edit', [UserAddressController::class, 'updateAddress'])->name('user-address.update');
     Route::post('user-address/{user_address}/destroy', [UserAddressController::class, 'destroyAddress'])->name('user-address.destroy');
+    Route::post('/user-address/{user_address}/set-default', [UserAddressController::class, 'setDefaultAddress'])->name('user-address.set-default');
     Route::get('/user-address/{ma_dia_chi}/select', [UserAddressController::class, 'selectAddressGet'])->name('user-address.select');
 
     Route::get('/checkout/{ma_bien_the?}', [PaymentController::class, 'viewPayment'])->name('payment.view');

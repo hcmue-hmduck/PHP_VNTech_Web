@@ -27,4 +27,15 @@ class HomeController extends Controller {
             ])->get();
         return view('homeUI.home', compact('brands', 'categories', 'products', 'flashSales'));
     }
+
+    public function viewHomeProducts() {
+        $products = Product::where('trang_thai', 'active')->latest()->get();
+        $categories = Category::latest()->get();
+        $brands = Brand::latest()->get();
+        return view('homeUI.listProduct', compact('products', 'categories', 'brands'));
+    }
+
+    public function viewHomeNews() {
+        return view('homeUI.news');
+    }
 }

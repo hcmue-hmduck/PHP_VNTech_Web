@@ -3,43 +3,215 @@
 @section('title', 'VNTECH | Laptop, PC, Linh kiện máy tính giá rẻ')
 
 @section('content')
-<div class="bg-[#121414] text-white font-['Inter'] selection:bg-lime-400 selection:text-black min-h-screen">
+@php
+    $categoriesMap = [];
+    foreach($categories as $cat) {
+        $categoriesMap[$cat->ma_danh_muc] = $cat->ten_danh_muc;
+    }
+
+    $promoLabels = [
+        ['text' => 'Trả Góp 0%', 'bg' => 'bg-amber-500 text-white'],
+        ['text' => 'Bảo Hành 24T', 'bg' => 'bg-[#0058bc] text-white'],
+        ['text' => 'Chính Hãng 100%', 'bg' => 'bg-emerald-600 text-white'],
+        ['text' => 'Freeship Toàn Quốc', 'bg' => 'bg-[#ff5c00] text-white'],
+    ];
+
+    $bestSellerCategoriesList = [['id' => 'all', 'name' => 'Tất cả']];
+    foreach($categories->take(5) as $cat) {
+        $bestSellerCategoriesList[] = [
+            'id' => (string)$cat->ma_danh_muc,
+            'name' => (string)$cat->ten_danh_muc
+        ];
+    }
+
+    $bestSellerProductsList = [];
+    foreach($products as $index => $prod) {
+        $categoryName = $categoriesMap[$prod->ma_danh_muc] ?? 'Khác';
+        $selectedLabel = $promoLabels[$index % count($promoLabels)];
+        $bestSellerProductsList[] = [
+            'id' => (string)$prod->ma_san_pham,
+            'name' => (string)$prod->ten_san_pham,
+            'ma_danh_muc' => (string)$prod->ma_danh_muc,
+            'category' => (string)$categoryName,
+            'mo_ta_ngan' => (string)($prod->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.'),
+            'price' => (int)$prod->gia_thap_nhat,
+            'originalPrice' => (int)($prod->gia_thap_nhat * 1.25),
+            'image' => (string)($prod->link_anh_dai_dien ?? 'https://via.placeholder.com/400'),
+            'promoText' => $selectedLabel['text'],
+            'promoBg' => $selectedLabel['bg'],
+            'rating' => 4 + ($prod->luot_xem % 2 ? 0.8 : 0.5),
+            'reviewsCount' => (int)($prod->luot_xem * 2.5 + 4),
+        ];
+    }
+@endphp
+<div class="bg-[#FAF8F2] text-slate-800 font-['Inter'] selection:bg-brand-500/20 selection:text-brand-500 min-h-screen" x-data="{ activeCategories: [] }">
     @vite(['resources/css/home.css'])
 
 
-    <!-- Hero Section -->
-    <section class="relative h-[870px] flex flex-col items-center justify-center text-center px-4 overflow-hidden" id="hero-section">
-        <div class="absolute inset-0 z-0">
-            <video autoplay loop muted playsinline class="w-full h-full object-cover opacity-40">
-                <source src="{{ asset('category-page-blade-family-2025-main-web-kv-loop-nocompress.mp4') }}" type="video/mp4">
-            </video>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#121414] via-transparent to-transparent"></div>
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-transparent"></div>
-        </div>
-        <div class="relative z-10 space-y-8 max-w-5xl">
-            <div class="inline-block px-4 py-1 border border-lime-400/30 rounded-full bg-lime-400/10 text-lime-400 text-xs font-bold tracking-[0.2em] uppercase mb-4 transition-all hover:bg-lime-400/20" id="hero-badge">
-                PHẦN CỨNG THẾ HỆ MỚI ĐÃ RA MẮT
+    <!-- HERO BANNER SLIDER with robust layout match -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-8 pt-6" x-data="{
+        activeSlide: 0,
+        banners: [
+            { image: '/iphone_banner.png', url: '/product-detail/6a16db4f38f4a607df0c0e6f' },
+            { image: '/asus_banner.png', url: '/product-detail/6a16db5038f4a607df0c0e7b' },
+            { image: '/rtx_banner.png', url: '/product-detail/6a16db5338f4a607df0c0e99' }
+        ],
+        init() {
+            setInterval(() => {
+                this.activeSlide = (this.activeSlide + 1) % this.banners.length;
+            }, 8500);
+        }
+    }">
+        <div class="relative bg-white rounded-[32px] border border-slate-100 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] aspect-[1200/400] md:aspect-[1200/450] flex items-center transition-all duration-500">
+            <!-- Slides Wrapper -->
+            <div class="w-full h-full relative">
+                <template x-for="(banner, index) in banners" :key="index">
+                    <div x-show="activeSlide === index"
+                         x-transition:enter="transition ease-out duration-700 absolute inset-0"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-500 absolute inset-0"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="w-full h-full">
+                        <a :href="banner.url" class="block w-full h-full group">
+                            <img :src="banner.image" 
+                                 alt="VNTech Promotion Banner" 
+                                 class="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-700" 
+                                 referrerpolicy="no-referrer" />
+                        </a>
+                    </div>
+                </template>
             </div>
-            <h1 class="font-['Space_Grotesk'] text-[72px] md:text-[90px] uppercase italic tracking-tighter leading-none glow-text font-bold" id="hero-title">
-                BỨT PHÁ SỨC MẠNH CÙNG <span class="text-lime-400">VNTECH</span>
-            </h1>
-            <p class="text-lg text-slate-400 max-w-2xl mx-auto" id="hero-description">
-                Trải nghiệm hiệu năng đỉnh cao cùng hệ sinh thái VNTech mới. Thiết kế tối ưu cho mọi tác vụ đồ họa và chiến game mượt mà.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4" id="hero-actions">
-                <button onclick="document.getElementById('product-grid-section').scrollIntoView({ behavior: 'smooth' })" class="bg-lime-400 text-black px-10 py-4 rounded-none font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,229,91,0.4)]" id="btn-explore">
-                    Khám Phá Sản Phẩm
-                </button>
+
+            <!-- Slider Arrows -->
+            <button @click="activeSlide = (activeSlide - 1 + banners.length) % banners.length"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center bg-white/90 hover:bg-white text-neutral-800 hover:text-brand-500 w-12 h-12 rounded-full shadow-md border border-neutral-200 transition-all duration-300 z-30 focus:outline-none focus:ring-2 focus:ring-brand-500/50 group"
+                    title="Slide trước">
+                <svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <button @click="activeSlide = (activeSlide + 1) % banners.length"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center bg-white/90 hover:bg-white text-neutral-800 hover:text-brand-500 w-12 h-12 rounded-full shadow-md border border-neutral-200 transition-all duration-300 z-30 focus:outline-none focus:ring-2 focus:ring-brand-500/50 group"
+                    title="Slide sau">
+                <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+
+            <!-- Slider Dot Indicators -->
+            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                <template x-for="(banner, index) in banners" :key="index">
+                    <button @click="activeSlide = index"
+                            class="w-3 h-3 rounded-full transition-all duration-300"
+                            :class="activeSlide === index ? 'bg-brand-500 w-8' : 'bg-neutral-300 hover:bg-neutral-400'"
+                            :title="'Trang ' + (index + 1)"></button>
+                </template>
             </div>
         </div>
     </section>
 
+    <!-- TRUST FEATURE BADGES -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-8 py-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Badge 1 -->
+            <div class="flex items-center gap-4 p-6 bg-white border border-slate-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.035)] hover:-translate-y-1 transition-all duration-300 text-left">
+                <div class="p-3 bg-brand-50 text-brand-500 rounded-xl">
+                    <i data-lucide="truck" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h4 class="font-extrabold text-neutral-900 text-sm">Miễn phí vận chuyển</h4>
+                    <p class="text-xs text-neutral-500">Đơn hàng từ 500.000₫</p>
+                </div>
+            </div>
+            <!-- Badge 2 -->
+            <div class="flex items-center gap-4 p-6 bg-white border border-slate-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.035)] hover:-translate-y-1 transition-all duration-300 text-left">
+                <div class="p-3 bg-brand-50 text-brand-500 rounded-xl">
+                    <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h4 class="font-extrabold text-neutral-900 text-sm">Đổi trả dễ dàng</h4>
+                    <p class="text-xs text-neutral-500">Trong vòng 7 ngày</p>
+                </div>
+            </div>
+            <!-- Badge 3 -->
+            <div class="flex items-center gap-4 p-6 bg-white border border-slate-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.035)] hover:-translate-y-1 transition-all duration-300 text-left">
+                <div class="p-3 bg-brand-50 text-brand-500 rounded-xl">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h4 class="font-extrabold text-neutral-900 text-sm">Thanh toán an toàn</h4>
+                    <p class="text-xs text-neutral-500">Bảo mật tuyệt đối</p>
+                </div>
+            </div>
+            <!-- Badge 4 -->
+            <div class="flex items-center gap-4 p-6 bg-white border border-slate-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.035)] hover:-translate-y-1 transition-all duration-300 text-left">
+                <div class="p-3 bg-brand-50 text-brand-500 rounded-xl">
+                    <i data-lucide="phone-call" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h4 class="font-extrabold text-neutral-900 text-sm">Hỗ trợ 24/7</h4>
+                    <p class="text-xs text-neutral-500">Hotline: 1900 1234</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <!-- RECTANGULAR BUBBLES CATEGORIES SHOWCASE AREA -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-8 py-4">
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.015)]">
+            <div class="flex items-center justify-between mb-8 pb-3 border-b border-slate-100">
+                <h3 class="font-['Space_Grotesk'] font-black text-xl text-slate-800 border-l-4 border-accent-500 pl-3.5">
+                    Danh mục công nghệ hàng đầu
+                </h3>
+                <a 
+                    href="{{ route('home.products') }}"
+                    class="text-xs font-bold text-accent-500 hover:text-accent-600 transition-colors duration-300"
+                >
+                    Xem tất cả và lọc thiết bị &gt;
+                </a>
+            </div>
+
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-4 text-center">
+                @foreach($categories->take(8) as $cat)
+                    @php
+                        $iconMap = [
+                            'Điện thoại' => 'smartphone',
+                            'Laptop' => 'laptop',
+                            'Máy tính để bàn' => 'monitor',
+                            'Linh kiện máy tính' => 'cpu',
+                            'Gaming Gear' => 'gamepad-2',
+                            'CPU' => 'cpu',
+                            'Card đồ họa' => 'layers',
+                            'RAM' => 'database',
+                            'Ổ cứng SSD' => 'hard-drive',
+                            'Bàn phím' => 'keyboard',
+                            'Chuột' => 'mouse',
+                            'Tai nghe' => 'headphones',
+                        ];
+                        $icon = $iconMap[$cat->ten_danh_muc] ?? 'cpu';
+                    @endphp
+                    <a
+                        href="{{ route('home.products', ['category' => $cat->ten_danh_muc]) }}"
+                        class="flex flex-col items-center gap-2 group outline-none cursor-pointer"
+                    >
+                        <div class="w-16 h-16 rounded-full border flex items-center justify-center transition-all duration-300 bg-slate-50 border-slate-100 text-slate-600 group-hover:bg-gradient-to-r group-hover:from-brand-500 group-hover:to-brand-600 group-hover:border-transparent group-hover:text-white group-hover:-translate-y-1.5 group-hover:shadow-[0_10px_20px_rgba(255,79,0,0.15)] shadow-xs">
+                            <i data-lucide="{{ $icon }}" class="w-5.5 h-5.5"></i>
+                        </div>
+                        <span class="text-[11px] font-extrabold transition-colors mt-2 text-slate-500 group-hover:text-brand-500">
+                            {{ $cat->ten_danh_muc }}
+                        </span>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
     <style>
         #flash-sale-section {
-            background: rgba(0, 0, 0, 0.4) !important;
-            padding: 80px 0;
+            background: transparent !important;
+            padding: 40px 0;
         }
         .flash-wrapper {
             position: relative;
@@ -47,59 +219,27 @@
             width: 100%;
             max-width: 1400px;
             margin: 30px auto;
-            background: linear-gradient(180deg, #0f1112 0%, #070809 100%);
-            border: 3px solid #00ff66;
+            background: radial-gradient(circle at 10% 20%, #0f172a 0%, #070a13 90%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 28px;
-            box-shadow:
-                0 4px 15px rgba(0, 255, 102, 0.15),
-                0 8px 30px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: visible;
             padding-bottom: 24px;
         }
         .flash-top {
-            position: absolute;
-            top: -42px;
-            left: 50px;
-            width: calc(100% - 100px);
-            height: 44px;
-            background: linear-gradient(90deg, #00ff66, #008833);
-            clip-path: polygon(6% 0%, 94% 0%, 97% 20%, 98.5% 60%, 100% 100%, 0% 100%, 1.5% 60%, 3% 20%);
-            border-radius: 0;
-            z-index: 5;
-            opacity: 0.95;
+            display: none;
         }
         .flash-label {
-            position: absolute;
-            top: -55px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 280px;
-            height: 52px;
-            background: linear-gradient(180deg, #020304, #0b0d0e);
-            border: 2px solid #00ff66;
-            border-radius: 18px 18px 8px 8px;
-            color: #00ff66;
-            font-weight: 900;
-            font-size: 22px;
-            font-style: italic;
-            text-transform: uppercase;
-            box-shadow: 0 4px 20px rgba(0,255,102,0.4), inset 0 0 10px rgba(0,255,102,0.1);
-            z-index: 10;
-            text-shadow: 0 0 12px rgba(0, 255, 102, 0.6);
-            letter-spacing: 0.08em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            display: none;
         }
         .flash-header {
-            height: 70px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 30px 0 30px;
+            padding: 24px 30px;
             position: relative;
             z-index: 20;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         .date-tabs {
             display: flex;
@@ -108,51 +248,55 @@
         .date-tab {
             padding: 0 16px;
             height: 36px;
-            background: #121414;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
             font-weight: 800;
             font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
+        }
+        .date-tab:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
         }
         .date-tab.active {
-            background: #00ff66;
-            color: #000;
-            border-color: #00ff66;
-            box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
+            background: linear-gradient(135deg, #ff4f00 0%, #ff007a 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(255, 79, 0, 0.35);
         }
         .countdown {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: white;
+            color: #ffffff;
             font-weight: 900;
             font-size: 16px;
         }
         .time-box {
-            width: 34px;
-            height: 34px;
-            background: #121414;
-            color: #00ff66;
-            border: 1px solid rgba(0, 255, 102, 0.3);
-            border-radius: 6px;
-            font-size: 20px;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: #ff4f00;
+            border: 1px solid rgba(255, 79, 0, 0.3);
+            border-radius: 8px;
+            font-size: 18px;
             font-weight: 900;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 8px rgba(0, 255, 102, 0.1);
+            box-shadow: 0 0 15px rgba(255, 79, 0, 0.1);
         }
         .time-separator {
-            color: #00ff66;
-            font-size: 24px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 20px;
             font-weight: 900;
-            text-shadow: 0 0 5px rgba(0, 255, 102, 0.5);
         }
         .flash-product-list {
             display: grid;
@@ -177,34 +321,34 @@
 
         .sold-bar {
             height: 18px;
-            background: #070809;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 999px;
-            color: white;
+            color: #f1f5f9;
             font-size: 10px;
             font-weight: 800;
             text-align: center;
             line-height: 16px;
             overflow: hidden;
             position: relative;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             margin-top: 12px;
             width: 100%;
         }
         .sold-progress {
             height: 100%;
-            background: linear-gradient(90deg, #008833, #00ff66);
+            background: linear-gradient(90deg, #ff4f00 0%, #ff007a 100%);
             border-radius: 999px;
             position: absolute;
             left: 0;
             top: 0;
             z-index: 1;
+            box-shadow: 0 0 8px rgba(255, 79, 0, 0.5);
         }
         .sold-text {
             position: relative;
             z-index: 2;
             display: block;
             width: 100%;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
             line-height: 16px;
         }
 
@@ -218,11 +362,11 @@
             background: transparent;
         }
         .filter-scrollable::-webkit-scrollbar-thumb {
-            background: rgba(163, 230, 53, 0.2);
+            background: rgba(12, 135, 235, 0.1);
             border-radius: 999px;
         }
         .filter-scrollable::-webkit-scrollbar-thumb:hover {
-            background: rgba(163, 230, 53, 0.5);
+            background: rgba(12, 135, 235, 0.3);
         }
 
     </style>
@@ -284,36 +428,34 @@
         }
     }">
         <div class="flash-wrapper">
-            <div class="flash-top"></div>
-            <div class="flash-label">
-                <svg class="w-6 h-6 text-[#00ff66] fill-[#00ff66] animate-pulse" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-                <span>FLASHSALE</span>
-            </div>
+            <div class="flash-header flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 border-b border-slate-800">
+                <div class="flex items-center gap-4 flex-wrap">
+                    <h2 class="font-display font-black text-2xl text-white flex items-center gap-2">
+                        <i data-lucide="bolt" class="w-6 h-6 text-brand-500 fill-brand-500"></i>
+                        FLASH SALE
+                    </h2>
+                    
+                    <div class="countdown flex items-center gap-1.5 font-mono">
+                        <span class="time-box" x-text="days">00</span>
+                        <span class="time-separator text-white font-extrabold">:</span>
+                        <span class="time-box" x-text="hours">00</span>
+                        <span class="time-separator text-white font-extrabold">:</span>
+                        <span class="time-box" x-text="minutes">00</span>
+                        <span class="time-separator text-white font-extrabold">:</span>
+                        <span class="time-box" x-text="seconds">00</span>
+                    </div>
+                </div>
 
-            <div class="flash-header">
-                <div class="date-tabs">
+                <div class="date-tabs flex gap-2">
                     @foreach($flashSales as $campaign)
                     <button 
                         @click="activeCampaignId = '{{ $campaign->id }}'"
                         :class="activeCampaignId === '{{ $campaign->id }}' ? 'active' : ''"
-                        class="date-tab"
+                        class="date-tab text-xs font-bold px-3 py-1.5 rounded-full border border-neutral-200 transition-all"
                     >
                         {{ $campaign->ten_flash_sales }}
                     </button>
                     @endforeach
-                </div>
-
-                <div class="countdown">
-                    <span>KẾT THÚC SAU</span>
-                    <span class="time-box" x-text="days">00</span>
-                    <span class="time-separator">:</span>
-                    <span class="time-box" x-text="hours">00</span>
-                    <span class="time-separator">:</span>
-                    <span class="time-box" x-text="minutes">00</span>
-                    <span class="time-separator">:</span>
-                    <span class="time-box" x-text="seconds">00</span>
                 </div>
             </div>
 
@@ -331,31 +473,39 @@
                              x-transition:enter="transition ease-out duration-300"
                              x-transition:enter-start="opacity-0 transform scale-95"
                              x-transition:enter-end="opacity-100 transform scale-100"
-                             class="product-item group bg-slate-900/80 border border-white/10 rounded-2xl overflow-hidden hover:border-lime-400/50 hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                             class="product-item group bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden hover:border-brand-500/50 hover:-translate-y-1.5 hover:shadow-[0_15px_30px_rgba(255,79,0,0.2)] transition-all duration-300 flex flex-col"
                         >
                             <a href="{{ $item->variant ? route('viewProductDetail', $item->variant->ma_san_pham) : '#' }}"
-                               class="aspect-square bg-slate-950 overflow-hidden relative block">
+                               class="aspect-square bg-slate-950/20 flex items-center justify-center p-6 border-b border-slate-800/80 overflow-hidden relative block">
+                                @if($phanTramGiam > 0)
+                                    <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wider z-10">
+                                        -{{ $phanTramGiam }}%
+                                    </div>
+                                @endif
                                 <img
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
+                                    class="w-full h-full object-contain group-hover:scale-110 transition-all duration-700"
                                     src="{{ $item->variant->link_anh_bien_the ?? $item->variant->product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
                                     alt="{{ $item->variant->ten_bien_the ?? 'Sản phẩm Flash Sale' }}"
                                 >
                             </a>
 
-                            <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div class="p-5 flex-1 flex flex-col justify-between text-left">
                                 <div>
-                                    <h5 class="font-black uppercase text-sm text-white text-center line-clamp-1 group-hover:text-lime-400 transition-colors">
+                                    <h5 class="font-black uppercase text-xs text-slate-100 text-center line-clamp-2 group-hover:text-brand-500 transition-colors leading-tight min-h-[32px]">
                                         {{ $item->variant->ten_bien_the ?? 'Sản phẩm Flash Sale' }}
                                     </h5>
+                                    <p class="text-[10px] text-slate-400 line-clamp-2 leading-relaxed text-center mt-1">
+                                        {{ $item->variant->product->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.' }}
+                                    </p>
                                 </div>
 
-                                <div class="pt-5 space-y-4">
+                                <div class="pt-4 space-y-4">
                                     <div class="text-center">
-                                        <span class="text-lime-400 font-black text-2xl">
+                                        <span class="text-brand-500 font-black text-xl">
                                             {{ number_format($item->gia_flash_sale, 0, ',', '.') }}₫
                                         </span>
                                         @if($item->variant)
-                                        <span class="text-xs text-slate-500 text-center block line-through mt-1">
+                                        <span class="text-[11px] text-slate-500 text-center block line-through mt-0.5">
                                             {{ number_format($item->variant->gia_niem_yet, 0, ',', '.') }}₫
                                         </span>
                                         @endif
@@ -368,12 +518,8 @@
                                     </div>
 
                                      <a href="{{ $item->variant ? route('payment.view', $item->variant->ma_bien_the) : '#' }}"
-                                        class="block w-full rounded-xl py-3 bg-lime-400 text-black font-black text-[10px] uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all text-center">
+                                        class="block w-full rounded-xl py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 text-white font-black text-[10px] uppercase tracking-widest hover:from-brand-600 hover:to-brand-700 hover:shadow-[0_4px_15px_rgba(255,79,0,0.3)] active:scale-95 transition-all text-center">
                                          Săn ngay
-                                     </a>
-                                     <a href="{{ $item->variant ? route('viewProductDetail', $item->variant->ma_san_pham) : '#' }}"
-                                        class="block w-full rounded-xl py-3 bg-white/5 border border-white/10 text-white font-black text-[10px] uppercase tracking-widest hover:bg-white/10 active:scale-95 transition-all text-center">
-                                         Xem chi tiết
                                      </a>
                                 </div>
                             </div>
@@ -381,281 +527,154 @@
                     @endforeach
                 @endforeach
             </div>
-
-
         </div>
     </section>
     @endif
 
-    <!-- Product Grid Section -->
-    <section class="py-20 px-8 md:px-16 w-full max-w-none flex flex-col lg:flex-row gap-12" id="product-grid-section" x-data="{ activeCategories: [] }">
-        <!-- Sidebar Filters -->
-        <aside class="w-full lg:w-80 bg-slate-900 border border-white/5 h-[calc(100vh-140px)] sticky top-24 flex flex-col overflow-hidden rounded-2xl shrink-0" id="sidebar-filters">
-            <div class="flex items-center gap-3 px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
-                <i data-lucide="filter" class="text-lime-400 w-6 h-6"></i>
-                <h3 class="font-bold uppercase tracking-[0.2em] text-base text-lime-400">Lọc Dữ liệu</h3>
-            </div>
-            
-            <div class="space-y-6 filter-scrollable flex-1 pl-6 pr-4 py-6">
-                <div>
-                    <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">Danh mục</h4>
-                    <ul class="space-y-3">
-                        <li class="flex items-center gap-3 group cursor-pointer" @click="activeCategories = []">
-                            <div class="w-4 h-4 border transition-all"
-                                 :class="activeCategories.length === 0 ? 'bg-lime-400 border-lime-400' : 'border-white/20'"></div>
-                            <span class="text-xs uppercase tracking-tight transition-colors"
-                                  :class="activeCategories.length === 0 ? 'text-lime-400 font-bold' : 'text-slate-400 group-hover:text-lime-400'">
-                                Tất cả danh mục
-                            </span>
-                        </li>
-                        @foreach($categories as $cat)
-                        <li class="flex items-center gap-3 group cursor-pointer" @click="activeCategories.includes('{{ $cat->ma_danh_muc }}') ? activeCategories = activeCategories.filter(id => id !== '{{ $cat->ma_danh_muc }}') : activeCategories.push('{{ $cat->ma_danh_muc }}')">
-                            <div class="w-4 h-4 border transition-all"
-                                 :class="activeCategories.includes('{{ $cat->ma_danh_muc }}') ? 'bg-lime-400 border-lime-400' : 'border-white/20'"></div>
-                            <span class="text-xs uppercase tracking-tight transition-colors"
-                                  :class="activeCategories.includes('{{ $cat->ma_danh_muc }}') ? 'text-lime-400 font-bold' : 'text-slate-400 group-hover:text-lime-400'">
-                                {{ $cat->ten_danh_muc }}
-                            </span>
-                        </li>
-                        @endforeach
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">Khoảng giá</h4>
-                    <input class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-lime-400" max="100000000" min="0" step="1000000" type="range"/>
-                    <div class="flex justify-between mt-2 text-[10px] font-mono text-slate-500">
-                        <span>0đ</span>
-                        <span>100.000.000đ+</span>
-                    </div>
-                </div>
-
-                <div>
-                <h4 class="text-[11px] font-bold uppercase text-slate-500 mb-5 tracking-[0.2em]">
-                    Thương hiệu
-                </h4>
-
-                <div class="grid grid-cols-1 gap-3">
-                    @foreach($brands as $brand)
-                        <button
-                            class="group flex items-center gap-3 w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 transition-all duration-300 hover:border-lime-400 hover:bg-lime-400/10"
-                        >
-                            <div class="w-10 h-10 flex items-center justify-center rounded-xl p-1 overflow-hidden shrink-0 border border-white/10 relative {{ !empty($brand->logo_url) ? 'bg-white' : 'bg-white/5' }}">
-                                @if(!empty($brand->logo_url))
-                                    <img
-                                        src="{{ $brand->logo_url }}"
-                                        alt="{{ $brand->ten_thuong_hieu }}"
-                                        class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110"
-                                        onerror="this.style.display='none'; this.parentNode.classList.remove('bg-white'); this.parentNode.classList.add('bg-white/5'); this.nextElementSibling.style.display='flex';"
-                                    >
-                                    <span class="text-xs font-black uppercase text-lime-400 hidden">
-                                        {{ substr($brand->ten_thuong_hieu, 0, 1) }}
-                                    </span>
-                                @else
-                                    <span class="text-xs font-black uppercase text-lime-400 flex">
-                                        {{ substr($brand->ten_thuong_hieu, 0, 1) }}
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div class="flex flex-col text-left">
-                                <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-white">
-                                    {{ $brand->ten_thuong_hieu }}
-                                </span>
-                            </div>
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-                
-                <button @click="activeCategories = []" class="w-full py-4 border border-lime-400 text-lime-400 text-xs font-bold uppercase tracking-widest hover:bg-lime-400/10 transition-all flex items-center justify-center gap-2">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i> Xóa Bộ Lọc
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Grid -->
-        <div class="flex-1 space-y-12">
-
-            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-8">
-                <div>
-                    <h2 class="text-3xl font-black uppercase tracking-tight text-white flex items-center gap-3">
-                        <span class="w-2.5 h-8 bg-lime-400 inline-block"></span>
-                        Danh sách Sản phẩm
-                    </h2>
-                    <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">
-                        Có tất cả {{ count($products) }} sản phẩm đang sẵn có
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-2 bg-white/5 px-4 py-2 border border-white/10 rounded-xl">
-                    <span class="text-[10px] uppercase text-slate-400 font-black tracking-wider">Sắp xếp:</span>
-                    <div class="flex items-center gap-1 text-[10px] text-lime-400 font-black uppercase cursor-pointer tracking-wider">
-                        Mới nhất
-                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                    </div>
-                </div>
+    <!-- 2. BEST SELLERS products showcasing section -->
+    <section id="best-sellers" class="max-w-7xl mx-auto px-4 sm:px-8 py-12"
+             x-data="{
+                selectedCategory: 'all',
+                categories: {{ json_encode($bestSellerCategoriesList) }},
+                products: {{ json_encode($bestSellerProductsList) }},
+                formatVND(value) {
+                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '₫';
+                },
+                get bestSellerProducts() {
+                    if (this.selectedCategory === 'all') return this.products;
+                    return this.products.filter(p => p.ma_danh_muc === this.selectedCategory);
+                },
+                init() {
+                    this.$watch('selectedCategory', () => {
+                        this.$nextTick(() => {
+                            if (window.lucide) window.lucide.createIcons();
+                        });
+                    });
+                    this.$nextTick(() => {
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                }
+             }">
+        <!-- Styled header container block -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.015)] mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div class="space-y-1 text-left">
+                <h2 class="font-['Space_Grotesk'] font-black text-2xl text-slate-800 border-l-4 border-brand-500 pl-3.5 uppercase">
+                    SẢN PHẨM BÁN CHẠY
+                </h2>
+                <p class="text-neutral-400 text-xs font-semibold">Được đánh giá & sắm sửa nhiều nhất tháng này từ TechHub</p>
             </div>
 
-            @foreach($categories as $category)
-                @php
-                    $categoryProducts = $products->where('ma_danh_muc', $category->ma_danh_muc);
-                @endphp
-
-                @if($categoryProducts->count() > 0)
-                    <section class="category-section mb-16" data-category="{{ $category->ma_danh_muc }}" x-show="activeCategories.length === 0 || activeCategories.includes('{{ $category->ma_danh_muc }}')" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0">
-                        <!-- Solid Category Header Bar (VNTech themed) -->
-                        <div class="flex items-center justify-between bg-lime-400 text-black px-6 py-3.5 rounded-2xl mb-8 shadow-lg shadow-lime-400/10 border border-lime-500/20">
-                            <div class="flex items-center gap-3">
-                                <span class="bg-black text-lime-400 text-[10px] font-black px-2.5 py-1 uppercase tracking-widest rounded-lg">
-                                    VNTech
-                                </span>
-                                <h3 class="font-['Space_Grotesk'] text-base md:text-lg font-black uppercase tracking-wider">
-                                    {{ $category->ten_danh_muc }}
-                                </h3>
-                            </div>
-                            
-                            <a href="#" class="text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity flex items-center gap-1.5 border-b-2 border-black/80 pb-0.5">
-                                Tất cả sản phẩm <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                            </a>
-                        </div>
-
-                        <!-- Responsive Product Grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 product-list">
-                            @foreach($categoryProducts as $product)
-                                <div class="product-item group bg-[#111313]/60 border border-white/5 hover:border-lime-400/30 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col relative">
-                                    
-                                    <!-- Product Image Box -->
-                                    <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}"
-                                       class="aspect-square bg-slate-950/80 flex items-center justify-center p-6 border-b border-white/5 overflow-hidden">
-                                        <img
-                                            class="w-full h-full object-contain group-hover:scale-105 transition-all duration-700"
-                                            src="{{ $product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
-                                            alt="{{ $product->ten_san_pham }}"
-                                        >
-                                    </a>
-
-                                    <!-- Product Info Details (Centered) -->
-                                    <div class="p-5 flex-1 flex flex-col justify-between items-center text-center gap-4">
-                                        <div class="space-y-2 text-center">
-                                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}">
-                                                <h5 class="font-['Space_Grotesk'] font-bold text-xs md:text-sm text-slate-200 group-hover:text-lime-400 transition-colors uppercase line-clamp-2 leading-snug text-center">
-                                                    {{ $product->ten_san_pham }}
-                                                </h5>
-                                            </a>
-                                            <p class="text-[10px] text-slate-500 line-clamp-2 text-center">
-                                                {{ $product->mo_ta_ngan }}
-                                            </p>
-                                        </div>
-
-                                        <div class="space-y-3 text-center w-full">
-                                            <div class="flex items-baseline justify-center gap-1.5 w-full">
-                                                <span class="text-lime-400 font-bold text-sm md:text-base text-center">
-                                                    Chỉ từ {{ number_format($product->gia_thap_nhat, 0, ',', '.') }}₫
-                                                </span>
-                                            </div>
-                                            <a href="{{ route('viewProductDetail', $product->ma_san_pham) }}" 
-                                               class="inline-flex items-center justify-center gap-2 w-full py-2 bg-lime-400 hover:bg-lime-500 text-black font-black uppercase text-[10px] tracking-widest transition-all duration-300 rounded-xl hover:scale-[1.03] active:scale-[0.97] shadow-[0_0_15px_rgba(163,230,53,0.1)]">
-                                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Mua ngay
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <div class="pagination mt-8 flex justify-center gap-2"></div>
-                    </section>
-                @endif
-            @endforeach
-
+            <!-- In-tab categorical product filters matched dynamically -->
+            <div class="flex flex-wrap gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/10 shadow-xs">
+                <template x-for="cat in categories" :key="cat.id">
+                    <button
+                        @click="selectedCategory = cat.id"
+                        :class="selectedCategory === cat.id ? 'bg-white text-accent-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)]' : 'text-slate-500 hover:text-slate-900'"
+                        class="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer"
+                        x-text="cat.name"
+                    ></button>
+                </template>
+            </div>
         </div>
-    </section>
 
-    <!-- Tin Công Nghệ Section -->
-    <section class="w-full bg-[#0d0f0f] border-y border-lime-400/10 py-20" id="tech-news">
-        <div class="max-w-[1600px] mx-auto px-16">
-            <div class="flex justify-between items-end mb-12">
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-8 bg-lime-400"></div>
-                        <h2 class="font-['Space_Grotesk'] text-4xl font-bold uppercase tracking-tighter">Tin Công Nghệ</h2>
-                    </div>
-                    <p class="text-slate-500 text-xs uppercase tracking-widest">Cập nhật những xu hướng phần cứng mới nhất từ VNTech</p>
-                </div>
-                <button class="text-xs font-bold text-lime-400 uppercase tracking-[0.2em] hover:opacity-70 transition-all flex items-center gap-2">
-                    Tất cả tin tức <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- News Card 1 -->
-                <div class="group relative bg-[#111313] border border-white/8 overflow-hidden transition-all hover:border-lime-400/50 hover:-translate-y-2">
-                    <div class="h-64 overflow-hidden">
-                        <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&q=80&w=800" alt="Card Đồ Họa">
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <span class="text-[10px] text-lime-400/70 font-bold uppercase tracking-widest">Hardware</span>
-                        <h3 class="font-['Space_Grotesk'] text-2xl font-bold uppercase text-lime-400">Card Đồ Họa Vortex</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">VNTech ra mắt dòng card đồ họa Vortex series mới với hiệu năng vượt trội, hỗ trợ Ray Tracing 2.0 cực đỉnh.</p>
-                        <div class="pt-2">
-                            <button class="text-xs font-bold tracking-widest text-lime-400 uppercase border-b border-lime-400 pb-1 group-hover:pr-4 transition-all flex items-center gap-2">
-                                Xem chi tiết <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                            </button>
+        <!-- Core products grid -->
+        <div x-show="bestSellerProducts.length === 0" class="bg-white rounded-3xl p-12 text-center border border-slate-100" style="display: none;">
+            <p class="text-xs text-neutral-400 font-bold">Hiện tạm hết sản phẩm thuộc liên kết bán chạy.</p>
+        </div>
+
+        <div x-show="bestSellerProducts.length > 0">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <template x-for="product in bestSellerProducts.slice(0, 10)" :key="product.id">
+                    <div
+                        @click="window.location.href = '/product-detail/' + product.id"
+                        class="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer group text-left"
+                    >
+                        <!-- Product Image Panel -->
+                        <div class="relative bg-slate-50/50 aspect-square overflow-hidden flex items-center justify-center p-4 border-b border-slate-100/80">
+                            <img
+                                :src="product.image"
+                                :alt="product.name"
+                                class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                                referrerpolicy="no-referrer"
+                            />
+
+                            <!-- Dynamic Badge Overlays -->
+                            <div class="absolute top-3 left-3 flex gap-2 z-10">
+                                <span
+                                    :class="product.promoBg"
+                                    class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm"
+                                    x-text="product.promoText"
+                                ></span>
+                            </div>
+                        </div>
+
+                        <!-- Info Panel -->
+                        <div class="p-4 flex flex-col flex-1">
+                            <span class="font-sans text-xs text-neutral-400 font-medium tracking-wide mb-1 uppercase" x-text="product.category"></span>
+                            <h3 class="font-['Space_Grotesk'] text-base font-semibold text-slate-800 line-clamp-2 group-hover:text-accent-500 transition-colors min-h-[48px]" x-text="product.name"></h3>
+                            <p class="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed" x-text="product.mo_ta_ngan"></p>
+
+                            <!-- Rating Block -->
+                            <div class="flex items-center gap-1.5 mb-3">
+                                <div class="flex items-center text-yellow-500">
+                                    <template x-for="i in [1, 2, 3, 4, 5]">
+                                        <svg
+                                            class="w-3.5 h-3.5"
+                                            :class="i <= Math.floor(product.rating) ? 'fill-current text-amber-500' : 'text-gray-200'"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                    </template>
+                                </div>
+                                <span class="text-xs text-neutral-400 font-sans">
+                                    (<span x-text="product.reviewsCount"></span>)
+                                </span>
+                            </div>
+
+                            <!-- Price and CTA Block -->
+                            <div class="flex justify-between items-center mt-auto w-full">
+                                <div class="text-left">
+                                    <span class="text-[10px] text-neutral-400 uppercase tracking-widest block font-bold leading-none mb-1">Chỉ từ</span>
+                                    <span class="font-['Space_Grotesk'] text-[15px] font-bold text-accent-600 tracking-tight block leading-none" x-text="formatVND(product.price)"></span>
+                                </div>
+                                <button
+                                    @click.stop="window.location.href = '/product-detail/' + product.id"
+                                    class="w-10 h-10 bg-brand-500 hover:bg-brand-600 hover:shadow-[0_4px_10px_rgba(255,79,0,0.3)] text-white rounded-lg flex items-center justify-center transition-all duration-300 transform active:scale-90"
+                                    title="Xem chi tiết"
+                                >
+                                    <i data-lucide="eye" class="w-5 h-5 text-white"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- News Card 2 -->
-                <div class="group relative bg-[#111313] border border-white/8 overflow-hidden transition-all hover:border-lime-400/50 hover:-translate-y-2">
-                    <div class="h-64 overflow-hidden">
-                        <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&q=80&w=800" alt="VNTech Expo">
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <span class="text-[10px] text-lime-400/70 font-bold uppercase tracking-widest">Events</span>
-                        <h3 class="font-['Space_Grotesk'] text-2xl font-bold uppercase text-lime-400">VNTech Expo 2025</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Sự kiện công nghệ lớn nhất năm 2025, nơi hội tụ các siêu phẩm PC Custom độc bản và giải đấu Esport rực lửa.</p>
-                        <div class="pt-2">
-                            <button class="text-xs font-bold tracking-widest text-lime-400 uppercase border-b border-lime-400 pb-1 group-hover:pr-4 transition-all flex items-center gap-2">
-                                Xem chi tiết <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- News Card 3 -->
-                <div class="group relative bg-[#111313] border border-white/8 overflow-hidden transition-all hover:border-lime-400/50 hover:-translate-y-2">
-                    <div class="h-64 overflow-hidden">
-                        <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&q=80&w=800" alt="Cryo Cooling">
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <span class="text-[10px] text-lime-400/70 font-bold uppercase tracking-widest">Guide</span>
-                        <h3 class="font-['Space_Grotesk'] text-2xl font-bold uppercase text-lime-400">Cryo-Cooling Pro</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Hướng dẫn tối ưu hóa tản nhiệt Cryo-Cooling Pro cho PC Gaming, giữ nhiệt độ luôn ở mức sub-zero cả ngày.</p>
-                        <div class="pt-2">
-                            <button class="text-xs font-bold tracking-widest text-lime-400 uppercase border-b border-lime-400 pb-1 group-hover:pr-4 transition-all flex items-center gap-2">
-                                Xem chi tiết <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                </template>
             </div>
         </div>
     </section>
 
     <!-- Mobile Nav Mockup -->
-    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 bg-slate-950/90 backdrop-blur-lg border-t border-lime-400/20 md:hidden px-4" id="mobile-nav">
-        <button class="flex flex-col items-center justify-center text-lime-400">
-            <i data-lucide="bolt" class="w-6 h-6"></i>
+    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 bg-white/95 backdrop-blur-md border-t border-slate-100 md:hidden px-4 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]" id="mobile-nav">
+        <button class="flex flex-col items-center justify-center text-brand-500">
+            <i data-lucide="bolt" class="w-5 h-5 fill-brand-500"></i>
             <span class="text-[8px] font-bold uppercase mt-1">Trang chủ</span>
         </button>
-        <button class="flex flex-col items-center justify-center text-slate-500">
-            <i data-lucide="gamepad-2" class="w-6 h-6"></i>
+        <button class="flex flex-col items-center justify-center text-slate-400 hover:text-brand-500 transition-colors">
+            <i data-lucide="gamepad-2" class="w-5 h-5"></i>
             <span class="text-[8px] font-bold uppercase mt-1">Cửa hàng</span>
         </button>
-        <button class="flex flex-col items-center justify-center text-slate-500">
-            <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+        <button class="flex flex-col items-center justify-center text-slate-400 hover:text-brand-500 transition-colors">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
             <span class="text-[8px] font-bold uppercase mt-1">Giỏ hàng</span>
         </button>
-        <button class="flex flex-col items-center justify-center text-slate-500">
-            <i data-lucide="user" class="w-6 h-6"></i>
+        <button class="flex flex-col items-center justify-center text-slate-400 hover:text-brand-500 transition-colors">
+            <i data-lucide="user" class="w-5 h-5"></i>
             <span class="text-[8px] font-bold uppercase mt-1">Tài khoản</span>
         </button>
     </nav>

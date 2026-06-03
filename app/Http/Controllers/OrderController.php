@@ -104,10 +104,12 @@ class OrderController extends Controller
             $orderItems->ma_chi_tiet_don_hang = $orderItems->_id;
             $orderItems->save();
 
+            ProductVariant::where('ma_bien_the', $item['ma_bien_the'])->decrement('so_luong_ton_kho', $item['so_luong']);
+
             if (!empty($item['ma_flash_sales'])) {
                 FlashSaleItem::where('ma_flash_sales', $item['ma_flash_sales'])
                     ->where('ma_bien_the', $item['ma_bien_the'])
-                    ->increment('so_luong_da_ban', (int)$item['so_luong']);
+                    ->increment('so_luong_da_ban',  $item['so_luong']);
             }
         }
 

@@ -104,6 +104,18 @@ class UserAddressController extends Controller
         return redirect()->back()->with('success', 'Xoá địa chỉ thành công!');
     }
 
+    public function setDefaultAddress(UserAddress $user_address)
+    {
+        if ($user_address->ma_nguoi_dung != Auth::id()) {
+            return redirect()->back()->with('error', 'Không có quyền thực hiện thao tác này!');
+        }
+
+        UserAddress::where('ma_nguoi_dung', Auth::id())->update(['is_default' => false]);
+        $user_address->update(['is_default' => true]);
+
+        return redirect()->back()->with('success', 'Đã đặt làm địa chỉ mặc định!');
+    }
+
     public function selectAddressGet(string $ma_dia_chi)
     {
         $exists = UserAddress::where('ma_nguoi_dung', Auth::id())

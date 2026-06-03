@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Services\OtpService;
+use App\Models\Order;
+
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +27,8 @@ class UserController extends Controller
     {
         $user = User::where('ma_nguoi_dung', Auth::user()->id)->firstOrFail();
         $user_address = UserAddress::where('ma_nguoi_dung', $user->ma_nguoi_dung)->get();
-        return view('homeUI.user', compact('user', 'user_address'));
+        $orders = Order::where('ma_nguoi_dung', $user->ma_nguoi_dung)->latest()->get();
+        return view('homeUI.user', compact('user', 'user_address', 'orders'));
     }
 
     public function viewUsersAdmin()

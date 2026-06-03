@@ -113,7 +113,7 @@
                 <!-- Profile Footer -->
                 <div class="border-t border-white/5 pt-6 mt-auto">
                     <!-- Nút Quay lại Trang chủ dài -->
-                    <a href="{{ route('viewHome') }}" class="flex items-center justify-center gap-2 w-full py-3 mb-4 rounded-xl bg-neon-green/10 border border-neon-green/20 text-neon-green hover:bg-neon-green/20 font-bold text-xs uppercase tracking-widest transition-all duration-300">
+                    <a href="{{ route('home.index') }}" class="flex items-center justify-center gap-2 w-full py-3 mb-4 rounded-xl bg-neon-green/10 border border-neon-green/20 text-neon-green hover:bg-neon-green/20 font-bold text-xs uppercase tracking-widest transition-all duration-300">
                         <i data-lucide="home" class="size-4"></i>
                         <span>Quay lại Trang chủ</span>
                     </a>
