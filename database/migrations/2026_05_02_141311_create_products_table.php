@@ -29,6 +29,9 @@ return new class extends Migration
 
             $collection->integer('luot_xem')->default(0);
             $collection->decimal('gia_thap_nhat', 15, 2)->default(0);
+            $collection->decimal('so_sao_trung_binh', 3, 2)->default(0);
+            $collection->integer('so_luot_danh_gia')->default(0);
+            $collection->integer('tong_so_sao')->default(0);
 
             $collection->timestamps();
         });

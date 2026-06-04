@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_items', function (Blueprint $collection) {
+            $collection->string('ma_chi_tiet_don_hang')->nullable()->index();
             $collection->string('ma_don_hang')->index();
             $collection->string('ma_bien_the')->index();
             $collection->string('ten_san_pham');

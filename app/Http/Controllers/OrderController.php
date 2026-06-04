@@ -13,6 +13,7 @@ use App\Models\Voucher;
 use App\Models\FlashSaleItem;
 use App\Models\User;
 use App\Models\Notification;
+use App\Models\Review;
 use App\OrderStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -46,7 +47,7 @@ class OrderController extends Controller
         if ($order) {
             $order->trang_thai = $request->trang_thai;
             $order->save();
-            
+
             $customer = User::where('ma_nguoi_dung', $order->ma_nguoi_dung)->first();
             if ($customer && $customer->email) {
                 Mail::to($customer->email)->send(new OrderNotificationMail($order));
@@ -91,7 +92,7 @@ class OrderController extends Controller
         }
         return redirect()->back()->with('error', 'Không tìm thấy đơn hàng!');
     }
-    
+
     public function storeCreateOrder(Request $request)
     {
         $data = $request->validate([
@@ -175,9 +176,16 @@ class OrderController extends Controller
         if ($request->filled('ma_voucher')) {
             Voucher::where('ma_voucher', $request->ma_voucher)->increment('da_dung');
         }
-        
+
         if ($paymentMethod === 'momo') {
-            return redirect()->route('momo.create', ['ma_don_hang' => $order->ma_don_hang]);
+            $totalBill = $data['tong_thanh_toan'];
+
+            if ($totalBill != 0) {
+                return redirect()->route('momo.create', ['ma_don_hang' => $order->ma_don_hang]);
+            }
+
+            $order['trang_thai'] = OrderStatus::WAITING_PICKUP;
+            $order->save();
         }
 
         $customer = User::where('ma_nguoi_dung', $order->ma_nguoi_dung)->first();
@@ -195,6 +203,7 @@ class OrderController extends Controller
             ->where('ma_nguoi_dung', $userId)
             ->firstOrFail();
         $orders = Order::where('ma_nguoi_dung', $userId)->latest()->get();
+        $this->attachReviewActions($orders, $userId);
         $orderItems = OrderItem::where('ma_don_hang', $request->ma_don_hang)->with('variant.product')->get();
         return view('homeUI.orderDetail', compact('order', 'orders', 'orderItems'));
     }
@@ -203,6 +212,61 @@ class OrderController extends Controller
     {
         $userId = Auth::user()->id;
         $orders = Order::where('ma_nguoi_dung', $userId)->latest()->get();
+        $this->attachReviewActions($orders, $userId);
         return view('homeUI.orderDetail', compact('orders'));
+    }
+
+    private function attachReviewActions($orders, string $userId): void
+    {
+        foreach ($orders as $order) {
+            $order->review_is_expired = $this->isReviewExpired($order);
+            $order->review_action = $this->resolveReviewAction($order, $userId);
+        }
+    }
+
+    private function resolveReviewAction(Order $order, string $userId): string
+    {
+        if ($order->trang_thai !== OrderStatus::DELIVERED->value) {
+            return 'none';
+        }
+
+        $orderItemIds = OrderItem::where('ma_don_hang', $order->ma_don_hang)
+            ->pluck('ma_chi_tiet_don_hang')
+            ->filter()
+            ->values();
+
+        if ($orderItemIds->isEmpty()) {
+            return 'none';
+        }
+
+        $reviewedItemCount = Review::where('ma_don_hang', $order->ma_don_hang)
+            ->where('ma_nguoi_dung', $userId)
+            ->where('is_deleted', '!=', true)
+            ->whereIn('ma_chi_tiet_don_hang', $orderItemIds->all())
+            ->pluck('ma_chi_tiet_don_hang')
+            ->filter()
+            ->unique()
+            ->count();
+
+        if ($reviewedItemCount >= $orderItemIds->count()) {
+            return 'view';
+        }
+
+        $canCreateReview = !$this->isReviewExpired($order);
+
+        if ($canCreateReview) {
+            return 'create';
+        }
+
+        return $reviewedItemCount > 0 ? 'view' : 'none';
+    }
+
+    private function isReviewExpired(Order $order): bool
+    {
+        if ($order->trang_thai !== OrderStatus::DELIVERED->value) {
+            return false;
+        }
+
+        return !($order->created_at?->greaterThanOrEqualTo(now()->subDays(30)) ?? false);
     }
 }

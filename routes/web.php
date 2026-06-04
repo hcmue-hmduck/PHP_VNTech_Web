@@ -17,6 +17,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AiController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\BannerImagesController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('home.index');
 Route::get('/products', [HomeController::class, 'viewHomeProducts'])->name('home.products');
@@ -24,6 +25,7 @@ Route::get('/news', [HomeController::class, 'viewHomeNews'])->name('home.news');
 Route::view('/support', 'homeUI.support')->name('support');
 Route::view('/contact', 'homeUI.contact')->name('contact');
 Route::get('/product-detail/{ma_san_pham}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
+Route::get('/products/{ma_san_pham}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 
 Route::post('/momo/ipn', [PaymentController::class, 'momoIpn'])->name('momo.ipn');
 
@@ -76,7 +78,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/order/create', [OrderController::class, 'storeCreateOrder'])->name('order.store');
     Route::get('/orders', [OrderController::class, 'viewOrder'])->name('order.view');
+    Route::get('/orders/{ma_don_hang}/reviews', [ReviewController::class, 'byOrder'])->name('reviews.by-order');
     Route::get('/orders/{ma_don_hang}', [OrderController::class, 'viewOrderDetail'])->name('order_detail.view');
+
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
 
     Route::get('/momo/create/{ma_don_hang}', [PaymentController::class, 'createMomoPayment'])->name('momo.create');
     Route::get('/momo/return', [PaymentController::class, 'momoReturn'])->name('momo.return');

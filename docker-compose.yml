@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: vntech-app
+    working_dir: /var/www/PHP_VNTech_Web
+    volumes:
+      - .:/var/www/PHP_VNTech_Web
+      - composer-cache:/tmp/composer-cache
+    environment:
+      COMPOSER_CACHE_DIR: /tmp/composer-cache
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "git config --global --add safe.directory /var/www/PHP_VNTech_Web
+      && composer install
+      && php artisan config:clear
+      && php artisan serve --host=0.0.0.0 --port=8000"
+
+  vite:
+    image: node:20
+    container_name: vntech-vite
+    working_dir: /var/www/PHP_VNTech_Web
+    volumes:
+      - .:/var/www/PHP_VNTech_Web
+      - node-modules:/var/www/PHP_VNTech_Web/node_modules
+    ports:
+      - "5173:5173"
+    command: >
+      sh -c "npm install
+      && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - app
+
+volumes:
+  composer-cache:
+  node-modules:

@@ -28,6 +28,8 @@
     $currentPrice = $isFlashSaleActive ? $flashSaleInfo->gia_flash_sale : $selectedVariant->gia_ban;
     $savingsPercent = $originalPrice > $currentPrice ? round((($originalPrice - $currentPrice) / $originalPrice) * 100) : 0;
     $tietKiemVal = $originalPrice - $currentPrice;
+    $averageRating = (float) ($productDetail->so_sao_trung_binh ?? 0);
+    $reviewsCount = (int) ($productDetail->so_luot_danh_gia ?? 0);
 @endphp
 
 <!-- Custom Styles for Product Detail -->
@@ -146,14 +148,18 @@
                     
                     <!-- Rating blocks -->
                     <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-500">
-                        <div class="flex text-amber-450">
+                        <div class="flex">
                             @for($i = 1; $i <= 5; $i++)
-                                <i data-lucide="star" class="w-4 h-4 fill-current {{ $i > 4 ? 'text-neutral-200 fill-none' : 'text-amber-500' }}"></i>
+                                @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
+                                <span class="relative inline-block w-4 h-4 text-base leading-none text-neutral-200">
+                                    ★
+                                    <span class="absolute inset-0 overflow-hidden text-amber-500" style="width: {{ $starFill }}%;">★</span>
+                                </span>
                             @endfor
                         </div>
                         <span class="font-semibold text-slate-700">
-                            <b class="text-slate-950 mr-1">4.8</b>
-                            (4,527 đánh giá)
+                            <b class="text-slate-950 mr-1">{{ number_format($averageRating, 1) }}</b>
+                            ({{ number_format($reviewsCount, 0, ',', '.') }} đánh giá)
                         </span>
                         <span class="h-4 w-[1px] bg-slate-200"></span>
                         <span class="text-emerald-600 font-bold">Còn hàng</span>
@@ -334,7 +340,7 @@
             <!-- Tabs Navigation -->
             <div class="flex border-b border-neutral-200 gap-8 mb-8 pb-px">
                 <button
-                    @click="activeTab = 'specs'"
+                    x-on:click="activeTab = 'specs'"
                     :class="activeTab === 'specs' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
                     class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
                 >
@@ -343,7 +349,7 @@
                 </button>
                 @if ($productDetail->mo_ta_chi_tiet)
                     <button
-                        @click="activeTab = 'desc'"
+                        x-on:click="activeTab = 'desc'"
                         :class="activeTab === 'desc' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
                         class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
                     >
@@ -352,16 +358,16 @@
                     </button>
                 @endif
                 <button
-                    @click="activeTab = 'reviews'"
+                    x-on:click="activeTab = 'reviews'"
                     :class="activeTab === 'reviews' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
                     class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
                 >
                     <i data-lucide="star" class="w-4 h-4"></i>
-                    Đánh giá từ chuyên gia
+                    Đánh giá sản phẩm
                 </button>
                 @if($hasThongTinThem)
                     <button
-                        @click="activeTab = 'additional'"
+                        x-on:click="activeTab = 'additional'"
                         :class="activeTab === 'additional' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
                         class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
                     >
@@ -434,56 +440,141 @@
             @endif
 
             <!-- Reviews Tab -->
-            <div x-show="activeTab === 'reviews'" class="space-y-8 animate-fade-in" style="display: none;">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white rounded-3xl border border-neutral-100 p-6 sm:p-8 gap-6 shadow-xs">
+            <div
+                x-show="activeTab === 'reviews'"
+                x-data="productReviews({{ json_encode(route('reviews.index', $productDetail->ma_san_pham)) }}, {{ json_encode(asset('AvatarDefault.jpg')) }})"
+                x-init="load(initialPage())"
+                class="space-y-6 animate-fade-in"
+                style="display: none;"
+            >
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white rounded-2xl border border-neutral-100 p-5 sm:p-6 gap-5 shadow-xs">
                     <div class="text-left">
-                        <h3 class="font-display text-lg font-black text-slate-900">Đánh giá hiệu năng thực tế</h3>
-                        <p class="text-xs text-neutral-400 mt-1 uppercase tracking-wider font-bold">VNTech Verified</p>
+                        <h3 class="font-display text-lg font-black text-slate-900">Đánh giá sản phẩm</h3>
+                        <p class="text-xs text-neutral-400 mt-1 font-bold">
+                            Chia sẻ thực tế từ khách hàng đã mua tại VNTech
+                        </p>
                     </div>
-                    <div class="flex items-center gap-3 text-amber-500 bg-amber-50/50 px-5 py-2.5 rounded-2xl border border-amber-100/50">
-                        <i data-lucide="star" class="w-8 h-8 fill-current"></i>
-                        <span class="text-4xl font-display font-black italic text-slate-900">4.8</span>
-                        <span class="text-amber-600/70 text-lg">/ 5.0</span>
+                    <div class="flex items-end gap-3 text-amber-500">
+                        <div class="text-4xl font-display font-black text-[#FF5C00] leading-none">
+                            {{ number_format($averageRating, 1) }}
+                        </div>
+                        <div class="pb-0.5">
+                            <div class="flex text-sm leading-none">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
+                                    <span class="relative inline-block w-3.5 h-3.5 text-sm leading-none text-neutral-200">
+                                        ★
+                                        <span class="absolute inset-0 overflow-hidden text-amber-400" style="width: {{ $starFill }}%;">★</span>
+                                    </span>
+                                @endfor
+                            </div>
+                            <p class="text-xs text-neutral-400 mt-1 font-bold">
+                                {{ number_format($reviewsCount, 0, ',', '.') }} đánh giá
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    @php
-                        $reviews = [
-                            [
-                                'name' => 'Alex_Vortex',
-                                'avatar' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuDLREUz_-iIyRNpbNGQ71fZWgQQkbeLSyWrMgYxwibJTaVC97a3yxKmSZBazf8DxEOpOQxA-K1fUshf5BQyAa4ynB05JGOWr6fvlH8uJ6i1EqdrY-TFTFbZTGpwN4MfYQaL26EPE3TKgybQoJaxFOHc7r_ZyttpS2KvhK_vIhQUfF0jB1sTdHCQHmETdNa_aKZj-GeDbjOzhOMJcXcrEGLJ04qHKpITJkU5x1SxIapvS3MKIuAyC4fixtXYwBpX_Xmu12DsQQjeSjbJ',
-                                'rating' => 5,
-                                'text' => 'Khả năng tản nhiệt trên thiết bị này cực kỳ ổn định. Tôi chạy các tác vụ nặng liên tục trong nhiều giờ mà CPU không hề bị quá nhiệt. Thiết kế khung sườn cứng cáp, bền bỉ.'
-                            ],
-                            [
-                                'name' => 'Neon_Rebel',
-                                'avatar' => 'https://lh3.googleusercontent.com/aida-public/AB6AXuBabewNTVTEQP_9W0ijnA8kFDxBPe4BDpAAj1ldgpwpxFkKMvldf7jNc_CdQjykz5AYFXDp71-8Hk9GNww14YNIM39wYSpgT7bvrXAlbAfaPt9mTYECLQPwMWNHQuty4alnBGDkpDj54sxQCbhzYbvSRT3nUhX9Vx2QAK8jSH45GgsId6Vq8IKfIxOmRVvZlF97lKbOM93O4YuLjDrb8oz5py8yXNLt9I5m0veq4eToJGpdoazlGiom2qfE3Y_TMgJylzwo4hQhTGDd',
-                                'rating' => 4,
-                                'text' => 'Màu sắc màn hình hiển thị chuẩn xác, tốc độ làm mới siêu mượt. Phản hồi phím nhạy và êm ái. Rất xứng đáng với số tiền bỏ ra để phục vụ cả công việc lẫn giải trí.'
-                            ]
-                        ];
-                    @endphp
-                    @foreach($reviews as $review)
-                    <div class="bg-white rounded-3xl border border-neutral-100 p-6 sm:p-8 space-y-4 hover:-translate-y-1 transition-all duration-300 shadow-xs">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full overflow-hidden border border-neutral-100 shadow-sm">
-                                <img src="{{ $review['avatar'] }}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="text-left">
-                                <div class="font-extrabold text-slate-900 text-sm">{{ $review['name'] }}</div>
-                                <div class="flex text-amber-500 mt-0.5">
-                                    @for($i = 0; $i < 5; $i++)
-                                        <i data-lucide="star" class="w-3.5 h-3.5 {{ $i < $review['rating'] ? 'fill-current' : 'text-neutral-250 fill-none' }}"></i>
-                                    @endfor
+                <div x-show="loading" class="bg-white rounded-2xl border border-neutral-100 p-8 text-center text-sm font-bold text-neutral-400">
+                    Đang tải đánh giá...
+                </div>
+
+                <div x-show="!loading && reviews.length === 0" class="bg-white rounded-2xl border border-neutral-100 p-8 text-center">
+                    <i data-lucide="message-square" class="w-10 h-10 text-neutral-300 mx-auto mb-3"></i>
+                    <p class="text-sm font-bold text-slate-500">Sản phẩm chưa có đánh giá nào</p>
+                </div>
+
+                <div x-show="!loading && reviews.length > 0" class="bg-white rounded-2xl border border-neutral-100 divide-y divide-neutral-100 shadow-xs overflow-hidden">
+                    <template x-for="review in reviews" :key="review.id || review.ma_danh_gia || review.created_at">
+                        <article class="p-5 sm:p-6">
+                            <div class="flex gap-4">
+                                <img
+                                    :src="review.is_anonymous ? defaultAvatar : (review.user?.avatar_url || defaultAvatar)"
+                                    alt="Avatar người đánh giá"
+                                    class="w-10 h-10 rounded-full object-cover border border-neutral-200 shrink-0 bg-neutral-50"
+                                    x-on:error="$event.target.src = defaultAvatar"
+                                >
+
+                                <div class="min-w-0 flex-1 space-y-2">
+                                    <div class="flex flex-wrap items-start justify-between gap-2">
+                                        <div class="min-w-0">
+                                            <h4 class="text-sm font-extrabold text-slate-900 truncate" x-text="review.is_anonymous ? 'Ẩn danh' : (review.user?.ho_ten || 'Khách hàng VNTech')"></h4>
+                                            <div class="flex text-amber-400 text-sm leading-none mt-1" :aria-label="`${review.so_sao} sao`">
+                                                <template x-for="star in 5" :key="star">
+                                                    <span :class="star <= Number(review.so_sao || 0) ? 'text-amber-400' : 'text-neutral-250'">★</span>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <span
+                                                x-show="review.is_updated"
+                                                class="rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-neutral-500"
+                                            >
+                                                Đã chỉnh sửa
+                                            </span>
+                                            <time class="text-xs text-neutral-400 font-semibold" x-text="formatDate(review.created_at)"></time>
+                                        </div>
+                                    </div>
+
+                                    <p x-show="review.ten_bien_the" class="text-xs text-neutral-500 font-semibold">
+                                        Phân loại hàng: <span class="text-slate-600" x-text="review.ten_bien_the"></span>
+                                    </p>
+
+                                    <p x-show="review.noi_dung" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line" x-text="review.noi_dung"></p>
+
+                                    <div x-show="mediaItems(review).length > 0" class="flex flex-wrap gap-2 pt-1">
+                                        <template x-for="item in mediaItems(review)" :key="`${item.type}-${item.url}`">
+                                            <a :href="item.url" target="_blank" rel="noopener" class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border border-neutral-200 bg-neutral-50 group">
+                                                <template x-if="item.type === 'video'">
+                                                    <video :src="item.url" class="w-full h-full object-cover bg-slate-900" muted preload="metadata"></video>
+                                                </template>
+                                                <template x-if="item.type === 'image'">
+                                                    <img :src="item.url" alt="Ảnh đánh giá" class="w-full h-full object-cover" loading="lazy">
+                                                </template>
+                                                <div x-show="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/25 text-white">
+                                                    <i data-lucide="play" class="w-7 h-7 fill-current"></i>
+                                                </div>
+                                            </a>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <p class="text-slate-600 italic font-medium text-sm leading-relaxed border-l-2 border-[#FF5C00] pl-4 text-left">
-                            "{{ $review['text'] }}"
-                        </p>
-                    </div>
-                    @endforeach
+                        </article>
+                    </template>
+                </div>
+
+                <div x-show="!loading && lastPage > 1" class="flex flex-wrap items-center justify-center gap-2">
+                    <button
+                        type="button"
+                        x-on:click="goToPage(page - 1)"
+                        :disabled="page <= 1"
+                        class="w-9 h-9 rounded-lg border border-neutral-200 bg-white text-slate-500 hover:border-[#FF5C00] hover:text-[#FF5C00] disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-slate-500 transition-colors text-xs font-extrabold"
+                    >
+                        Trước
+                    </button>
+
+                    <template x-for="item in paginationItems()" :key="item.key">
+                        <span>
+                            <span x-show="item.type === 'ellipsis'" class="w-9 h-9 flex items-center justify-center text-xs font-extrabold text-neutral-400">...</span>
+                            <button
+                                x-show="item.type === 'page'"
+                                type="button"
+                                x-on:click="goToPage(item.page)"
+                                :class="item.page === page ? 'bg-[#FF5C00] border-[#FF5C00] text-white' : 'bg-white border-neutral-200 text-slate-600 hover:border-[#FF5C00] hover:text-[#FF5C00]'"
+                                class="w-9 h-9 rounded-lg border transition-colors text-xs font-extrabold"
+                                x-text="item.page"
+                            ></button>
+                        </span>
+                    </template>
+
+                    <button
+                        type="button"
+                        x-on:click="goToPage(page + 1)"
+                        :disabled="page >= lastPage"
+                        class="w-9 h-9 rounded-lg border border-neutral-200 bg-white text-slate-500 hover:border-[#FF5C00] hover:text-[#FF5C00] disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-slate-500 transition-colors text-xs font-extrabold"
+                    >
+                        Sau
+                    </button>
                 </div>
             </div>
 
@@ -590,6 +681,151 @@
 
 @section('scripts')
 <script>
+    function productReviews(endpoint, defaultAvatar) {
+        return {
+            endpoint,
+            defaultAvatar,
+            reviews: [],
+            loading: false,
+            page: 1,
+            lastPage: 1,
+
+            initialPage() {
+                const page = Number(new URL(window.location.href).searchParams.get('page') || 1);
+
+                return page > 0 ? page : 1;
+            },
+
+            async load(page = 1) {
+                this.loading = true;
+
+                try {
+                    const url = new URL(this.endpoint, window.location.origin);
+                    url.searchParams.set('page', page);
+
+                    const response = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Không tải được đánh giá');
+                    }
+
+                    const payload = await response.json();
+                    const items = Array.isArray(payload.data) ? payload.data : [];
+
+                    this.reviews = items;
+                    this.page = Number(payload.current_page || page);
+                    this.lastPage = Number(payload.last_page || 1);
+                    this.syncPageQuery();
+
+                    this.$nextTick(() => {
+                        if (typeof lucide !== 'undefined') {
+                            lucide.createIcons();
+                        }
+                    });
+                } catch (error) {
+                    console.error(error);
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Không tải được đánh giá sản phẩm', 'error');
+                    }
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            goToPage(pageNumber) {
+                const nextPage = Number(pageNumber);
+
+                if (!nextPage || nextPage < 1 || nextPage > this.lastPage || nextPage === this.page) return;
+
+                this.load(nextPage);
+            },
+
+            paginationItems() {
+                const pages = new Set([1, this.lastPage]);
+                const start = Math.max(1, this.page - 2);
+                const end = Math.min(this.lastPage, this.page + 2);
+
+                for (let page = start; page <= end; page += 1) {
+                    pages.add(page);
+                }
+
+                const sortedPages = [...pages].sort((a, b) => a - b);
+                const items = [];
+
+                sortedPages.forEach((pageNumber, index) => {
+                    const previousPage = sortedPages[index - 1];
+
+                    if (previousPage && pageNumber - previousPage > 1) {
+                        items.push({
+                            type: 'ellipsis',
+                            key: `ellipsis-${previousPage}-${pageNumber}`,
+                        });
+                    }
+
+                    items.push({
+                        type: 'page',
+                        key: `page-${pageNumber}`,
+                        page: pageNumber,
+                    });
+                });
+
+                return items;
+            },
+
+            syncPageQuery() {
+                const url = new URL(window.location.href);
+
+                if (this.page > 1) {
+                    url.searchParams.set('page', this.page);
+                } else {
+                    url.searchParams.delete('page');
+                }
+
+                window.history.replaceState({}, '', url.toString());
+            },
+
+            mediaItems(review) {
+                const media = [];
+
+                if (review.video?.url) {
+                    media.push({
+                        type: 'video',
+                        url: review.video.url,
+                    });
+                }
+
+                (review.danh_sach_anh || []).forEach((image) => {
+                    const url = typeof image === 'string' ? image : image?.url;
+
+                    if (url) {
+                        media.push({
+                            type: 'image',
+                            url,
+                        });
+                    }
+                });
+
+                return media;
+            },
+
+            formatDate(value) {
+                if (!value) return '';
+
+                return new Intl.DateTimeFormat('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }).format(new Date(value));
+            },
+        };
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();

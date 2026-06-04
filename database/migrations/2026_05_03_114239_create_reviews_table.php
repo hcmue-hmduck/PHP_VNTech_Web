@@ -12,15 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reviews', function (Blueprint $collection) {
+            $collection->string('ma_danh_gia')->nullable()->unique();
             $collection->string('ma_san_pham')->index();
+            $collection->string('ma_bien_the')->index();
             $collection->string('ma_nguoi_dung')->index();
             $collection->string('ma_don_hang')->index(); // Để xác thực là đã mua hàng mới được đánh giá
+            $collection->string('ma_chi_tiet_don_hang')->index();
             
+            $collection->string('ten_bien_the')->nullable();
             $collection->integer('so_sao')->default(5);
             $collection->text('noi_dung');
-            $collection->array('hinh_anh')->nullable();
+            $collection->array('danh_sach_anh')->nullable();
+            $collection->array('video')->nullable();
             
-            $collection->string('trang_thai')->default('pending'); // pending, approved, hidden
+            $collection->boolean('is_anonymous')->default(false);
+            $collection->string('trang_thai')->default('active'); // active, hidden
             $collection->timestamps();
         });
     }

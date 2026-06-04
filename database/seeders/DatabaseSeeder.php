@@ -515,16 +515,33 @@ class DatabaseSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        Review::create([
-            'ma_san_pham'  => (string) Product::first()->_id,
-            'ma_nguoi_dung'=> (string) $user1->_id,
-            'ma_don_hang'  => (string) $order->_id,
-            'so_sao'       => 5,
-            'noi_dung'     => 'Sản phẩm rất tốt',
-            'hinh_anh'     => [
-                'reviews/review1.jpg'
+        $review = Review::create([
+            'ma_san_pham'          => $allVariants[0]->ma_san_pham,
+            'ma_bien_the'          => $orderItem->ma_bien_the,
+            'ma_nguoi_dung'        => (string) $user1->_id,
+            'ma_don_hang'          => (string) $order->_id,
+            'ma_chi_tiet_don_hang' => $orderItem->ma_chi_tiet_don_hang,
+            'ten_bien_the'         => $orderItem->ten_bien_the,
+            'so_sao'               => 5,
+            'noi_dung'             => 'Sản phẩm rất tốt',
+            'danh_sach_anh'        => [
+                [
+                    'url' => 'reviews/review1.jpg',
+                    'public_id' => 'reviews/review1',
+                ],
             ],
-            'trang_thai'   => 'approved',
+            'video'                => null,
+            'is_anonymous'         => false,
+            'trang_thai'           => 'active',
+        ]);
+        $review->update([
+            'ma_danh_gia' => (string) $review->_id,
+        ]);
+
+        Product::where('ma_san_pham', $allVariants[0]->ma_san_pham)->update([
+            'tong_so_sao' => 5,
+            'so_luot_danh_gia' => 1,
+            'so_sao_trung_binh' => 5,
         ]);
     }
 }

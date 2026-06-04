@@ -23,6 +23,9 @@ class Product extends Model
         'thong_tin_them',
         'luot_xem',
         'gia_thap_nhat',
+        'so_sao_trung_binh',
+        'so_luot_danh_gia',
+        'tong_so_sao',
     ];
 
     public function uniqueIds(): array
@@ -33,6 +36,9 @@ class Product extends Model
     protected $casts = [
         'gia_thap_nhat' => 'decimal:0',
         'luot_xem' => 'integer',
+        'so_sao_trung_binh' => 'decimal:2',
+        'so_luot_danh_gia' => 'integer',
+        'tong_so_sao' => 'integer',
     ];
 
     public function getRouteKeyName(): string
@@ -43,6 +49,11 @@ class Product extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class, 'ma_san_pham', 'ma_san_pham');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'ma_san_pham', 'ma_san_pham');
     }
 
     public function getFlashSaleInfoAttribute()

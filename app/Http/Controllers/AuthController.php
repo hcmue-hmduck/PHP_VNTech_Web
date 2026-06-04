@@ -215,6 +215,7 @@ class AuthController extends Controller
             $foundUser = User::create([
                 'ho_ten' => $name,
                 'email' => $email,
+                'avatar_url' => $avatar,
                 'vai_tro' => 'user',
                 'trang_thai' => 'active',
             ]);
