@@ -4,46 +4,6 @@
 
 @section('content')
 @php
-    $categoriesMap = [];
-    foreach($categories as $cat) {
-        $categoriesMap[$cat->ma_danh_muc] = $cat->ten_danh_muc;
-    }
-
-    $promoLabels = [
-        ['text' => 'Trả Góp 0%', 'bg' => 'bg-amber-500 text-white'],
-        ['text' => 'Bảo Hành 24T', 'bg' => 'bg-[#0058bc] text-white'],
-        ['text' => 'Chính Hãng 100%', 'bg' => 'bg-emerald-600 text-white'],
-        ['text' => 'Freeship Toàn Quốc', 'bg' => 'bg-[#ff5c00] text-white'],
-    ];
-
-    $bestSellerCategoriesList = [['id' => 'all', 'name' => 'Tất cả']];
-    foreach($categories->take(5) as $cat) {
-        $bestSellerCategoriesList[] = [
-            'id' => (string)$cat->ma_danh_muc,
-            'name' => (string)$cat->ten_danh_muc
-        ];
-    }
-
-    $bestSellerProductsList = [];
-    foreach($products as $index => $prod) {
-        $categoryName = $categoriesMap[$prod->ma_danh_muc] ?? 'Khác';
-        $selectedLabel = $promoLabels[$index % count($promoLabels)];
-        $bestSellerProductsList[] = [
-            'id' => (string)$prod->ma_san_pham,
-            'name' => (string)$prod->ten_san_pham,
-            'ma_danh_muc' => (string)$prod->ma_danh_muc,
-            'category' => (string)$categoryName,
-            'mo_ta_ngan' => (string)($prod->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.'),
-            'price' => (int)$prod->gia_thap_nhat,
-            'originalPrice' => (int)($prod->gia_thap_nhat * 1.25),
-            'image' => (string)($prod->link_anh_dai_dien ?? 'https://via.placeholder.com/400'),
-            'promoText' => $selectedLabel['text'],
-            'promoBg' => $selectedLabel['bg'],
-            'rating' => 4 + ($prod->luot_xem % 2 ? 0.8 : 0.5),
-            'reviewsCount' => (int)($prod->luot_xem * 2.5 + 4),
-        ];
-    }
-
     $activeBanners = [];
     if (isset($banner_images)) {
         foreach ($banner_images as $b) {
@@ -507,7 +467,7 @@
                              x-transition:enter-end="opacity-100 transform scale-100"
                              class="product-item group bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden hover:border-brand-500/50 hover:-translate-y-1.5 hover:shadow-[0_15px_30px_rgba(255,79,0,0.2)] transition-all duration-300 flex flex-col"
                         >
-                            <a href="{{ $item->variant ? route('viewProductDetail', $item->variant->ma_san_pham) : '#' }}"
+                            <a href="{{ $item->variant ? route('home.product_detail', ['ma_san_pham' => $item->variant->ma_san_pham, 'ma_bien_the' => $item->variant->ma_bien_the]) : '#' }}"
                                class="aspect-square bg-slate-950/20 flex items-center justify-center p-6 border-b border-slate-800/80 overflow-hidden relative block">
                                 @if($phanTramGiam > 0)
                                     <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wider z-10">
@@ -516,15 +476,15 @@
                                 @endif
                                 <img
                                     class="w-full h-full object-contain group-hover:scale-110 transition-all duration-700"
-                                    src="{{ $item->variant->link_anh_bien_the ?? $item->variant->product->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}"
-                                    alt="{{ $item->variant->ten_bien_the ?? 'Sản phẩm Flash Sale' }}"
+                                    src="{{ $item->variant->link_anh_bien_the ?: ($item->variant->product->link_anh_dai_dien ?: asset('images/no-image.png')) }}"
+                                    alt="{{ $item->variant->ten_hien_thi ?? 'Sản phẩm Flash Sale' }}"
                                 >
                             </a>
 
                             <div class="p-5 flex-1 flex flex-col justify-between text-left">
                                 <div>
                                     <h5 class="font-black uppercase text-xs text-slate-100 text-center line-clamp-2 group-hover:text-brand-500 transition-colors leading-tight min-h-[32px]">
-                                        {{ $item->variant->ten_bien_the ?? 'Sản phẩm Flash Sale' }}
+                                        {{ $item->variant->ten_hien_thi ?? 'Sản phẩm Flash Sale' }}
                                     </h5>
                                     <p class="text-[10px] text-slate-400 line-clamp-2 leading-relaxed text-center mt-1">
                                         {{ $item->variant->product->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.' }}
@@ -589,20 +549,25 @@
              }">
         <!-- Styled header container block -->
         <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.015)] mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div class="space-y-1 text-left">
-                <h2 class="font-['Space_Grotesk'] font-black text-2xl text-slate-800 border-l-4 border-brand-500 pl-3.5 uppercase">
+            <div class="space-y-1 text-left border-l-4 border-brand-500 pl-3.5">
+                <h2 class="font-['Space_Grotesk'] font-black text-2xl text-slate-800 uppercase">
                     SẢN PHẨM BÁN CHẠY
                 </h2>
-                <p class="text-neutral-400 text-xs font-semibold">Được đánh giá & sắm sửa nhiều nhất tháng này từ TechHub</p>
+                <p class="text-neutral-400 text-xs font-semibold">Được mua nhiều nhất ở VNTech</p>
             </div>
 
             <!-- In-tab categorical product filters matched dynamically -->
-            <div class="flex flex-wrap gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/10 shadow-xs">
+            <style>
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+            </style>
+            <div class="flex items-center flex-nowrap overflow-x-auto gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/10 shadow-xs max-w-full no-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
                 <template x-for="cat in categories" :key="cat.id">
                     <button
                         @click="selectedCategory = cat.id"
                         :class="selectedCategory === cat.id ? 'bg-white text-accent-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)]' : 'text-slate-500 hover:text-slate-900'"
-                        class="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer"
+                        class="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap shrink-0"
                         x-text="cat.name"
                     ></button>
                 </template>
@@ -616,9 +581,9 @@
 
         <div x-show="bestSellerProducts.length > 0">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <template x-for="product in bestSellerProducts.slice(0, 10)" :key="product.id">
+                <template x-for="product in bestSellerProducts.slice(0, 5)" :key="product.ma_bien_the">
                     <div
-                        @click="window.location.href = '/product-detail/' + product.id"
+                        @click="window.location.href = '/products/' + product.ma_san_pham + '/product-detail/' + (product.ma_bien_the || '')"
                         class="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer group text-left"
                     >
                         <!-- Product Image Panel -->
@@ -648,21 +613,15 @@
 
                             <!-- Rating Block -->
                             <div class="flex items-center gap-1.5 mb-3">
-                                <div class="flex items-center text-yellow-500">
+                                <div class="flex items-center">
                                     <template x-for="i in [1, 2, 3, 4, 5]">
-                                        <svg
-                                            class="w-3.5 h-3.5"
-                                            :class="i <= Math.floor(product.rating) ? 'fill-current text-amber-500' : 'text-gray-200'"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        >
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                        </svg>
+                                        <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-gray-200">
+                                            ★
+                                            <span
+                                                class="absolute left-0 top-0 h-full overflow-hidden text-amber-500"
+                                                :style="`width: ${Math.max(0, Math.min(100, (Number(product.rating || 0) - (i - 1)) * 100))}%`"
+                                            >★</span>
+                                        </span>
                                     </template>
                                 </div>
                                 <span class="text-xs text-neutral-400 font-sans">
@@ -673,11 +632,11 @@
                             <!-- Price and CTA Block -->
                             <div class="flex justify-between items-center mt-auto w-full">
                                 <div class="text-left">
-                                    <span class="text-[10px] text-neutral-400 uppercase tracking-widest block font-bold leading-none mb-1">Chỉ từ</span>
+                                    <span class="text-[11px] text-slate-700 uppercase tracking-wider block font-extrabold leading-none mb-1.5" x-text="'Đã bán: ' + product.da_ban"></span>
                                     <span class="font-['Space_Grotesk'] text-[15px] font-bold text-accent-600 tracking-tight block leading-none" x-text="formatVND(product.price)"></span>
                                 </div>
                                 <button
-                                    @click.stop="window.location.href = '/product-detail/' + product.id"
+                                    @click.stop="window.location.href = '/products/' + product.ma_san_pham + '/product-detail/' + (product.ma_bien_the || '')"
                                     class="w-10 h-10 bg-brand-500 hover:bg-brand-600 hover:shadow-[0_4px_10px_rgba(255,79,0,0.3)] text-white rounded-lg flex items-center justify-center transition-all duration-300 transform active:scale-90"
                                     title="Xem chi tiết"
                                 >

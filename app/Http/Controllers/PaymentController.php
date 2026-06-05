@@ -26,7 +26,7 @@ class PaymentController extends Controller
         $user_address = UserAddress::where('ma_nguoi_dung', $user_id)->get();
         $cartItems = session('cartItems', []);
         if ($ma_bien_the) {
-            $variant = ProductVariant::with(['activeFlashSaleItem.campaign'])->where('ma_bien_the', $ma_bien_the)->first();
+            $variant = ProductVariant::with(['product', 'activeFlashSaleItem.campaign'])->where('ma_bien_the', $ma_bien_the)->first();
             if ($variant) {
                 $cartItems = [
                     [
@@ -34,6 +34,7 @@ class PaymentController extends Controller
                         'ma_bien_the' => $variant->ma_bien_the,
                         'ma_flash_sales' => $variant?->flash_sale_info->ma_flash_sales ?? '',
                         'ten_bien_the' => $variant->ten_bien_the,
+                        'ten_hien_thi' => $variant->ten_hien_thi,
                         'gia_ban' => $variant->flash_sale_info ? $variant->flash_sale_info->gia_flash_sale : $variant->gia_ban,
                         'so_luong' => 1,
                         'link_anh_dai_dien' => $variant->link_anh_bien_the ?: ($variant->product->link_anh_dai_dien ?? '')

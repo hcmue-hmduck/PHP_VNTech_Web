@@ -29,8 +29,6 @@ class Review extends Model {
         'danh_sach_anh' => 'array',
         'video' => 'array',
         'is_anonymous' => 'boolean',
-        'is_updated' => 'boolean',
-        'is_deleted' => 'boolean',
     ];
 
     public function product()

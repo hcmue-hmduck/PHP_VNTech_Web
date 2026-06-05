@@ -168,11 +168,14 @@
             </thead>
             <tbody>
                 @foreach($orderItems as $index => $item)
+                    @php
+                        $displayName = $item->variant?->ten_hien_thi ?? $item->ten_bien_the;
+                    @endphp
                     <tr>
                         <td class="text-center font-mono">{{ $index + 1 }}</td>
                         <td>
                             <div class="font-bold text-slate-900 uppercase text-xs">
-                                {{ $item->variant->ten_bien_the ?? $item->ten_san_pham }}
+                                {{ $displayName }}
                             </div>
                         </td>
                         <td class="text-center font-bold font-mono">{{ $item->so_luong }}</td>

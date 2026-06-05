@@ -106,11 +106,12 @@
             'category' => (string) $categoryName,
             'mo_ta_ngan' => (string) ($prod->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.'),
             'price' => (int) $prod->gia_thap_nhat,
-            'image' => (string) ($prod->link_anh_dai_dien ?? 'https://via.placeholder.com/400'),
+            'image' => (string) ($prod->link_anh_dai_dien ?: asset('images/no-image.png')),
             'promoText' => $selectedLabel['text'],
             'promoBg' => $selectedLabel['bg'],
-            'rating' => 4 + ($prod->luot_xem % 2 ? 0.8 : 0.5),
-            'reviewsCount' => (int) ($prod->luot_xem * 2.5 + 4),
+            'rating' => $prod->so_sao_trung_binh ?? 0,
+            'reviewsCount' => $prod->so_luot_danh_gia ?? 0,
+            'tong_da_ban' => (int) ($prod->tong_luot_ban ?? 0),
             'created_at' => $prod->created_at,
         ];
     }
@@ -146,7 +147,8 @@
         'price_asc' => $filteredProducts->sortBy('price'),
         'price_desc' => $filteredProducts->sortByDesc('price'),
         'newest' => $filteredProducts->sortByDesc('created_at'),
-        default => $filteredProducts->sortByDesc('reviewsCount'),
+        'popular' => $filteredProducts->sortByDesc('tong_da_ban'),
+        default => $filteredProducts->sortByDesc('tong_da_ban'),
     };
 
     $processedProducts = $processedProducts->values();
@@ -382,7 +384,7 @@
                         @foreach($paginatedProducts as $product)
                             <a
                                 id="product-card-{{ $product['id'] }}"
-                                href="{{ url('/product-detail/' . $product['id']) }}"
+                                href="{{ route('home.product_detail', ['ma_san_pham' => $product['id']]) }}"
                                 class="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col cursor-pointer group no-underline"
                             >
                                 <div class="relative bg-slate-50/50 aspect-square overflow-hidden flex items-center justify-center p-4 border-b border-slate-100/80">
@@ -406,20 +408,15 @@
                                     <p class="text-[11px] text-neutral-400 line-clamp-2 leading-relaxed">{{ $product['mo_ta_ngan'] }}</p>
 
                                     <div class="flex items-center gap-1.5 mb-3">
-                                        <div class="flex items-center text-yellow-500">
+                                        <div class="flex items-center">
                                             @for($i = 1; $i <= 5; $i++)
-                                                <svg
-                                                    class="w-3.5 h-3.5 {{ $i <= floor($product['rating']) ? 'fill-current text-amber-500' : 'text-gray-200' }}"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    stroke-width="2"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                >
-                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                                </svg>
+                                                @php
+                                                    $starFill = max(0, min(100, (((float) $product['rating']) - ($i - 1)) * 100));
+                                                @endphp
+                                                <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-gray-200">
+                                                    ★
+                                                    <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-500" @style(['width' => $starFill . '%'])>★</span>
+                                                </span>
                                             @endfor
                                         </div>
                                         <span class="text-xs text-neutral-400 font-sans">({{ $product['reviewsCount'] }})</span>
@@ -427,6 +424,7 @@
 
                                     <div class="flex justify-between items-center mt-auto w-full">
                                         <div class="text-left">
+                                            <span class="text-[11px] text-slate-700 uppercase tracking-wider block font-extrabold leading-none mb-1.5">Đã bán: {{ $product['tong_da_ban'] }}</span>
                                             <span class="text-[10px] text-neutral-400 uppercase tracking-widest block font-bold leading-none mb-1">Chỉ từ</span>
                                             <span class="font-['Space_Grotesk'] text-[15px] font-bold text-accent-600 tracking-tight block leading-none">{{ number_format($product['price'], 0, ',', '.') }}₫</span>
                                         </div>

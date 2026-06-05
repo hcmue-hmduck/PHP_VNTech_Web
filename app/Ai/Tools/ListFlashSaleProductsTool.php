@@ -79,6 +79,7 @@ class ListFlashSaleProductsTool implements Tool
                     'ten_san_pham' => $product?->ten_san_pham,
                     'ma_bien_the' => $item->ma_bien_the,
                     'ten_bien_the' => $variant?->ten_bien_the,
+                    'ten_hien_thi' => $variant?->ten_hien_thi,
                     'gia_niem_yet' => $variant?->gia_niem_yet,
                     'gia_ban' => $variant?->gia_ban,
                     'gia_flash_sale' => $item->gia_flash_sale,

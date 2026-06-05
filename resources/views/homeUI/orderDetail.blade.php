@@ -145,18 +145,19 @@
                         @foreach($items as $product)
                             @php
                                 $variant = $product->variant;
-                                $productDetailUrl = $variant?->ma_san_pham ? route('viewProductDetail', $variant->ma_san_pham) : null;
+                                $displayName = $variant?->ten_hien_thi ?? $product->ten_bien_the;
+                                $productDetailUrl = ($variant?->ma_san_pham && $variant?->ma_bien_the) ? route('home.product_detail', ['ma_san_pham' => $variant->ma_san_pham, 'ma_bien_the' => $variant->ma_bien_the]) : null;
                             @endphp
                             <div class="flex gap-5 py-4 items-center first:pt-0 last:pb-0">
                                 <a href="{{ $productDetailUrl ?? '#' }}"
                                    class="w-16 h-16 bg-slate-50 border border-slate-150 p-1.5 rounded-xl flex-shrink-0 flex items-center justify-center transition-all {{ $productDetailUrl ? 'hover:border-brand-500 hover:bg-orange-50/30' : 'pointer-events-none' }}">
-                                    <img src="{{ $variant->link_anh_bien_the ?? 'https://via.placeholder.com/150' }}" 
-                                         alt="{{ $variant->ten_bien_the ?? $product->ten_san_pham }}" 
+                                    <img src="{{ $variant->link_anh_bien_the ?: asset('images/no-image.png') }}" 
+                                         alt="{{ $displayName }}" 
                                          class="w-full h-full object-contain">
                                 </a>
                                 <div class="flex-grow min-w-0">
                                     <h4 class="text-sm font-black text-slate-800 uppercase tracking-tight truncate">
-                                        {{ $variant->ten_bien_the ?? $product->ten_san_pham }}
+                                        {{ $displayName }}
                                     </h4>
                                     <p class="text-xs text-slate-400 mt-1 uppercase font-bold">
                                         Số lượng: <span class="text-brand-500 font-black">{{ $product->so_luong }}</span>
@@ -362,10 +363,11 @@
                                         @endif
 
                                         @foreach($items as $product)
-                                            @php
-                                                $variant = $product->variant;
-                                                $productDetailUrl = $variant?->ma_san_pham ? route('viewProductDetail', $variant->ma_san_pham) : null;
-                                            @endphp
+                                                @php
+                                                    $variant = $product->variant;
+                                                    $displayName = $variant?->ten_hien_thi ?? $product->ten_bien_the;
+                                                    $productDetailUrl = ($variant?->ma_san_pham && $variant?->ma_bien_the) ? route('home.product_detail', ['ma_san_pham' => $variant->ma_san_pham, 'ma_bien_the' => $variant->ma_bien_the]) : null;
+                                                @endphp
                                             <form method="POST"
                                                   action="{{ route('reviews.store') }}"
                                                   enctype="multipart/form-data"
@@ -382,13 +384,13 @@
                                                 <div class="flex gap-4">
                                                     <a href="{{ $productDetailUrl ?? '#' }}"
                                                        class="w-16 h-16 bg-white border border-slate-200 p-1.5 rounded-xl shrink-0 flex items-center justify-center transition-all {{ $productDetailUrl ? 'hover:border-brand-500 hover:bg-orange-50/30' : 'pointer-events-none' }}">
-                                                        <img src="{{ $variant->link_anh_bien_the ?? 'https://via.placeholder.com/150' }}"
-                                                             alt="{{ $variant->ten_bien_the ?? $product->ten_san_pham }}"
+                                                        <img src="{{ $variant->link_anh_bien_the ?: asset('images/no-image.png') }}"
+                                                             alt="{{ $displayName }}"
                                                              class="w-full h-full object-contain">
                                                     </a>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm font-black text-slate-850 uppercase truncate">
-                                                            {{ $variant->ten_bien_the ?? $product->ten_san_pham }}
+                                                            {{ $displayName }}
                                                         </h4>
                                                         <p class="text-xs text-slate-400 font-bold mt-1">
                                                             Số lượng: <span class="text-brand-500">{{ $product->so_luong }}</span>

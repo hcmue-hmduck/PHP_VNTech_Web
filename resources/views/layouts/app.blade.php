@@ -82,7 +82,7 @@
                     
                     <!-- Store Branding Header Logo -->
                     <a href="{{ route('home.index') }}" class="flex items-center gap-2 px-1 outline-none">
-                        <img src="{{ asset('vntech_logo.ico') }}" alt="VNTech Logo" class="w-9 h-9 rounded-full border border-slate-800 object-cover" />
+                        <img src="{{ asset('images/vntech_logo.ico') }}" alt="VNTech Logo" class="w-9 h-9 rounded-full border border-slate-800 object-cover" />
                         <span class="text-3xl font-display font-black tracking-tighter bg-gradient-to-r from-brand-500 to-brand-600 bg-clip-text text-transparent hover:opacity-90 transition-opacity">
                             VNTech
                         </span>
@@ -206,10 +206,9 @@
                                     <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Xin chào</span>
                                     <span class="text-xs font-black text-slate-200 mt-1">{{ Auth::user()->ho_ten }}</span>
                                 </div>
-                                <img src="{{ Auth::user()->avatar_url ?: asset('AvatarDefault.jpg') }}" 
+                                <img src="{{ Auth::user()->avatar_url ?: asset('images/AvatarDefault.jpg') }}" 
                                      alt="Avatar" 
-                                     class="w-8 h-8 rounded-full object-cover border border-slate-700 hover:border-brand-500 transition-colors"
-                                     onerror="this.src='/AvatarDefault.jpg';">
+                                     class="w-8 h-8 rounded-full object-cover border border-slate-700 hover:border-brand-500 transition-colors">
                             </button>
 
                             <!-- Dropdown Menu -->
@@ -475,7 +474,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pb-8 border-b border-slate-800">
                 <!-- Column 1: Brand Info -->
                 <div class="flex items-center gap-6">
-                    <img src="{{ asset('vntech_logo.ico') }}" alt="VNTech Logo" class="w-32 h-32 rounded-full border border-slate-800 object-cover shrink-0" />
+                    <img src="{{ asset('images/vntech_logo.ico') }}" alt="VNTech Logo" class="w-32 h-32 rounded-full border border-slate-800 object-cover shrink-0" />
                     <div class="space-y-3">
                         <span class="text-4xl font-black bg-gradient-to-r from-brand-500 via-orange-400 to-cyber-pink bg-clip-text text-transparent font-space uppercase italic tracking-tighter block leading-none">VNTech</span>
                         <p class="text-xs text-slate-400 leading-relaxed max-w-md">

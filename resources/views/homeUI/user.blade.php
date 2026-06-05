@@ -47,7 +47,7 @@
             <div class="lg:col-span-3 lg:sticky lg:top-24 flex flex-col gap-2 h-fit bg-white p-5 border border-neutral-200/60 rounded-3xl shadow-sm">
                 <!-- User Profile Intro -->
                 <div class="flex items-center gap-3 pb-4 mb-4 border-b border-neutral-100 select-none">
-                    <img src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : asset('AvatarDefault.jpg') }}" alt="Avatar" class="w-12 h-12 rounded-full border border-neutral-200 object-cover shrink-0">
+                    <img src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : asset('images/AvatarDefault.jpg') }}" alt="Avatar" class="w-12 h-12 rounded-full border border-neutral-200 object-cover shrink-0">
                     <div class="overflow-hidden">
                         <h4 class="text-neutral-900 font-display font-bold text-sm truncate uppercase tracking-tight">{{ $realUser->ho_ten ?? 'Khách hàng' }}</h4>
                         <p class="text-neutral-400 text-xs truncate font-mono">{{ $realUser->email }}</p>
@@ -97,7 +97,7 @@
                                 <img id="avatar-preview" 
                                      alt="Profile Picture" 
                                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                                     src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : asset('AvatarDefault.jpg') }}" />
+                                     src="{{ !empty($realUser->avatar_url) ? $realUser->avatar_url : asset('images/AvatarDefault.jpg') }}" />
                                 <div id="avatar-placeholder" 
                                      class="w-full h-full bg-orange-50 flex items-center justify-center text-[#ff5c00] font-display font-black text-4xl hidden">
                                 </div>

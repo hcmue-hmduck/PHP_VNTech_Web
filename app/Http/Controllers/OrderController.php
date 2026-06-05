@@ -241,7 +241,7 @@ class OrderController extends Controller
 
         $reviewedItemCount = Review::where('ma_don_hang', $order->ma_don_hang)
             ->where('ma_nguoi_dung', $userId)
-            ->where('is_deleted', '!=', true)
+            ->where('trang_thai', 'active')
             ->whereIn('ma_chi_tiet_don_hang', $orderItemIds->all())
             ->pluck('ma_chi_tiet_don_hang')
             ->filter()

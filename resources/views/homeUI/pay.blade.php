@@ -536,14 +536,14 @@
                                 @foreach($cartItems as $item)
                                 <div class="flex gap-4 items-center">
                                     <div class="w-16 h-16 bg-slate-50 border border-slate-200/60 p-1 rounded-xl flex-shrink-0 relative overflow-hidden flex items-center justify-center">
-                                        <img src="{{ $item['link_anh_dai_dien'] ?? 'https://via.placeholder.com/200' }}" 
+                                        <img src="{{ $item['link_anh_dai_dien'] ?: asset('images/no-image.png') }}" 
                                              alt="Product" 
                                              class="w-full h-full object-contain">
                                     </div>
                                     <div class="flex flex-col justify-between py-1 flex-grow">
                                         <div>
                                             <h3 class="text-xs font-black text-slate-800 uppercase tracking-tight line-clamp-1">
-                                                {{ $item['ten_bien_the'] ?? '' }}
+                                                {{ $item['ten_hien_thi'] ?? $item['ten_bien_the'] ?? '' }}
                                             </h3>
                                             <p class="text-[9px] text-slate-400 mt-0.5 uppercase tracking-wider font-bold">
                                                 SL: {{ $item['so_luong'] ?? 0 }} • {{ number_format($item['gia_ban'] ?? 0, 0, ',', '.') }}đ

@@ -20,7 +20,8 @@
         return [
             'id' => $item->id,
             'ma_bien_the' => $item->ma_bien_the,
-            'name' => $variant->ten_bien_the,
+            'name' => $variant->ten_hien_thi,
+            'ten_bien_the' => $variant->ten_bien_the,
             'price' => $price,
             'quantity' => $item->so_luong,
             'image' => $variant->link_anh_bien_the,
@@ -60,7 +61,8 @@
           ma_san_pham: item.id,
           ma_bien_the: item.ma_bien_the,
           ma_flash_sales: item.ma_flash_sales,
-          ten_bien_the: item.name,
+          ten_bien_the: item.ten_bien_the,
+          ten_hien_thi: item.name,
           gia_ban: item.price,
           so_luong: item.quantity,
           link_anh_dai_dien: item.image
@@ -279,14 +281,14 @@
             <div>
               <div class="aspect-square bg-neutral-50 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-4 border border-neutral-200/40 relative group">
                 <img
-                  alt="{{ $p->ten_bien_the }}"
+                  alt="{{ $p->ten_hien_thi }}"
                   src="{{ $p->link_anh_bien_the }}"
                   class="w-full h-full object-contain group-hover:scale-105 duration-200"
                 />
               </div>
 
-              <h4 class="font-display font-bold text-sm text-neutral-900 line-clamp-1 hover:text-[#ff5c00]" title="{{ $p->ten_bien_the }}">
-                {{ $p->ten_bien_the }}
+              <h4 class="font-display font-bold text-sm text-neutral-900 line-clamp-1 hover:text-[#ff5c00]" title="{{ $p->ten_hien_thi }}">
+                {{ $p->ten_hien_thi }}
               </h4>
               <p class="text-xs text-neutral-500 font-medium mt-1">
                 {{ $spec ?: 'Chính hãng 100%' }}

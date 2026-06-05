@@ -26,6 +26,7 @@ class Product extends Model
         'so_sao_trung_binh',
         'so_luot_danh_gia',
         'tong_so_sao',
+        'tong_luot_ban',
     ];
 
     public function uniqueIds(): array
@@ -39,6 +40,7 @@ class Product extends Model
         'so_sao_trung_binh' => 'decimal:2',
         'so_luot_danh_gia' => 'integer',
         'tong_so_sao' => 'integer',
+        'tong_luot_ban' => 'integer',
     ];
 
     public function getRouteKeyName(): string

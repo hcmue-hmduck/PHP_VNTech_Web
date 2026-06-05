@@ -174,21 +174,22 @@
                 </thead>
                 <tbody>
                   @foreach($orderItems as $item)
-                  @php
+                    @php
                       $variant = $item->variant;
-                  @endphp
+                      $displayName = $variant?->ten_hien_thi ?? $item->ten_bien_the;
+                    @endphp
                   <tr class="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
                     <td class="px-8 py-6">
                       <div class="flex items-center gap-4">
                         <div class="h-16 w-16 overflow-hidden border border-white/10 bg-surface-high flex-shrink-0">
                           <img 
-                            src="{{ $variant->link_anh_bien_the ?? $item->link_anh_dai_dien ?? 'https://via.placeholder.com/150' }}" 
-                            alt="{{ $variant->ten_bien_the ?? $item->ten_san_pham }}" 
+                            src="{{ $variant->link_anh_bien_the ?: ($item->link_anh_dai_dien ?: asset('images/no-image.png')) }}" 
+                            alt="{{ $displayName }}" 
                             class="h-full w-full object-cover" 
                           />
                         </div>
                         <div>
-                          <p class="font-bold text-white uppercase text-sm tracking-wide">{{ $variant->ten_bien_the ?? $item->ten_san_pham }}</p>
+                          <p class="font-bold text-white uppercase text-sm tracking-wide">{{ $displayName }}</p>
                         </div>
                       </div>
                     </td>

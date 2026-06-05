@@ -127,7 +127,7 @@
                         <td class="px-6 py-4 text-center">
                             <div class="w-14 h-14 bg-black/40 border border-white/10 p-1 grayscale group-hover:grayscale-0 group-hover:border-neon-green/40 transition-all mx-auto">
                                 <img 
-                                    src="{{ $product->link_anh_dai_dien ?? 'https://via.placeholder.com/150' }}" 
+                                    src="{{ $product->link_anh_dai_dien ?: asset('images/no-image.png') }}" 
                                     alt="{{ $product->ten_san_pham }}" 
                                     class="w-full h-full object-cover"
                                 />

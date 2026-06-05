@@ -10,6 +10,7 @@ class FlashSaleItem extends Model {
     use HasFactory;
 
     protected $fillable = [
+        'ma_chi_tiet_flash_sales',
         'ma_flash_sales',
         'ma_bien_the',
         'gia_flash_sale',

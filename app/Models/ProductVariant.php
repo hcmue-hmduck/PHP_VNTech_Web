@@ -16,6 +16,7 @@ class ProductVariant extends Model {
         'gia_ban',
         'gia_niem_yet',
         'so_luong_ton_kho',
+        'da_ban',
         'thong_so_ky_thuat_rieng',
         'trang_thai',
     ];
@@ -24,11 +25,20 @@ class ProductVariant extends Model {
         'gia_ban'          => 'decimal:0',
         'gia_niem_yet'     => 'decimal:0',
         'so_luong_ton_kho' => 'integer',
+        'da_ban'           => 'integer',
     ];
 
     public function product()
     {
         return $this->belongsTo(Product::class, 'ma_san_pham', 'ma_san_pham');
+    }
+
+    public function getTenHienThiAttribute(): string
+    {
+        $productName = trim((string) ($this->product?->ten_san_pham ?? ''));
+        $variantName = trim((string) ($this->ten_bien_the ?? ''));
+
+        return trim($productName . ' ' . $variantName) ?: $variantName;
     }
 
     public function activeFlashSaleItem()

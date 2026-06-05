@@ -3,34 +3,7 @@
 @section('title', $productDetail->ten_san_pham)
 
 @section('content')
-@php
-    $selectedVariant = $variants->firstWhere('ma_bien_the', request('ma_bien_the')) ?? $variants->first();
-    $flashSaleInfo = $selectedVariant->flash_sale_info;
-    $flashSaleCampaign = $selectedVariant->flash_sale_campaign;
-    $isFlashSaleActive = $flashSaleInfo && $flashSaleCampaign;
-    
-    // Calculate discount specifications
-    $daBan = (int)($flashSaleInfo->so_luong_da_ban ?? 0);
-    $gioiHan = max(1, (int)($flashSaleInfo->so_luong_gioi_han ?? 1));
-    $soLuongFlashConLai = max(0, $gioiHan - $daBan);
-    $percent = min(100, round(($daBan / $gioiHan) * 100));
-    
-    $endTimeStr = '';
-    if ($isFlashSaleActive) {
-        $endTimeStr = is_string($flashSaleCampaign->ket_thuc) 
-            ? $flashSaleCampaign->ket_thuc 
-            : ($flashSaleCampaign->ket_thuc instanceof \Carbon\Carbon 
-                ? $flashSaleCampaign->ket_thuc->toIso8601String() 
-                : (string)$flashSaleCampaign->ket_thuc);
-    }
-
-    $originalPrice = $selectedVariant->gia_niem_yet ?: ($selectedVariant->gia_ban * 1.25);
-    $currentPrice = $isFlashSaleActive ? $flashSaleInfo->gia_flash_sale : $selectedVariant->gia_ban;
-    $savingsPercent = $originalPrice > $currentPrice ? round((($originalPrice - $currentPrice) / $originalPrice) * 100) : 0;
-    $tietKiemVal = $originalPrice - $currentPrice;
-    $averageRating = (float) ($productDetail->so_sao_trung_binh ?? 0);
-    $reviewsCount = (int) ($productDetail->so_luot_danh_gia ?? 0);
-@endphp
+<!-- Loaded data and configurations from ProductDetailController -->
 
 <!-- Custom Styles for Product Detail -->
 <style>
@@ -121,9 +94,7 @@
                 </div>
 
                 <!-- Gallery Thumbnails directly below (Horizontal & Left-aligned, matching reference) -->
-                @php
-                    $galleryImages = array_merge([$selectedVariant->link_anh_bien_the ?: $productDetail->link_anh_dai_dien], $productDetail->hinh_anh ?? []);
-                @endphp
+                <!-- Gallery list loaded from Controller -->
                 @if(count($galleryImages) > 1)
                     <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none justify-start">
                         @foreach($galleryImages as $idx => $img)
@@ -166,15 +137,19 @@
                         <div class="flex">
                             @for($i = 1; $i <= 5; $i++)
                                 @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
-                                <span class="relative inline-block w-4 h-4 text-base leading-none text-neutral-200">
+                                <span class="relative inline-block w-4 h-4 overflow-hidden text-base leading-none text-neutral-200">
                                     ★
-                                    <span class="absolute inset-0 overflow-hidden text-amber-500" style="width: {{ $starFill }}%;">★</span>
+                                    <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-500" @style(['width' => $starFill . '%'])>★</span>
                                 </span>
                             @endfor
                         </div>
                         <span class="font-semibold text-slate-700">
                             <b class="text-slate-950 mr-1">{{ number_format($averageRating, 1) }}</b>
                             ({{ number_format($reviewsCount, 0, ',', '.') }} đánh giá)
+                        </span>
+                        <span class="h-4 w-[1px] bg-slate-200"></span>
+                        <span class="text-slate-700 font-semibold">
+                            Đã bán: <b class="text-slate-950">{{ $selectedVariant->da_ban ?? 0 }}</b>
                         </span>
                         <span class="h-4 w-[1px] bg-slate-200"></span>
                         <span class="text-emerald-600 font-bold">Còn hàng</span>
@@ -264,19 +239,9 @@
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">CHỌN CẤU HÌNH:</p>
                     <div class="flex flex-wrap gap-2.5">
                         @foreach($variants as $idx => $variant)
-                        @php
-                            $thong_tin_bien_the = '';
-                            if (isset($variant->thong_so_ky_thuat_rieng) && is_array($variant->thong_so_ky_thuat_rieng)) {
-                                foreach($variant->thong_so_ky_thuat_rieng as $item) {
-                                    $thong_tin_bien_the .= $item['gia_tri'] . '/';
-                                }
-                            } 
-                            $thong_tin_bien_the = rtrim($thong_tin_bien_the, '/');
-                            $isActive = $variant->ma_bien_the === $selectedVariant->ma_bien_the;
-                        @endphp
-                        <a href="?ma_bien_the={{ $variant->ma_bien_the }}" 
-                           class="py-2.5 px-4 rounded-xl text-xs font-semibold tracking-wide border transition-all duration-200 {{ $isActive ? 'border-[#FF5C00] text-[#FF5C00] bg-orange-50/15 font-bold shadow-xs' : 'border-neutral-200 text-slate-600 bg-white hover:border-neutral-400' }}">
-                            {{ $thong_tin_bien_the ?: 'Bản mặc định' }}
+                        <a href="{{ route('home.product_detail', ['ma_san_pham' => $productDetail->ma_san_pham, 'ma_bien_the' => $variant->ma_bien_the]) }}" 
+                           class="py-2.5 px-4 rounded-xl text-xs font-semibold tracking-wide border transition-all duration-200 {{ $variant->ma_bien_the === $selectedVariant->ma_bien_the ? 'border-[#FF5C00] text-[#FF5C00] bg-orange-50/15 font-bold shadow-xs' : 'border-neutral-200 text-slate-600 bg-white hover:border-neutral-400' }}">
+                            {{ $variant->thong_tin_hien_thi ?: 'Bản mặc định' }}
                         </a>
                         @endforeach
                     </div>
@@ -336,19 +301,6 @@
             </div>
         </div>
 
-        @php
-            $hasThongTinThem = false;
-            if (isset($productDetail->thong_tin_them) && (is_array($productDetail->thong_tin_them) || $productDetail->thong_tin_them instanceof \Traversable)) {
-                foreach ($productDetail->thong_tin_them as $row) {
-                    $rowTen = is_array($row) ? ($row['ten'] ?? null) : ($row->ten ?? null);
-                    $rowVal = is_array($row) ? ($row['gia_tri'] ?? null) : ($row->gia_tri ?? null);
-                    if (!empty($rowTen) || !empty($rowVal)) {
-                        $hasThongTinThem = true;
-                        break;
-                    }
-                }
-            }
-        @endphp
 
         <!-- Interactive Tabbed Product Details -->
         <div class="mt-20 border-t border-neutral-200 pt-12 text-left animate-fade-in" x-data="{ activeTab: 'specs' }">
@@ -397,42 +349,28 @@
                 <div class="bg-white rounded-3xl border border-neutral-100 overflow-hidden shadow-xs">
                     <table class="w-full text-left">
                         <tbody class="divide-y divide-neutral-100">
-                            @foreach($productDetail->thong_so_ky_thuat_chung ?? [] as $row)
-                            @php
-                                $rowTen = is_array($row) ? ($row['ten'] ?? '') : ($row->ten ?? '');
-                                $rowVal = is_array($row) ? ($row['gia_tri'] ?? '') : ($row->gia_tri ?? '');
-                            @endphp
-                            @if(!empty($rowTen) || !empty($rowVal))
+                            @foreach($formattedChung as $row)
                             <tr class="hover:bg-neutral-50/50 transition-colors group">
                                 <td class="p-5 font-bold text-xs tracking-wider text-slate-400 w-1/3 uppercase">
-                                    {{ $rowTen }}
+                                    {{ $row['ten'] }}
                                 </td>
                                 <td class="p-5 text-slate-800 font-semibold text-sm">
-                                    {{ $rowVal }}
+                                    {{ $row['gia_tri'] }}
                                 </td>
                             </tr>
-                            @endif
                             @endforeach
 
                             <!-- Variant Specific Specs -->
-                            @if(isset($selectedVariant->thong_so_ky_thuat_rieng) && (is_array($selectedVariant->thong_so_ky_thuat_rieng) || $selectedVariant->thong_so_ky_thuat_rieng instanceof \Traversable))
-                                @foreach($selectedVariant->thong_so_ky_thuat_rieng as $spec)
-                                @php
-                                    $specTen = is_array($spec) ? ($spec['ten'] ?? '') : ($spec->ten ?? '');
-                                    $specVal = is_array($spec) ? ($spec['gia_tri'] ?? '') : ($spec->gia_tri ?? '');
-                                @endphp
-                                @if(!empty($specTen) || !empty($specVal))
-                                <tr class="hover:bg-neutral-50/50 transition-colors group">
-                                    <td class="p-5 font-bold text-xs tracking-wider text-slate-400 w-1/3 uppercase">
-                                        {{ $specTen }}
-                                    </td>
-                                    <td class="p-5 text-slate-800 font-semibold text-sm">
-                                        {{ $specVal }}
-                                    </td>
-                                </tr>
-                                @endif
-                                @endforeach
-                            @endif
+                            @foreach($formattedRieng as $spec)
+                            <tr class="hover:bg-neutral-50/50 transition-colors group">
+                                <td class="p-5 font-bold text-xs tracking-wider text-slate-400 w-1/3 uppercase">
+                                    {{ $spec['ten'] }}
+                                </td>
+                                <td class="p-5 text-slate-800 font-semibold text-sm">
+                                    {{ $spec['gia_tri'] }}
+                                </td>
+                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -457,7 +395,7 @@
             <!-- Reviews Tab -->
             <div
                 x-show="activeTab === 'reviews'"
-                x-data="productReviews({{ json_encode(route('reviews.index', $productDetail->ma_san_pham)) }}, {{ json_encode(asset('AvatarDefault.jpg')) }})"
+                x-data="productReviews({{ json_encode(route('reviews.index', $productDetail->ma_san_pham)) }}, {{ json_encode(asset('images/AvatarDefault.jpg')) }})"
                 x-init="load(initialPage())"
                 class="space-y-6 animate-fade-in"
                 style="display: none;"
@@ -469,7 +407,7 @@
                             Chia sẻ thực tế từ khách hàng đã mua tại VNTech
                         </p>
                     </div>
-                    <div class="flex items-end gap-3 text-amber-500">
+                    <div class="flex items-end gap-3">
                         <div class="text-4xl font-display font-black text-[#FF5C00] leading-none">
                             {{ number_format($averageRating, 1) }}
                         </div>
@@ -477,9 +415,9 @@
                             <div class="flex text-sm leading-none">
                                 @for($i = 1; $i <= 5; $i++)
                                     @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
-                                    <span class="relative inline-block w-3.5 h-3.5 text-sm leading-none text-neutral-200">
+                                    <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-neutral-200">
                                         ★
-                                        <span class="absolute inset-0 overflow-hidden text-amber-400" style="width: {{ $starFill }}%;">★</span>
+                                        <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-400" @style(['width' => $starFill . '%'])>★</span>
                                     </span>
                                 @endfor
                             </div>
@@ -507,16 +445,15 @@
                                     :src="review.is_anonymous ? defaultAvatar : (review.user?.avatar_url || defaultAvatar)"
                                     alt="Avatar người đánh giá"
                                     class="w-10 h-10 rounded-full object-cover border border-neutral-200 shrink-0 bg-neutral-50"
-                                    x-on:error="$event.target.src = defaultAvatar"
                                 >
 
                                 <div class="min-w-0 flex-1 space-y-2">
                                     <div class="flex flex-wrap items-start justify-between gap-2">
                                         <div class="min-w-0">
                                             <h4 class="text-sm font-extrabold text-slate-900 truncate" x-text="review.is_anonymous ? 'Ẩn danh' : (review.user?.ho_ten || 'Khách hàng VNTech')"></h4>
-                                            <div class="flex text-amber-400 text-sm leading-none mt-1" :aria-label="`${review.so_sao} sao`">
+                                            <div class="flex text-sm leading-none mt-1" :aria-label="`${review.so_sao} sao`">
                                                 <template x-for="star in 5" :key="star">
-                                                    <span :class="star <= Number(review.so_sao || 0) ? 'text-amber-400' : 'text-neutral-250'">★</span>
+                                                    <span :class="star <= Number(review.so_sao || 0) ? 'text-amber-400' : 'text-neutral-200'">★</span>
                                                 </template>
                                             </div>
                                         </div>
@@ -531,8 +468,8 @@
                                         </div>
                                     </div>
 
-                                    <p x-show="review.ten_bien_the" class="text-xs text-neutral-500 font-semibold">
-                                        Phân loại hàng: <span class="text-slate-600" x-text="review.ten_bien_the"></span>
+                                    <p x-show="review.ten_hien_thi || review.ten_bien_the" class="text-xs text-neutral-500 font-semibold">
+                                        Phân loại hàng: <span class="text-slate-600" x-text="review.ten_hien_thi || review.ten_bien_the"></span>
                                     </p>
 
                                     <p x-show="review.noi_dung" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line" x-text="review.noi_dung"></p>
@@ -599,21 +536,15 @@
                     <div class="bg-white rounded-3xl border border-neutral-100 overflow-hidden shadow-xs">
                         <table class="w-full text-left">
                             <tbody class="divide-y divide-neutral-100">
-                                @foreach($productDetail->thong_tin_them as $row)
-                                @php
-                                    $rowTen = is_array($row) ? ($row['ten'] ?? '') : ($row->ten ?? '');
-                                    $rowVal = is_array($row) ? ($row['gia_tri'] ?? '') : ($row->gia_tri ?? '');
-                                @endphp
-                                @if(!empty($rowTen) || !empty($rowVal))
+                                @foreach($formattedThem as $row)
                                 <tr class="hover:bg-neutral-50/50 transition-colors group">
                                     <td class="p-5 font-bold text-xs tracking-wider text-slate-400 w-1/3 uppercase">
-                                        {{ $rowTen }}
+                                        {{ $row['ten'] }}
                                     </td>
                                     <td class="p-5 text-slate-800 font-semibold text-sm">
-                                        {{ $rowVal }}
+                                        {{ $row['gia_tri'] }}
                                     </td>
                                 </tr>
-                                @endif
                                 @endforeach
                             </tbody>
                         </table>
@@ -634,15 +565,11 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                 @foreach($relatedProducts as $prod)
-                @php
-                    $originalPrice = $prod->gia_thap_nhat * 1.25;
-                    $currentPrice = $prod->gia_thap_nhat;
-                @endphp
-                <a href="{{ route('viewProductDetail', $prod->ma_san_pham) }}" 
+                <a href="{{ route('home.product_detail', ['ma_san_pham' => $prod->ma_san_pham, 'ma_bien_the' => $prod->default_ma_bien_the]) }}" 
                    class="bg-white border border-neutral-150/70 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group text-left shadow-xs">
                     <!-- Image Wrapper -->
                     <div class="relative bg-neutral-50/50 aspect-square overflow-hidden flex items-center justify-center p-4 border-b border-neutral-100/60">
-                        <img src="{{ $prod->link_anh_dai_dien ?? 'https://via.placeholder.com/400' }}" 
+                        <img src="{{ $prod->link_anh_dai_dien ?: asset('images/no-image.png') }}" 
                              alt="{{ $prod->ten_san_pham }}" 
                              class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
                         
@@ -669,9 +596,10 @@
                         <!-- Price & CTA -->
                         <div class="flex justify-between items-center mt-auto pt-4 border-t border-neutral-100/50 w-full">
                             <div class="text-left">
+                                <span class="text-[11px] text-slate-700 uppercase tracking-wider block font-extrabold leading-none mb-1.5">Đã bán: {{ $prod->tong_luot_ban ?? 0 }}</span>
                                 <span class="text-[9px] text-neutral-400 uppercase tracking-widest block font-bold leading-none mb-1">Chỉ từ</span>
                                 <span class="font-display text-[15px] font-black text-[#E04F2A] tracking-tight block leading-none">
-                                    {{ number_format($currentPrice, 0, ',', '.') }}₫
+                                    {{ number_format($prod->current_price, 0, ',', '.') }}₫
                                 </span>
                             </div>
                             <div class="w-9 h-9 bg-neutral-50 border border-neutral-150/70 group-hover:bg-[#ff5c00] group-hover:border-[#ff5c00] text-slate-400 group-hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 transform active:scale-90 shadow-xs">

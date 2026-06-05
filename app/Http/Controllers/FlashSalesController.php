@@ -24,7 +24,10 @@ class FlashSalesController extends Controller
     }
 
     public function viewEditFlashSalesAdmin(FlashSales $flash_sales) {
-        $flash_sale_products = FlashSaleItem::where('ma_flash_sales', $flash_sales->ma_flash_sales)->where('trang_thai', '!=', 'delete')->get();
+        $flash_sale_products = FlashSaleItem::with('variant.product')
+            ->where('ma_flash_sales', $flash_sales->ma_flash_sales)
+            ->where('trang_thai', '!=', 'delete')
+            ->get();
         $productWithVariants = Product::with(['variants' => function ($query) {
             $query->where('trang_thai', '!=', 'delete');
         }])->get();

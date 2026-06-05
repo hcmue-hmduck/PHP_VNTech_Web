@@ -15,9 +15,8 @@ class ReviewController extends Controller
     {
         $query = Review::where('ma_san_pham', $ma_san_pham)
             ->where('trang_thai', 'active')
-            ->where('is_deleted', '!=', true)
-            ->with(['user:ma_nguoi_dung,ho_ten,avatar_url'])
-            ->select(['ma_nguoi_dung', 'ten_bien_the', 'so_sao', 'noi_dung', 'danh_sach_anh', 'video', 'is_anonymous', 'created_at', 'is_updated']);
+            ->with(['user:ma_nguoi_dung,ho_ten,avatar_url', 'product:ma_san_pham,ten_san_pham'])
+            ->select(['ma_san_pham', 'ma_nguoi_dung', 'ten_bien_the', 'so_sao', 'noi_dung', 'danh_sach_anh', 'video', 'is_anonymous', 'created_at', 'is_updated']);
 
         if ($request->boolean('co_media')) {
             $query->where(function ($query) {
@@ -47,6 +46,12 @@ class ReviewController extends Controller
         }
 
         $reviews = $query->latest()->paginate(10);
+        $reviews->getCollection()->transform(function ($review) {
+            $review->ten_hien_thi = trim((string) ($review->product?->ten_san_pham ?? '') . ' ' . (string) ($review->ten_bien_the ?? ''));
+
+            return $review;
+        });
+
         return response()->json($reviews);
     }
 
@@ -55,7 +60,7 @@ class ReviewController extends Controller
     {
         $reviews = Review::where('ma_don_hang', $ma_don_hang)
             ->where('ma_nguoi_dung', Auth::id())
-            ->where('is_deleted', '!=', true)
+            ->where('trang_thai', 'active')
             ->get()
             ->map(function ($review) {
                 $review->can_update = !($review->is_updated ?? false)
@@ -276,7 +281,6 @@ class ReviewController extends Controller
 
         $reviews = Review::where('ma_san_pham', $ma_san_pham)
             ->where('trang_thai', 'active')
-            ->where('is_deleted', '!=', true)
             ->get(['so_sao']);
 
         $reviewCount = $reviews->count();
