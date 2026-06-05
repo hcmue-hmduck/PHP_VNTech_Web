@@ -18,12 +18,16 @@ use App\Http\Controllers\AiController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\BannerImagesController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CompareController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('home.index');
 Route::get('/products', [HomeController::class, 'viewHomeProducts'])->name('home.products');
 Route::get('/news', [HomeController::class, 'viewHomeNews'])->name('home.news');
 Route::view('/support', 'homeUI.support')->name('support');
 Route::view('/contact', 'homeUI.contact')->name('contact');
+Route::view('/compare', 'homeUI.compare')->name('compare.view');
+Route::post('/compare/variants', [CompareController::class, 'variants'])->name('compare.variants');
+Route::post('/compare/ai', [CompareController::class, 'aiCompare'])->name('compare.ai');
 Route::get('/product-detail/{ma_san_pham}', [ProductDetailController::class, "viewProductDetail"])->name('viewProductDetail');
 Route::get('/products/{ma_san_pham}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 

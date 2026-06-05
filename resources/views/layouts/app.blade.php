@@ -107,7 +107,9 @@
                     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                         
                         <!-- AI Comparison Trigger -->
-                        <button 
+                        <a
+                            href="{{ route('compare.view') }}"
+                            id="ai-compare-trigger"
                             class="relative p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-brand-500 transition-all duration-300 flex items-center justify-center cursor-pointer"
                             title="So sánh cấu hình AI"
                         >
@@ -115,7 +117,11 @@
                                 <i data-lucide="git-compare" class="w-5 h-5"></i>
                                 <span class="absolute -top-0.5 -right-1.5 w-3 h-3 bg-brand-500 text-white text-[6px] font-black rounded-full flex items-center justify-center leading-none">AI</span>
                             </div>
-                        </button>
+                            <span
+                                id="ai-compare-count"
+                                class="hidden absolute -bottom-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-white text-brand-500 text-[9px] font-black leading-4 text-center shadow-md ring-2 ring-slate-900"
+                            >0</span>
+                        </a>
 
                         <!-- Notifications Dropdown -->
                         <div class="relative" x-data="{ open: false }" @click.away="open = false">
@@ -572,6 +578,35 @@
             });
         </script>
     @endif
+
+    <script>
+        window.VNTECH_COMPARE_STORAGE_KEY = 'vntech_compare_variants';
+
+        window.getCompareVariantIds = function() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(window.VNTECH_COMPARE_STORAGE_KEY) || '[]');
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        };
+
+        window.updateCompareCount = function() {
+            const badge = document.getElementById('ai-compare-count');
+            if (!badge) return;
+
+            const count = window.getCompareVariantIds().length;
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+        };
+
+        document.addEventListener('DOMContentLoaded', window.updateCompareCount);
+        window.addEventListener('storage', function(event) {
+            if (event.key === window.VNTECH_COMPARE_STORAGE_KEY) {
+                window.updateCompareCount();
+            }
+        });
+    </script>
 
     @include('layouts.chatbot')
     @yield('scripts')

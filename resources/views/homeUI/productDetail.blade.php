@@ -51,6 +51,21 @@
     .animate-fade-in {
         animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+    @keyframes compareBlink {
+        0%, 100% {
+            color: rgb(148 163 184);
+            transform: scale(1);
+            box-shadow: none;
+        }
+        50% {
+            color: #ff4f00;
+            transform: scale(1.18);
+            box-shadow: 0 0 0 10px rgba(255, 79, 0, 0.16);
+        }
+    }
+    .compare-blink {
+        animation: compareBlink 0.45s ease-in-out 2;
+    }
 </style>
 
 <div class="relative bg-white text-gray-800 font-['Inter'] selection:bg-orange-100 selection:text-[#FF5C00] min-h-screen">
@@ -295,10 +310,10 @@
 
                         <button
                             type="button"
-                            onclick="toggleFavorite()"
-                            id="wishlist-btn"
+                            onclick="addCurrentVariantToCompare()"
+                            id="compare-variant-btn"
                             class="w-14 h-14 border border-neutral-200 rounded-2xl flex items-center justify-center transition-all shadow-xs active:scale-95 cursor-pointer bg-white text-neutral-400 hover:text-[#FF5C00] hover:bg-orange-50/20"
-                            title="Lưu sản phẩm yêu thích"
+                            title="Thêm vào danh sách so sánh"
                         >
                             <div class="relative">
                                 <i data-lucide="git-compare" class="w-5 h-5"></i>
@@ -933,6 +948,50 @@
     // Buy now redirect
     function submitBuyNow() {
         window.location.href = "{{ route('payment.view', $selectedVariant->ma_bien_the) }}?so_luong=1";
+    }
+
+    const COMPARE_STORAGE_KEY = window.VNTECH_COMPARE_STORAGE_KEY || 'vntech_compare_variants';
+    const MAX_COMPARE_ITEMS = 3;
+
+    function getCompareVariantIds() {
+        try {
+            const parsed = JSON.parse(localStorage.getItem(COMPARE_STORAGE_KEY) || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function saveCompareVariantIds(variantIds) {
+        localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(variantIds));
+    }
+
+    function blinkAiCompareButton() {
+        const compareTrigger = document.getElementById('ai-compare-trigger');
+        if (!compareTrigger) return;
+
+        compareTrigger.classList.remove('compare-blink');
+        void compareTrigger.offsetWidth;
+        compareTrigger.classList.add('compare-blink');
+    }
+
+    function addCurrentVariantToCompare() {
+        const variantId = @json($selectedVariant->ma_bien_the);
+        let variantIds = getCompareVariantIds().filter((id) => id !== variantId);
+
+        variantIds.push(variantId);
+
+        if (variantIds.length > MAX_COMPARE_ITEMS) {
+            variantIds = variantIds.slice(variantIds.length - MAX_COMPARE_ITEMS);
+        }
+
+        saveCompareVariantIds(variantIds);
+        window.updateCompareCount?.();
+        blinkAiCompareButton();
+
+        if (typeof window.showToast === 'function') {
+            window.showToast('Đã thêm sản phẩm vào danh sách so sánh', 'success');
+        }
     }
 </script>
 @endsection

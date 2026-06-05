@@ -22,20 +22,20 @@ use Stringable;
 
 class VnTechAssistant implements Agent, Conversational, HasProviderOptions, HasTools
 {
-   use Promptable, RemembersConversations;
+    use Promptable, RemembersConversations;
 
-   public function __construct(private readonly ?string $toolChoice = null) {}
+    public function __construct(private readonly ?string $toolChoice = null) {}
 
-   static function makeWithRequiredTool()
-   {
-      return static::make(toolChoice: 'required');
-   }
-   /**
-    * Get the instructions that the agent should follow.
-    */
-   public function instructions(): Stringable|string
-   {
-      return <<<'EOD'
+    static function makeWithRequiredTool()
+    {
+        return static::make(toolChoice: 'required');
+    }
+    /**
+     * Get the instructions that the agent should follow.
+     */
+    public function instructions(): Stringable|string
+    {
+        return <<<'EOD'
          Em tên Nhung, chuyên gia tư vấn thiết bị công nghệ và bán hàng cho VNTech tại TP.HCM. Em là người Việt Nam, luôn trả lời bằng tiếng Việt.
 
          QUY TẮC BẮT BUỘC ƯU TIÊN CAO NHẤT
@@ -97,40 +97,40 @@ class VnTechAssistant implements Agent, Conversational, HasProviderOptions, HasT
             - Dùng tiêu đề ngắn, bullet list hoặc bảng khi so sánh.
             - Khi liệt kê sản phẩm, ưu tiên: tên sản phẩm, giá, tồn kho, ưu đãi, gợi ý tiếp theo.
       EOD;
-   }
+    }
 
-   public function model()
-   {
-      return config('ai.chatbot.model');
-   }
+    public function model()
+    {
+        return config('ai.chatbot.model');
+    }
 
-   public function providerOptions(Lab|string $provider): array
-   {
-      // console_log(['toolChoie:' => $this->toolChoice]);
-      if ($this->toolChoice === null) {
-         return [];
-      }
-      return [
-         'tool_choice' => $this->toolChoice,
-      ];
-   }
+    public function providerOptions(Lab|string $provider): array
+    {
+        // console_log(['toolChoie:' => $this->toolChoice]);
+        if ($this->toolChoice === null) {
+            return [];
+        }
+        return [
+            'tool_choice' => $this->toolChoice,
+        ];
+    }
 
-   /**
-    * Get the tools available to the agent.
-    *
-    * @return Tool[]
-    */
-   public function tools(): iterable
-   {
-      return [
-         new ListCategoriesTool,
-         new ListBrandsTool,
-         new SearchProductsTool,
-         new ListFlashSaleProductsTool,
-         new ListVouchersTool,
-         new GetProductDetailsTool,
-         new ListMyOrdersTool,
-         new GetOrderDetailsTool,
-      ];
-   }
+    /**
+     * Get the tools available to the agent.
+     *
+     * @return Tool[]
+     */
+    public function tools(): iterable
+    {
+        return [
+            new ListCategoriesTool,
+            new ListBrandsTool,
+            new SearchProductsTool,
+            new ListFlashSaleProductsTool,
+            new ListVouchersTool,
+            new GetProductDetailsTool,
+            new ListMyOrdersTool,
+            new GetOrderDetailsTool,
+        ];
+    }
 }
