@@ -2521,20 +2521,242 @@ class Products_VariantsSeed extends Seeder
                         'specs' => [['ten' => 'Màu sắc', 'gia_tri' => 'Xám Không Gian']]
                     ]
                 ]
+            ],
+            [
+                'name' => 'Loa Bluetooth JBL Charge 5',
+                'category' => 'Thiết bị âm thanh',
+                'brand' => 'JBL',
+                'desc' => 'Loa di động chống nước, chống bụi với âm thanh JBL Pro Sound mạnh mẽ, thời gian chơi nhạc lên tới 20 giờ liên tục.',
+                'specs' => [
+                    ['ten' => 'Công suất', 'gia_tri' => '40W RMS'],
+                    ['ten' => 'Thời lượng pin', 'gia_tri' => 'Lên đến 20 giờ'],
+                    ['ten' => 'Chuẩn kháng nước', 'gia_tri' => 'IP67'],
+                    ['ten' => 'Kết nối', 'gia_tri' => 'Bluetooth 5.1']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'JBL Charge 5 Standard',
+                        'price' => 3990000,
+                        'price_retail' => 4490000,
+                        'stock' => 50,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Tai nghe chụp tai Sony WH-1000XM5',
+                'category' => 'Tai nghe',
+                'brand' => 'Sony',
+                'desc' => 'Tai nghe chụp tai chống ồn chủ động cao cấp hàng đầu của Sony, tích bộ xử lý kép V1 và chất âm độ phân giải cao Hi-Res Audio.',
+                'specs' => [
+                    ['ten' => 'Công nghệ chống ồn', 'gia_tri' => 'ANC kép (Auto NC Optimizer)'],
+                    ['ten' => 'Thời lượng pin', 'gia_tri' => 'Lên đến 30 giờ'],
+                    ['ten' => 'Kết nối', 'gia_tri' => 'Bluetooth 5.2']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'Sony WH-1000XM5 Standard',
+                        'price' => 6490000,
+                        'price_retail' => 8490000,
+                        'stock' => 30,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Màn hình Dell UltraSharp U2424H 23.8 inch',
+                'category' => 'Màn hình máy tính',
+                'brand' => 'Dell',
+                'desc' => 'Màn hình văn phòng chuyên nghiệp độ phủ màu cao, viền siêu mỏng, tần số quét 120Hz mượt mà mang lại sự thoải mái cho đôi mắt.',
+                'specs' => [
+                    ['ten' => 'Kích thước', 'gia_tri' => '23.8 inch'],
+                    ['ten' => 'Độ phân giải', 'gia_tri' => 'Full HD (1920 x 1080)'],
+                    ['ten' => 'Tần số quét', 'gia_tri' => '120Hz']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'Dell UltraSharp U2424H Standard',
+                        'price' => 5990000,
+                        'price_retail' => 6490000,
+                        'stock' => 40,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Chuột không dây Logitech Pebble M350',
+                'category' => 'Chuột',
+                'brand' => 'Logitech',
+                'desc' => 'Chuột không dây yên lặng (Silent), thiết kế mỏng nhẹ hiện đại, kết nối linh hoạt dễ dàng mang đi mọi nơi.',
+                'specs' => [
+                    ['ten' => 'Kiểu kết nối', 'gia_tri' => 'Bluetooth & USB Receiver 2.4GHz'],
+                    ['ten' => 'Độ phân giải', 'gia_tri' => '1000 DPI'],
+                    ['ten' => 'Trọng lượng', 'gia_tri' => '100g']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'Logitech Pebble M350 Standard',
+                        'price' => 349000,
+                        'price_retail' => 450000,
+                        'stock' => 100,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Bàn phím cơ ASUS ROG Strix Scope II',
+                'category' => 'Bàn phím',
+                'brand' => 'ASUS',
+                'desc' => 'Bàn phím cơ chơi game thế hệ mới trang bị switch độc quyền ROG NX được bôi trơn sẵn, cấu trúc tiêu âm bọt khí êm ái.',
+                'specs' => [
+                    ['ten' => 'Loại Switch', 'gia_tri' => 'ROG NX Snow (Linear)'],
+                    ['ten' => 'Đèn LED', 'gia_tri' => 'RGB Per-key'],
+                    ['ten' => 'Kết nối', 'gia_tri' => 'Cáp USB rời']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'ASUS ROG Strix Scope II Standard',
+                        'price' => 2690000,
+                        'price_retail' => 2990000,
+                        'stock' => 25,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Router Wifi TP-Link Archer AX55',
+                'category' => 'Thiết bị mạng',
+                'brand' => 'TP-Link',
+                'desc' => 'Bộ định tuyến chuẩn Wifi 6 thế hệ mới tốc độ cao, hỗ trợ bảo mật HomeShield và kết nối hàng chục thiết bị cùng lúc.',
+                'specs' => [
+                    ['ten' => 'Chuẩn Wifi', 'gia_tri' => 'Wifi 6 (802.11ax)'],
+                    ['ten' => 'Băng thông', 'gia_tri' => '3000 Mbps'],
+                    ['ten' => 'Ăng-ten', 'gia_tri' => '4 Ăng-ten ngoài']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'TP-Link Archer AX55 Standard',
+                        'price' => 1690000,
+                        'price_retail' => 1990000,
+                        'stock' => 60,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Sạc GaN Anker PowerPort III 65W Pod',
+                'category' => 'Củ sạc',
+                'brand' => 'Anker',
+                'desc' => 'Cốc sạc nhanh mini thế hệ mới của Anker ứng dụng công nghệ GaN II, hỗ trợ PPS sạc cực nhanh cho điện thoại và laptop.',
+                'specs' => [
+                    ['ten' => 'Công suất tối đa', 'gia_tri' => '65W'],
+                    ['ten' => 'Cổng kết nối', 'gia_tri' => '1 cổng USB-C']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'Anker PowerPort III 65W Standard',
+                        'price' => 490000,
+                        'price_retail' => 650000,
+                        'stock' => 150,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Webcam Logitech C922 Pro Stream',
+                'category' => 'Gaming Gear',
+                'brand' => 'Logitech',
+                'desc' => 'Webcam chuyên dụng cho truyền phát trực tiếp Full HD sắc nét, tích hợp chân đế mini tripod và chế độ lọc tạp âm mic kép.',
+                'specs' => [
+                    ['ten' => 'Độ phân giải', 'gia_tri' => '1080p@30fps / 720p@60fps'],
+                    ['ten' => 'Góc nhìn', 'gia_tri' => '78 độ']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'Logitech C922 Standard',
+                        'price' => 1990000,
+                        'price_retail' => 2490000,
+                        'stock' => 35,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Tay cầm chơi game Sony DualSense Wireless',
+                'category' => 'Gaming Gear',
+                'brand' => 'Sony',
+                'desc' => 'Tay cầm chơi game không dây thế hệ mới của PlayStation 5 mang lại trải nghiệm rung phản hồi xúc giác chân thực nhất.',
+                'specs' => [
+                    ['ten' => 'Tính năng nổi bật', 'gia_tri' => 'Haptic Feedback, Adaptive Triggers'],
+                    ['ten' => 'Kết nối', 'gia_tri' => 'Bluetooth, USB-C']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'DualSense Wireless Standard',
+                        'price' => 1590000,
+                        'price_retail' => 1790000,
+                        'stock' => 80,
+                        'specs' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Ổ cứng di động SSD Samsung T7 Portable 1TB',
+                'category' => 'Ổ cứng SSD',
+                'brand' => 'Samsung',
+                'desc' => 'Ổ cứng di động siêu bền, tốc độ truyền tải cực cao lên đến 1050 MB/s, bảo mật vân tay và mã hóa dữ liệu an toàn.',
+                'specs' => [
+                    ['ten' => 'Dung lượng', 'gia_tri' => '1TB'],
+                    ['ten' => 'Chuẩn kết nối', 'gia_tri' => 'USB 3.2 Gen 2 (10Gbps)'],
+                    ['ten' => 'Tốc độ đọc', 'gia_tri' => 'Lên đến 1050 MB/s']
+                ],
+                'variants' => [
+                    [
+                        'name' => 'Samsung T7 1TB Standard',
+                        'price' => 2490000,
+                        'price_retail' => 2990000,
+                        'stock' => 45,
+                        'specs' => []
+                    ]
+                ]
             ]
         ];
 
         // 4. Lặp tạo các bản ghi Sản phẩm và các Biến thể
         foreach ($productsData as $index => $item) {
-            $catId = $categories[$item['category']] ?? null;
-            $brandId = $brands[$item['brand']] ?? null;
-
-            if (!$catId || !$brandId) {
-                continue; // Bỏ qua nếu danh mục hoặc hãng không tìm thấy trong DB
+            // Tự động tạo danh mục nếu chưa có
+            if (empty($categories[$item['category']])) {
+                $newCat = Category::create([
+                    'ma_danh_muc'     => 'temp',
+                    'ma_danh_muc_cha' => null,
+                    'ten_danh_muc'    => $item['category'],
+                    'logo_url'        => null,
+                    'trang_thai'      => 'active',
+                ]);
+                $newCat->update(['ma_danh_muc' => $newCat->_id]);
+                $categories[$item['category']] = $newCat->_id;
             }
+            $catId = $categories[$item['category']];
+
+            // Tự động tạo hãng nếu chưa có
+            if (empty($brands[$item['brand']])) {
+                $newBrand = Brand::create([
+                    'ma_thuong_hieu' => 'temp',
+                    'ten_thuong_hieu'=> $item['brand'],
+                    'mo_ta'          => 'Thương hiệu ' . $item['brand'],
+                    'logo_url'       => null,
+                    'trang_thai'     => 'active',
+                ]);
+                $newBrand->update(['ma_thuong_hieu' => $newBrand->_id]);
+                $brands[$item['brand']] = $newBrand->_id;
+            }
+            $brandId = $brands[$item['brand']];
 
             // Tính giá thấp nhất ban đầu từ các biến thể
             $minPrice = collect($item['variants'])->min('price');
+
+            // Xác định sản phẩm có nhiều biến thể hay không
+            $hasVariants = count($item['variants']) > 1;
 
             // Tạo sản phẩm chính
             $product = Product::create([
@@ -2549,6 +2771,7 @@ class Products_VariantsSeed extends Seeder
                 'hinh_anh'                => [],   // Mảng ảnh rỗng
                 'thong_so_ky_thuat_chung' => $item['specs'],
                 'thong_tin_them'          => [],
+                'kiem_tra_bien_the'       => $hasVariants,
                 'luot_xem'                => rand(50, 1500),
                 'gia_thap_nhat'           => $minPrice,
                 'so_sao_trung_binh'       => 0,
@@ -2567,19 +2790,24 @@ class Products_VariantsSeed extends Seeder
 
                 // Tự động bỏ tên sản phẩm ở đầu và sinh tên từ các giá trị specs, cách nhau bởi /
                 $variantName = '';
-                if (!empty($vItem['specs']) && is_array($vItem['specs'])) {
-                    $specValues = [];
-                    foreach ($vItem['specs'] as $spec) {
-                        if (!empty($spec['gia_tri'])) {
-                            $specValues[] = $spec['gia_tri'];
+                if ($hasVariants) {
+                    if (!empty($vItem['specs']) && is_array($vItem['specs'])) {
+                        $specValues = [];
+                        foreach ($vItem['specs'] as $spec) {
+                            if (!empty($spec['gia_tri'])) {
+                                $specValues[] = $spec['gia_tri'];
+                            }
+                        }
+                        if (!empty($specValues)) {
+                            $variantName = implode('/', $specValues);
                         }
                     }
-                    if (!empty($specValues)) {
-                        $variantName = implode('/', $specValues);
+                    if (empty($variantName)) {
+                        $variantName = $vItem['name'];
                     }
-                }
-                if (empty($variantName)) {
-                    $variantName = $vItem['name'];
+                } else {
+                    // Nếu là sản phẩm đơn giản (không có biến thể), tên biến thể phải để rỗng ""
+                    $variantName = '';
                 }
 
                 $variant = ProductVariant::create([
@@ -2591,7 +2819,7 @@ class Products_VariantsSeed extends Seeder
                     'gia_niem_yet'            => $vItem['price_retail'],
                     'so_luong_ton_kho'        => $vItem['stock'],
                     'da_ban'                  => 0,
-                    'thong_so_ky_thuat_rieng' => $vItem['specs'],
+                    'thong_so_ky_thuat_rieng' => $hasVariants ? $vItem['specs'] : null,
                     'trang_thai'              => 'active',
                 ]);
 

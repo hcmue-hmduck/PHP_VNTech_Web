@@ -35,6 +35,10 @@ class GetProductDetailsTool implements Tool
             return "Không tìm thấy sản phẩm với mã: '{$maSanPham}'.";
         }
 
+        $product->variants->each(function ($variant) use ($product) {
+            $variant->setRelation('product', $product);
+        });
+
         return $product->toJson(JSON_UNESCAPED_UNICODE);
     }
 

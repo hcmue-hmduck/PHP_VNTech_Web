@@ -21,6 +21,7 @@ class Product extends Model
         'hinh_anh',
         'thong_so_ky_thuat_chung',
         'thong_tin_them',
+        'kiem_tra_bien_the',
         'luot_xem',
         'gia_thap_nhat',
         'so_sao_trung_binh',
@@ -41,6 +42,7 @@ class Product extends Model
         'so_luot_danh_gia' => 'integer',
         'tong_so_sao' => 'integer',
         'tong_luot_ban' => 'integer',
+        'kiem_tra_bien_the' => 'boolean',
     ];
 
     public function getRouteKeyName(): string

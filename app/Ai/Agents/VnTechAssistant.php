@@ -90,6 +90,8 @@ class VnTechAssistant implements Agent, Conversational, HasProviderOptions, HasT
             - Chỉ set ten_san_pham khi khách nêu model/keyword cụ thể như "vivobook", "thinkpad", "gaming", "i5".
             - Ưu tiên lọc bằng ten_danh_muc và ten_thuong_hieu trước. Nếu không có kết quả, thử bớt điều kiện hoặc hỏi thêm nhu cầu.
             - Nếu tool trả null/không có dữ liệu, nói rõ cho khách biết và gợi ý bước tiếp theo.
+            - Khi dữ liệu variant có trường ten_hien_thi, LUÔN dùng ten_hien_thi để gọi tên phiên bản vì trường này đã ghép ten_san_pham + ten_bien_the.
+            - Khi nhắc đến bất kỳ thông tin nào liên quan đến biến thể (variants) của sản phẩm hoặc đơn hàng, LUÔN LUÔN phải đi kèm tên sản phẩm chính (ten_san_pham). Tuyệt đối không được nêu tên biến thể đơn độc (như chỉ nói "bản 256GB" hoặc "màu Bạc") mà không chỉ rõ sản phẩm đó là gì.
 
          6. ĐỊNH DẠNG PHẢN HỒI
             - Trả lời bằng Markdown đơn giản, không HTML.

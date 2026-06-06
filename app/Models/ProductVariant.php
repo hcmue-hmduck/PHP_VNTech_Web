@@ -28,6 +28,16 @@ class ProductVariant extends Model {
         'da_ban'           => 'integer',
     ];
 
+    protected $appends = [
+        'ten_san_pham',
+        'ten_hien_thi',
+    ];
+
+    public function getTenSanPhamAttribute(): string
+    {
+        return $this->product?->ten_san_pham ?? '';
+    }
+
     public function product()
     {
         return $this->belongsTo(Product::class, 'ma_san_pham', 'ma_san_pham');

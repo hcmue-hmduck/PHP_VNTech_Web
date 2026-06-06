@@ -4,9 +4,9 @@
 
 @section('content')
 @php
-    $totalUsers = $users->count();
-    $activeUsers = $users->where('trang_thai', 'active')->count();
-    $inactiveUsers = $users->filter(fn($u) => ($u->trang_thai ?? 'active') !== 'active')->count();
+    $totalUsers = $totalUsersCount;
+    $activeUsers = $activeUsersCount;
+    $inactiveUsers = $inactiveUsersCount;
 @endphp
 
 <div class="w-full">
@@ -72,17 +72,42 @@
                 id="searchTerm"
                 type="text" 
                 placeholder="Tên khách hàng hoặc Email..." 
+                value="{{ request('search') }}"
+                onkeydown="if(event.key === 'Enter') { 
+                    const url = new URL(window.location.href);
+                    if(this.value.trim() === '') {
+                        url.searchParams.delete('search');
+                    } else {
+                        url.searchParams.set('search', this.value);
+                    }
+                    url.searchParams.delete('page');
+                    window.location.href = url.toString();
+                }"
                 class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white"
             />
         </div>
         
         <div class="space-y-1.5">
             <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Trạng thái tài khoản</label>
-            <select id="statusFilter" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
-                <option value="all">TẤT CẢ TRẠNG THÁI</option>
-                <option value="active">ĐANG HOẠT ĐỘNG</option>
-                <option value="inactive">ĐÃ BỊ KHÓA</option>
-            </select>
+            <div class="relative">
+                <select id="statusFilter" 
+                        onchange="
+                            const url = new URL(window.location.href);
+                            if(this.value === 'all') {
+                                url.searchParams.delete('status');
+                            } else {
+                                url.searchParams.set('status', this.value);
+                            }
+                            url.searchParams.delete('page');
+                            window.location.href = url.toString();
+                        "
+                        class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
+                    <option value="all" {{ request('status') === 'all' || !request()->has('status') ? 'selected' : '' }}>TẤT CẢ TRẠNG THÁI</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>ĐANG HOẠT ĐỘNG</option>
+                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>ĐÃ BỊ KHÓA</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 text-xs">▼</div>
+            </div>
         </div>
     </div>
 
@@ -174,6 +199,11 @@
                 </tbody>
             </table>
         </div>
+        @if ($users->hasPages())
+            <div class="px-6 py-4 border-t border-white/5 bg-surface-high/20">
+                {{ $users->appends(request()->query())->links() }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection
@@ -184,34 +214,6 @@
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
-
-        const searchInput = document.getElementById('searchTerm');
-        const statusSelect = document.getElementById('statusFilter');
-        const tableBody = document.getElementById('userTableBody');
-        const rows = tableBody ? tableBody.querySelectorAll('tr[data-name]') : [];
-
-        function filterUsers() {
-            const query = searchInput.value.toLowerCase().trim();
-            const status = statusSelect.value;
-
-            rows.forEach(row => {
-                const rowName = row.getAttribute('data-name').toLowerCase();
-                const rowEmail = row.getAttribute('data-email').toLowerCase();
-                const rowStatus = row.getAttribute('data-status').toLowerCase();
-
-                const matchesQuery = query === '' || rowName.includes(query) || rowEmail.includes(query);
-                const matchesStatus = status === 'all' || rowStatus === status;
-
-                if (matchesQuery && matchesStatus) {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
-                }
-            });
-        }
-
-        if (searchInput) searchInput.addEventListener('input', filterUsers);
-        if (statusSelect) statusSelect.addEventListener('change', filterUsers);
     });
 </script>
 @endpush

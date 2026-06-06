@@ -27,6 +27,8 @@ return new class extends Migration
             $collection->array('thong_so_ky_thuat_chung')->nullable();
             $collection->array('thong_tin_them')->nullable();
 
+            $collection->boolean('kiem_tra_bien_the');
+
             $collection->integer('luot_xem')->default(0);
             $collection->decimal('gia_thap_nhat', 15, 2)->default(0);
             $collection->decimal('so_sao_trung_binh', 3, 2)->default(0);

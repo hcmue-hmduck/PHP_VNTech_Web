@@ -415,7 +415,7 @@
                                                 @endphp
                                                 <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-gray-200">
                                                     ★
-                                                    <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-500" @style(['width' => $starFill . '%'])>★</span>
+                                                    <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-500" style="--fill: {{ $starFill }}%; width: var(--fill);">★</span>
                                                 </span>
                                             @endfor
                                         </div>

@@ -45,6 +45,8 @@
                     }}"></div>
                     @if($order->trang_thai === 'cho_thanh_toan')
                         <span class="text-yellow-400 font-bold uppercase tracking-widest text-sm">Chờ thanh toán</span>
+                    @elseif($order->trang_thai === 'da_huy')
+                        <span class="text-red-500 font-bold uppercase tracking-widest text-sm">Đã hủy</span>
                     @else
                         <select name="trang_thai" onchange="document.getElementById('status-form').submit()" class="bg-transparent text-white font-display text-sm font-bold uppercase tracking-widest outline-none border-none cursor-pointer focus:ring-0 pr-8">
                             @if($order->phuong_thuc_thanh_toan != 'momo') <option value="cho_xac_nhan" {{ $order->trang_thai === 'cho_xac_nhan' ? 'selected' : '' }} class="bg-surface text-white">Chờ xác nhận</option>@endif

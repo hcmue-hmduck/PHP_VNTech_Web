@@ -139,7 +139,7 @@
                                 @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
                                 <span class="relative inline-block w-4 h-4 overflow-hidden text-base leading-none text-neutral-200">
                                     ★
-                                    <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-500" @style(['width' => $starFill . '%'])>★</span>
+                                    <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-500" style="--fill: {{ $starFill }}%; width: var(--fill);">★</span>
                                 </span>
                             @endfor
                         </div>
@@ -234,9 +234,10 @@
                     @endif
                 </div>
 
+                @if ($productDetail->kiem_tra_bien_the)
                 <!-- Capacity pills section (Matches "Dung lượng" in attachment) -->
                 <div class="border-t border-neutral-100 pt-5">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">CHỌN CẤU HÌNH:</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">CHỌN PHIÊN BẢN:</p>
                     <div class="flex flex-wrap gap-2.5">
                         @foreach($variants as $idx => $variant)
                         <a href="{{ route('home.product_detail', ['ma_san_pham' => $productDetail->ma_san_pham, 'ma_bien_the' => $variant->ma_bien_the]) }}" 
@@ -246,6 +247,7 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
 
                 <div class="border-t border-neutral-100 pt-5">
                     <div class="inline-flex items-center gap-2.5 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-3.5 py-2 text-emerald-700">
@@ -415,9 +417,9 @@
                             <div class="flex text-sm leading-none">
                                 @for($i = 1; $i <= 5; $i++)
                                     @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
-                                    <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-neutral-200">
+                                    <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-gray-200">
                                         ★
-                                        <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-400" @style(['width' => $starFill . '%'])>★</span>
+                                        <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-400" style="--fill: {{ $starFill }}%; width: var(--fill);">★</span>
                                     </span>
                                 @endfor
                             </div>
@@ -904,7 +906,7 @@
     }
 
     function addCurrentVariantToCompare() {
-        const variantId = @json($selectedVariant->ma_bien_the);
+        const variantId = '{{ $selectedVariant->ma_bien_the }}';
         let variantIds = getCompareVariantIds().filter((id) => id !== variantId);
 
         variantIds.push(variantId);

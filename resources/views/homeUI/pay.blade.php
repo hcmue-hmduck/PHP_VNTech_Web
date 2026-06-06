@@ -59,7 +59,7 @@
     };
 @endphp
 
-<div class="bg-[#FAF8F2] min-h-screen pt-10 pb-24 px-4 sm:px-8 font-sans text-slate-800">
+<div class="bg-[#FAF8F2] min-h-screen pt-10 pb-[10px] px-4 sm:px-8 font-sans text-slate-800">
     <div class="max-w-7xl mx-auto">
         <main>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -457,7 +457,7 @@
                     </section>
 
                     <!-- PHẦN 2: THÔNG TIN THANH TOÁN (FORM CHÍNH) -->
-                    <form id="checkout-form" method="POST" action="{{ route('order.store') }}" x-data="{ paymentMethod: 'cod', cartItems: {{ json_encode($cartItems ?? []) }} }" class="space-y-8 text-left">
+                    <form id="checkout-form" method="POST" action="{{ route('order.store') }}" x-data="{ paymentMethod: '{{ request('phuong_thuc_thanh_toan', 'cod') }}', cartItems: {{ json_encode($cartItems ?? []) }} }" class="space-y-8 text-left">
                         @csrf
                         <input type="hidden" name="ma_don_hang" value="">
                         <input type="hidden" name="ma_nguoi_dung" value="{{ auth()->id() ?? 'guest' }}">
@@ -504,23 +504,6 @@
                                 </button>
                             </div>
                         </section>
-
-                        {{-- Ghi chú --}}
-                        <section class="bg-white border border-slate-200/60 rounded-3xl p-6 sm:p-8 shadow-[0_12px_40px_rgba(0,0,0,0.02)] relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-1 h-full bg-brand-500"></div>
-                            
-                            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-                                <div class="w-10 h-10 rounded-full bg-brand-50 text-brand-500 flex items-center justify-center">
-                                    <i data-lucide="pencil-line" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h2 class="font-space text-lg font-black text-slate-800 uppercase tracking-wide leading-none">Ghi Chú Đơn Hàng</h2>
-                                    <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mt-1">Lưu ý giao nhận đặc biệt (nếu có)</p>
-                                </div>
-                            </div>
-
-                            <textarea class="w-full rounded-2xl px-4 py-4 text-xs bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-accent-500 focus:ring-4 focus:ring-accent-500/10 focus:outline-none transition-all resize-none min-h-[140px]" placeholder="VD: Gọi trước khi giao, giao giờ hành chính, lắp đặt thêm Ram..." rows="5" name="ghi_chu"></textarea>
-                        </section>
                     </form>
                 </div>
 
@@ -563,27 +546,44 @@
                             @endif
                         </div>
 
-                        {{-- Voucher Input --}}
+                        {{-- Voucher & Ghi chú Input --}}
                         <div class="py-5 border-t border-slate-100">
-                            <label class="block text-[9px] font-black text-slate-450 uppercase tracking-wider mb-2 font-mono">Mã ưu đãi / Voucher</label>
-                            <form action="" method="GET">
-                                <div class="flex gap-2">
-                                    <input type="text" 
-                                        name="ma_voucher" 
-                                        placeholder="NHẬP VOUCHER..." 
-                                        value="{{ request('ma_voucher') }}"
-                                        class="flex-1 bg-white border {{ $voucher_error ? 'border-red-400/60' : ($voucher_success ? 'border-emerald-400/65' : 'border-slate-200') }} focus:border-accent-500 rounded-xl px-4 py-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none transition-all uppercase font-mono tracking-widest font-bold" />
-                                    <button type="submit" 
-                                            class="bg-white hover:bg-slate-50 border border-slate-250 text-slate-600 font-mono font-bold uppercase tracking-wider text-[10px] px-5 py-3 rounded-xl transition-all duration-300 flex items-center justify-center whitespace-nowrap cursor-pointer">
-                                        Áp dụng
-                                    </button>
+                            <form action="" method="GET" class="space-y-4">
+                                {{-- Nhóm Voucher --}}
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-1.5 text-slate-500">
+                                        <i data-lucide="ticket-percent" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <label class="block text-[9px] font-black uppercase tracking-wider font-mono">Mã ưu đãi / Voucher</label>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <input type="text" 
+                                            name="ma_voucher" 
+                                            placeholder="NHẬP VOUCHER..." 
+                                            value="{{ request('ma_voucher') }}"
+                                            class="flex-1 bg-slate-50/50 border {{ $voucher_error ? 'border-red-400/60' : ($voucher_success ? 'border-emerald-400/65' : 'border-slate-200') }} focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 focus:outline-none rounded-xl px-4 py-3 text-xs text-slate-800 placeholder:text-slate-400 transition-all uppercase font-mono tracking-widest font-bold" />
+                                        <button type="submit" 
+                                                class="bg-white hover:bg-slate-50 border border-slate-250 text-slate-600 font-mono font-bold uppercase tracking-wider text-[10px] px-5 py-3 rounded-xl transition-all duration-300 flex items-center justify-center whitespace-nowrap cursor-pointer hover:border-slate-400">
+                                            Áp dụng
+                                        </button>
+                                    </div>
+                                    @if($voucher_error)
+                                        <p class="text-[9px] text-red-500 font-mono mt-1.5 font-bold uppercase tracking-wider leading-none">{{ $voucher_error }}</p>
+                                    @endif
+                                    @if($voucher_success)
+                                        <p class="text-[9px] text-emerald-600 font-mono mt-1.5 font-bold uppercase tracking-wider leading-none">{{ $voucher_success }}</p>
+                                    @endif
                                 </div>
-                                @if($voucher_error)
-                                    <p class="text-[9px] text-red-500 font-mono mt-1.5 font-bold uppercase tracking-wider leading-none">{{ $voucher_error }}</p>
-                                @endif
-                                @if($voucher_success)
-                                    <p class="text-[9px] text-emerald-600 font-mono mt-1.5 font-bold uppercase tracking-wider leading-none">{{ $voucher_success }}</p>
-                                @endif
+
+                                {{-- Nhóm Ghi chú đơn hàng --}}
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-1.5 text-slate-500">
+                                        <i data-lucide="message-square-plus" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <label class="block text-[9px] font-black uppercase tracking-wider font-mono">Ghi chú đơn hàng (Tùy chọn)</label>
+                                    </div>
+                                    <textarea form="checkout-form" name="ghi_chu" 
+                                              class="w-full rounded-xl px-4 py-3 text-xs bg-slate-50/50 border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 focus:outline-none transition-all resize-none min-h-[90px]" 
+                                              placeholder="VD: Giao giờ hành chính, gọi trước khi giao..." rows="3">{{ old('ghi_chu', request('ghi_chu')) }}</textarea>
+                                </div>
                             </form>
                         </div>
 

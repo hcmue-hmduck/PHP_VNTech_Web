@@ -112,7 +112,7 @@
                                 <div class="relative">
                                     <select id="category_parent_select" name="ma_danh_muc_cha" class="w-full px-3 py-2 bg-[#0d0f10] border border-white/10 rounded text-sm text-white outline-none focus:border-neon-green/50 appearance-none cursor-pointer">
                                         <option value="">Không có</option>
-                                        @foreach($categories as $catOpt)
+                                        @foreach($allCategories as $catOpt)
                                             <option value="{{ $catOpt->ma_danh_muc }}">{{ $catOpt->ten_danh_muc }}</option>
                                         @endforeach
                                     </select>
@@ -375,10 +375,7 @@
                                 <td class="px-6 py-4">
                                     @if ($category->ma_danh_muc_cha) 
                                         <div class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase border bg-white/5 text-gray-400 border-gray-700">
-                                            @php
-                                                $parentCategory = $categories->firstWhere('ma_danh_muc', $category->ma_danh_muc_cha);
-                                            @endphp
-                                            {{ $parentCategory->ten_danh_muc }}
+                                            {{ $categoryMap[$category->ma_danh_muc_cha] ?? 'Không xác định' }}
                                         </div>
                                     @endif
                                 </td>

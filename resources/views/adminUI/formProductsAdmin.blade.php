@@ -48,6 +48,11 @@
 
     $moreInfo = old('thong_tin_them', (isset($product) && isset($product->thong_tin_them)) ? $product->thong_tin_them : [['ten' => '', 'gia_tri' => '']]);
     if (!is_array($moreInfo)) $moreInfo = [['ten' => '', 'gia_tri' => '']];
+
+    // Ghi đè bằng dữ liệu old() nếu xảy ra lỗi Validation
+    if (old('kiem_tra_bien_the') !== null) {
+        $hasVariants = filter_var(old('kiem_tra_bien_the'), FILTER_VALIDATE_BOOLEAN);
+    }
 @endphp
 
 <form action="{{ isset($product) ? route('admin.products.update', $product) : route('admin.products.store') }}" 
@@ -143,8 +148,18 @@
                             <!-- ĐƯA GIÁ VÀ TRẠNG THÁI SANG CỘT TRÁI -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div class="space-y-3">
-                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Giá niêm yết</label>
-                                    <div class="relative"><span class="absolute left-5 top-1/2 -translate-y-1/2 text-neon-green font-black text-xl">₫</span><input name="gia_thap_nhat" type="number" value="{{ old('gia_thap_nhat', $product->gia_thap_nhat ?? 0) }}" class="w-full bg-neon-green/5 border border-neon-green/20 p-5 pl-12 text-lg font-bold text-neon-green rounded-2xl" /></div>
+                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Cấu hình phiên bản</label>
+                                    <div class="flex items-center gap-4 bg-white/[0.03] border border-white/10 p-5 rounded-2xl h-[70px]">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="hidden" name="kiem_tra_bien_the" value="0">
+                                            <input type="checkbox" name="kiem_tra_bien_the" id="has_variants_toggle" value="1" {{ $hasVariants ? 'checked' : '' }} class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-700 rounded-full peer-checked:bg-neon-green transition-colors"></div>
+                                            <div class="absolute left-1 top-0.5 w-5 h-5 bg-white rounded-full transform transition-transform peer-checked:translate-x-5 shadow-sm"></div>
+                                        </label>
+                                        <div>
+                                            <span class="text-xs font-bold text-white block">Sản phẩm có nhiều phiên bản</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="space-y-3">
                                     <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Trạng thái</label>
@@ -155,24 +170,6 @@
                                         </select>
                                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-gray-500 text-xs">▼</div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Nhận thông số kỹ thuật chung -->
-                            <div class="group space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Thông số kỹ thuật chung</label>
-                                    <button type="button" onclick="addSpecRow()" class="px-4 py-2 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase tracking-[0.1em] hover:bg-neon-green hover:text-black transition-all rounded-xl">+ Thêm dòng</button>
-                                </div>
-                                <div class="bg-white/[0.03] border border-white/10 p-5 rounded-3xl space-y-4" id="techSpecsBody">
-                                    @foreach($techSpecs as $index => $spec)
-                                    <div class="grid grid-cols-12 gap-4 items-center sortable-row">
-                                        <div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div>
-                                        <div class="col-span-3"><input name="thong_so_ky_thuat_chung[{{ $index }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div>
-                                        <div class="col-span-7"><input name="thong_so_ky_thuat_chung[{{ $index }}][gia_tri]" value="{{ $spec['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div>
-                                        <div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>
-                                    </div>
-                                    @endforeach
                                 </div>
                             </div>
                         </div>
@@ -227,20 +224,69 @@
                     </div>
                 </section>
 
+                <!-- Thông số kỹ thuật chung -->
+                <section class="glass-panel p-6 md:p-10 rounded-3xl border border-white/5 bg-surface/20 animate-section mt-12" style="animation-delay: 0.22s">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="cpu" class="text-neon-green size-6"></i>
+                            <h2 class="font-display text-2xl font-bold uppercase text-white">Thông số kỹ thuật chung</h2>
+                        </div>
+                        <button type="button" onclick="addSpecRow()" class="px-6 py-3 bg-white/5 border border-white/10 text-white text-[12px] font-bold uppercase tracking-[0.1em] hover:bg-neon-green hover:text-black transition-all rounded-xl">+ Thêm dòng</button>
+                    </div>
+                    <div class="bg-white/[0.03] border border-white/10 p-5 rounded-3xl space-y-4" id="techSpecsBody">
+                        @foreach($techSpecs as $index => $spec)
+                        <div class="grid grid-cols-12 gap-4 items-center sortable-row">
+                            <div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div>
+                            <div class="col-span-3"><input name="thong_so_ky_thuat_chung[{{ $index }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div>
+                            <div class="col-span-7"><input name="thong_so_ky_thuat_chung[{{ $index }}][gia_tri]" value="{{ $spec['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div>
+                            <div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>
+                        </div>
+                        @endforeach
+                    </div>
+                </section>
+
                 <!-- Quản lý Biến thể (Variants) - ĐƯỢC ƯU TIÊN ĐƯA LÊN TRÊN -->
                 <section class="glass-panel p-6 md:p-10 rounded-3xl border border-neon-green/30 bg-neon-green/5 animate-section mt-12" style="animation-delay: 0.25s">
                     <div class="flex items-center justify-between mb-10">
                         <div class="flex items-center gap-4">
                             <i data-lucide="boxes" class="text-neon-green size-6"></i>
-                            <h2 class="font-display text-2xl font-bold uppercase text-white">Quản lý Biến thể</h2>
+                            <h2 class="font-display text-2xl font-bold uppercase text-white" id="variantSectionTitle">{{ $hasVariants ? 'Quản lý Biến thể' : 'Thông tin Giá & Kho hàng' }}</h2>
                         </div>
                         <div class="flex gap-3">
-                            <button type="button" onclick="addVariantRow()" class="px-6 py-3 bg-neon-green text-black text-[12px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all rounded-xl shadow-[0_0_20px_rgba(0,229,91,0.3)]">+ Thêm biến thể</button>
+                            <button type="button" id="addVariantBtn" onclick="addVariantRow()" class="px-6 py-3 bg-neon-green text-black text-[12px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all rounded-xl shadow-[0_0_20px_rgba(0,229,91,0.3)] {{ $hasVariants ? '' : 'hidden' }}">+ Thêm biến thể</button>
                         </div>
                     </div>
 
+                    <!-- Thông tin giá & kho cho Sản phẩm đơn giản -->
+                    <div id="simpleProductInputs" class="{{ $hasVariants ? 'hidden' : '' }} space-y-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Giá bán -->
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Giá bán (VNĐ)</label>
+                                <div class="relative">
+                                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-neon-green font-black text-xl">₫</span>
+                                    <input type="number" id="simple_gia_ban" value="{{ $simpleVariant ? $simpleVariant->gia_ban : '' }}" class="w-full bg-neon-green/5 border border-neon-green/20 p-5 pl-12 text-lg font-bold text-neon-green rounded-2xl focus:border-neon-green/50" placeholder="0" />
+                                </div>
+                            </div>
+                            <!-- Giá niêm yết -->
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Giá niêm yết (VNĐ)</label>
+                                <div class="relative">
+                                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">₫</span>
+                                    <input type="number" id="simple_gia_niem_yet" value="{{ $simpleVariant ? $simpleVariant->gia_niem_yet : '' }}" class="w-full bg-white/[0.03] border border-white/10 p-5 pl-12 text-lg text-white rounded-2xl focus:border-neon-green/50" placeholder="0" />
+                                </div>
+                            </div>
+                            <!-- Tồn kho -->
+                            <div class="space-y-3">
+                                <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Kho hàng (Tồn kho)</label>
+                                <input type="number" id="simple_so_luong_ton_kho" value="{{ $simpleVariant ? $simpleVariant->so_luong_ton_kho : '' }}" class="w-full bg-white/[0.03] border border-white/10 p-5 text-lg text-white rounded-2xl focus:border-neon-green/50" placeholder="0" />
+                            </div>
+                        </div>
+                        <input type="hidden" id="simple_ma_bien_the" value="{{ $simpleVariant ? $simpleVariant->ma_bien_the : '' }}">
+                    </div>
+
                     <!-- Bảng danh sách biến thể sinh ra -->
-                    <div class="overflow-x-auto {{ isset($product_variant) && $product_variant->count() > 0 ? '' : 'hidden' }}" id="variantsTableContainer">
+                    <div class="overflow-x-auto {{ $hasVariants ? '' : 'hidden' }}" id="variantsTableContainer">
                         <table class="w-full text-white text-sm table-fixed min-w-[1000px]">
                             <thead>
                                 <tr class="text-[10px] uppercase tracking-wider text-gray-500 border-b border-white/5">
@@ -401,6 +447,34 @@
     
     document.getElementById('createProductForm').onsubmit = function() { 
         document.getElementById('mo_ta_chi_tiet').value = quill.root.innerHTML; 
+
+        const hasVariantsToggle = document.getElementById('has_variants_toggle');
+        
+        if (!hasVariantsToggle.checked) {
+            // Tạo các input ẩn cho variants[0] để gửi cấu hình đơn giản lên Controller
+            const container = document.getElementById('simpleProductInputs');
+            
+            // Xóa các input ẩn đã tạo trước đó để tránh trùng lặp
+            const existingHiddenInputs = container.querySelectorAll('.simple-variant-hidden-input');
+            existingHiddenInputs.forEach(el => el.remove());
+
+            const maBienThe = document.getElementById('simple_ma_bien_the').value;
+            const giaBan = document.getElementById('simple_gia_ban').value;
+            const giaNiemYet = document.getElementById('simple_gia_niem_yet').value;
+            const soLuong = document.getElementById('simple_so_luong_ton_kho').value;
+
+            // Chèn các input ẩn để gửi dữ liệu lên controller với định dạng array
+            const html = `
+                <input type="hidden" class="simple-variant-hidden-input" name="variants[0][ma_bien_the]" value="${maBienThe}">
+                <input type="hidden" class="simple-variant-hidden-input" name="variants[0][ten_bien_the]" value="">
+                <input type="hidden" class="simple-variant-hidden-input" name="variants[0][gia_ban]" value="${giaBan}">
+                <input type="hidden" class="simple-variant-hidden-input" name="variants[0][gia_niem_yet]" value="${giaNiemYet}">
+                <input type="hidden" class="simple-variant-hidden-input" name="variants[0][so_luong_ton_kho]" value="${soLuong}">
+                <input type="hidden" class="simple-variant-hidden-input" name="variants[0][trang_thai]" value="active">
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
         return true; 
     };
     
@@ -564,12 +638,12 @@
                 <input name="variants[${index}][gia_niem_yet]" type="number" class="bg-white/[0.03] border border-white/5 p-3 rounded-xl text-sm text-gray-300 w-full focus:border-neon-green/50" placeholder="0" />
             </td>
             <td class="p-4 align-middle text-center">
-                <input name="variants[${index}][so_luong_ton_kho]" type="number" value="10" class="bg-white/[0.03] border border-white/5 p-3 rounded-xl text-sm text-center text-white w-full focus:border-neon-green/50" placeholder="0" />
+                <input name="variants[${index}][so_luong_ton_kho]" type="number" value="0" class="bg-white/[0.03] border border-white/5 p-3 rounded-xl text-sm text-center text-white w-full focus:border-neon-green/50" placeholder="0" />
             </td>
             <td class="p-4 align-middle text-center">
                 <input type="hidden" name="variants[${index}][trang_thai]" value="inactive">
                 <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" name="variants[${index}][trang_thai]" value="active" class="sr-only peer">
+                    <input type="checkbox" name="variants[${index}][trang_thai]" value="active" class="sr-only peer" checked>
                     <div class="w-11 h-6 bg-gray-700 rounded-full peer-checked:bg-neon-green transition-colors"></div>
                     <div class="absolute left-1 top-0.5 w-5 h-5 bg-white rounded-full transform transition-transform peer-checked:translate-x-5 shadow-sm"></div>
                 </label>
@@ -585,7 +659,7 @@
         const specsTr = document.createElement('tr');
         specsTr.className = 'variant-specs-row';
         specsTr.id = `variant-specs-${index}`;
-        specsTr.style.display = 'none';
+        specsTr.style.display = 'table-row';
         specsTr.innerHTML = `
             <td colspan="7" class="p-4 bg-white/[0.01] border-b border-white/5">
                 <div class="flex items-center justify-between mb-4 px-4">
@@ -599,8 +673,78 @@
         body.appendChild(tr);
         body.appendChild(specsTr);
         
+        // Tự động thêm 1 dòng thông số kỹ thuật riêng
+        addVariantSpecRow(index);
+        
         lucide.createIcons();
         variantIndex++;
+    }
+
+    const hasVariantsToggle = document.getElementById('has_variants_toggle');
+    const simpleProductInputs = document.getElementById('simpleProductInputs');
+    const variantsTableContainer = document.getElementById('variantsTableContainer');
+    const addVariantBtn = document.getElementById('addVariantBtn');
+    const variantSectionTitle = document.getElementById('variantSectionTitle');
+
+    let isOriginallySimple = "{{ !$hasVariants ? '1' : '0' }}" === "1";
+
+    function toggleVariantsMode(hasVariants) {
+        if (hasVariants) {
+            simpleProductInputs.classList.add('hidden');
+            variantsTableContainer.classList.remove('hidden');
+            addVariantBtn.classList.remove('hidden');
+            variantSectionTitle.textContent = 'Quản lý Biến thể';
+
+            if (isOriginallySimple) {
+                const body = document.getElementById('variantsTableBody');
+                body.innerHTML = '';
+                const specRows = document.querySelectorAll('.variant-specs-row');
+                specRows.forEach(row => row.remove());
+                isOriginallySimple = false;
+            }
+
+            // Enable all inputs in the variants table
+            const tableInputs = document.querySelectorAll('#variantsTableBody input, #variantsTableBody select, #variantsTableBody textarea');
+            tableInputs.forEach(input => {
+                input.disabled = false;
+            });
+
+            // Disable simple pricing inputs
+            document.getElementById('simple_gia_ban').disabled = true;
+            document.getElementById('simple_gia_niem_yet').disabled = true;
+            document.getElementById('simple_so_luong_ton_kho').disabled = true;
+            
+            // If the table is empty, add one empty row automatically
+            const body = document.getElementById('variantsTableBody');
+            if (body.children.length === 0) {
+                addVariantRow();
+            }
+        } else {
+            simpleProductInputs.classList.remove('hidden');
+            variantsTableContainer.classList.add('hidden');
+            addVariantBtn.classList.add('hidden');
+            variantSectionTitle.textContent = 'Thông tin Giá & Kho hàng';
+
+            // Disable all inputs in the variants table so they are not submitted
+            const tableInputs = document.querySelectorAll('#variantsTableBody input, #variantsTableBody select, #variantsTableBody textarea');
+            tableInputs.forEach(input => {
+                input.disabled = true;
+            });
+
+            // Enable simple pricing inputs
+            document.getElementById('simple_gia_ban').disabled = false;
+            document.getElementById('simple_gia_niem_yet').disabled = false;
+            document.getElementById('simple_so_luong_ton_kho').disabled = false;
+        }
+    }
+
+    if (hasVariantsToggle) {
+        hasVariantsToggle.addEventListener('change', function() {
+            toggleVariantsMode(this.checked);
+        });
+        
+        // Initial setup on page load
+        toggleVariantsMode(hasVariantsToggle.checked);
     }
 
 </script>

@@ -87,6 +87,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'viewOrder'])->name('order.view');
     Route::get('/orders/{ma_don_hang}/reviews', [ReviewController::class, 'byOrder'])->name('reviews.by-order');
     Route::get('/orders/{ma_don_hang}', [OrderController::class, 'viewOrderDetail'])->name('order_detail.view');
+    Route::post('/orders/{ma_don_hang}/cancel', [OrderController::class, 'cancelOrder'])->name('order.cancel');
 
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');

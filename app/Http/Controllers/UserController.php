@@ -31,10 +31,18 @@ class UserController extends Controller
         return view('homeUI.user', compact('user', 'user_address', 'orders'));
     }
 
-    public function viewUsersAdmin()
+    public function viewUsersAdmin(Request $request)
     {
-        $users = User::select('ma_nguoi_dung', 'ho_ten', 'email', 'avatar_url', 'trang_thai')->where('vai_tro', 'user')->latest()->get();
-        return view('adminUI.userAdmin', compact('users'));
+
+        $users = User::select('ma_nguoi_dung', 'ho_ten', 'email', 'avatar_url', 'trang_thai')
+            ->where('vai_tro', 'user')
+            ->latest()->paginate(10);
+
+        $totalUsersCount = User::where('vai_tro', 'user')->count();
+        $activeUsersCount = User::where('vai_tro', 'user')->where('trang_thai', 'active')->count();
+        $inactiveUsersCount = User::where('vai_tro', 'user')->where('trang_thai', '!=', 'active')->count();
+
+        return view('adminUI.userAdmin', compact('users', 'totalUsersCount', 'activeUsersCount', 'inactiveUsersCount'));
     }
 
     public function updateUserStatus(Request $request, User $user)

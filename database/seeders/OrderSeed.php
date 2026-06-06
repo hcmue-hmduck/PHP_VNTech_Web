@@ -120,7 +120,7 @@ class OrderSeed extends Seeder
 
                     $orderItemsData[] = [
                         'ma_bien_the'    => $variant->ma_bien_the,
-                        'ten_bien_the'   => $variant->ten_bien_the,
+                        'ten_bien_the'   => trim(($variant->product->ten_san_pham ?? '') . ' ' . ($variant->ten_bien_the ?? '')),
                         'link_anh'       => $variant->link_anh_bien_the ?? ($variant->product->link_anh_dai_dien ?? null),
                         'so_luong'       => $qty,
                         'gia_ban'        => $gia,

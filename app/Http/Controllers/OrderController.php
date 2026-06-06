@@ -45,6 +45,9 @@ class OrderController extends Controller
     {
         $order = Order::where('ma_don_hang', $request->ma_don_hang)->first();
         if ($order) {
+            if ($order->trang_thai === OrderStatus::CANCELLED->value) {
+                return redirect()->back()->with('error', 'Không thể cập nhật đơn hàng đã hủy!');
+            }
             $order->trang_thai = $request->trang_thai;
             $order->save();
 
@@ -140,11 +143,15 @@ class OrderController extends Controller
 
         // Create OrderItems for each cart item
         foreach ($cartItems as $item) {
+            $variant = ProductVariant::with('product')->where('ma_bien_the', $item['ma_bien_the'])->first();
+            $tenSanPham = $variant?->product?->ten_san_pham ?? '';
+            $tenBienTheCombined = trim($tenSanPham . ' ' . ($item['ten_bien_the'] ?? ''));
+
             $orderItems = OrderItem::create([
                 'ma_don_hang' => $order->ma_don_hang,
                 'ma_bien_the' => $item['ma_bien_the'],
                 'ma_flash_sales' => $item['ma_flash_sales'] ?? '',
-                'ten_bien_the' => $item['ten_bien_the'],
+                'ten_bien_the' => $tenBienTheCombined,
                 'gia_ban' => $item['gia_ban'],
                 'so_luong' => $item['so_luong'],
                 'link_anh_dai_dien' => $item['link_anh_dai_dien'],
@@ -216,7 +223,7 @@ class OrderController extends Controller
         return view('homeUI.orderDetail', compact('orders'));
     }
 
-    private function attachReviewActions($orders, string $userId): void
+    private function attachReviewActions(iterable $orders, string $userId): void
     {
         foreach ($orders as $order) {
             $order->review_is_expired = $this->isReviewExpired($order);
@@ -268,5 +275,54 @@ class OrderController extends Controller
         }
 
         return !($order->created_at?->greaterThanOrEqualTo(now()->subDays(30)) ?? false);
+    }
+
+    public function cancelOrder(Request $request, string $ma_don_hang)
+    {
+        $userId = Auth::user()->id;
+        $order = Order::where('ma_don_hang', $ma_don_hang)
+            ->where('ma_nguoi_dung', $userId)
+            ->firstOrFail();
+
+        // Check if order is eligible for cancellation (not yet dang_giao_hang, da_nhan_hang, or already da_huy)
+        if (in_array($order->trang_thai, [OrderStatus::WAITING_DELIVERY->value, OrderStatus::DELIVERED->value, OrderStatus::CANCELLED->value])) {
+            return redirect()->back()->with('error', 'Không thể hủy đơn hàng ở trạng thái này!');
+        }
+
+        // MoMo orders cannot be self-cancelled by the customer
+        if (strtolower($order->phuong_thuc_thanh_toan ?? '') === 'momo') {
+            return redirect()->back()->with('error', 'Không thể tự hủy đơn hàng thanh toán qua MoMo. Vui lòng liên hệ nhân viên hỗ trợ!');
+        }
+
+        // Restore stock levels for the order items
+        $orderItems = OrderItem::where('ma_don_hang', $ma_don_hang)->get();
+        foreach ($orderItems as $item) {
+            ProductVariant::where('ma_bien_the', $item->ma_bien_the)->increment('so_luong_ton_kho', (int)$item->so_luong);
+            
+            // If it's a flash sale item, decrement flash sale sold count
+            if (!empty($item->ma_flash_sales)) {
+                FlashSaleItem::where('ma_flash_sales', $item->ma_flash_sales)
+                    ->where('ma_bien_the', $item->ma_bien_the)
+                    ->decrement('so_luong_da_ban', (int)$item->so_luong);
+            }
+        }
+
+        // Set status to cancelled
+        $order->trang_thai = OrderStatus::CANCELLED->value;
+        $order->save();
+
+        // Create notification for the user
+        $noti = Notification::create([
+            'ma_nguoi_dung' => $order->ma_nguoi_dung,
+            'tieu_de' => 'Hủy đơn hàng thành công',
+            'noi_dung' => 'Đơn hàng #' . $order->ma_don_hang . ' của bạn đã được hủy thành công.',
+            'loai' => 'order',
+            'duong_dan' => '/orders/' . $order->ma_don_hang,
+            'da_doc'    => false,
+        ]);
+        $noti->ma_thong_bao = $noti->_id;
+        $noti->save();
+
+        return redirect()->back()->with('success', 'Hủy đơn hàng thành công!');
     }
 }

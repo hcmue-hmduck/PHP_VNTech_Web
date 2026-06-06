@@ -18,6 +18,7 @@
         OrderStatus::WAITING_PICKUP->value     => 'CHỜ LẤY HÀNG',
         OrderStatus::WAITING_DELIVERY->value   => 'CHỜ GIAO HÀNG',
         OrderStatus::DELIVERED->value          => 'ĐÃ GIAO',
+        OrderStatus::CANCELLED->value          => 'ĐÃ HỦY',
     ];
 
     $statusBadgeClasses = [
@@ -26,6 +27,7 @@
         OrderStatus::WAITING_PICKUP->value     => 'bg-indigo-50 border-indigo-200 text-indigo-700 text-xs',
         OrderStatus::WAITING_DELIVERY->value   => 'bg-sky-50 border-sky-200 text-sky-700 text-xs',
         OrderStatus::DELIVERED->value          => 'bg-emerald-50 border-emerald-200 text-emerald-700 text-xs',
+        OrderStatus::CANCELLED->value          => 'bg-rose-50 border-rose-200 text-rose-700 text-xs',
     ];
 
     $resolveOrderStatus = function ($order) {
@@ -65,34 +67,38 @@
      }">
     <main class="max-w-7xl mx-auto px-4 sm:px-8 pt-10 pb-16 flex-1 w-full">
         
-        <!-- Tiêu đề chính -->
-        <header class="mb-10 text-center relative flex flex-col items-center justify-center min-h-[60px]">
-            <a href="{{ url('/') }}" 
-               class="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-black uppercase tracking-wider transition-all duration-300 group shadow-xs no-underline">
-                <i data-lucide="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5"></i>
-                <span class="hidden sm:inline">Về trang chủ</span>
-            </a>
-            <h1 class="font-space text-3xl font-black text-slate-800 uppercase tracking-tight">
-                Đơn hàng của tôi
-            </h1>
-            <p class="text-slate-400 mt-1 uppercase tracking-wider text-xs font-semibold">
-                Quản lý và theo dõi lộ trình các đơn đặt hàng của bạn.
-            </p>
-        </header>
+        <!-- Unified Header & Tabs Card -->
+        <div class="bg-white border border-slate-200/60 rounded-3xl p-6 sm:p-8 shadow-[0_12px_40px_rgba(0,0,0,0.02)] mb-8">
+            <!-- Tiêu đề chính -->
+            <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-slate-100 text-left">
+                <div class="flex max-w-3xl flex-col gap-1 pr-28 sm:pr-40">
+                    <p class="text-[10px] font-black uppercase tracking-wider text-brand-500">VNTech Portal</p>
+                    <h1 class="font-space text-3xl font-black tracking-tight text-slate-800 uppercase leading-none">
+                        Đơn hàng của tôi
+                    </h1>
+                    <p class="text-xs font-semibold text-slate-400 mt-1">Quản lý và theo dõi lộ trình các đơn đặt hàng của bạn.</p>
+                </div>
+                <a href="{{ url('/') }}" 
+                   class="absolute right-0 top-0 flex items-center gap-1.5 px-4 py-2 border border-slate-200 bg-white hover:bg-brand-50 hover:border-brand-500/40 rounded-xl text-slate-500 hover:text-brand-500 text-[11px] font-black uppercase tracking-wider transition-all duration-300 group shadow-xs no-underline">
+                    <i data-lucide="arrow-left" class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5"></i>
+                    <span>Trang chủ</span>
+                </a>
+            </div>
 
-        <!-- Tab Selector -->
-        <div class="mb-8 border-b border-slate-200/80 overflow-x-auto custom-scrollbar">
-            <div class="flex justify-center gap-8 pb-3 min-w-max">
-                @foreach(['TẤT CẢ', 'CHỜ THANH TOÁN', 'CHỜ XÁC NHẬN', 'CHỜ LẤY HÀNG', 'CHỜ GIAO HÀNG', 'ĐÃ GIAO'] as $tab)
-                <button
-                    @click="activeTab = '{{ $tab }}'"
-                    class="whitespace-nowrap text-sm font-black tracking-wider transition-all duration-300 uppercase relative pb-1 cursor-pointer"
-                    :class="activeTab === '{{ $tab }}' ? 'text-brand-500' : 'text-slate-400 hover:text-slate-700'"
-                >
-                    {{ $tab }}
-                    <span x-show="activeTab === '{{ $tab }}'" class="absolute -bottom-[13px] left-0 w-full h-[3px] bg-brand-500 rounded-t-md"></span>
-                </button>
-                @endforeach
+            <!-- Tab Selector (Inside the same Card) -->
+            <div class="pt-6 overflow-x-auto custom-scrollbar">
+                <div class="flex justify-center gap-8 min-w-max">
+                    @foreach(['TẤT CẢ', 'CHỜ THANH TOÁN', 'CHỜ XÁC NHẬN', 'CHỜ LẤY HÀNG', 'CHỜ GIAO HÀNG', 'ĐÃ GIAO', 'ĐÃ HỦY'] as $tab)
+                    <button
+                        @click="activeTab = '{{ $tab }}'"
+                        class="whitespace-nowrap text-xs sm:text-sm font-black tracking-wider transition-all duration-300 uppercase relative pb-3 cursor-pointer"
+                        :class="activeTab === '{{ $tab }}' ? 'text-brand-500' : 'text-slate-400 hover:text-slate-700'"
+                    >
+                        {{ $tab }}
+                        <span x-show="activeTab === '{{ $tab }}'" class="absolute bottom-0 left-0 w-full h-[3px] bg-brand-500 rounded-t-md"></span>
+                    </button>
+                    @endforeach
+                </div>
             </div>
         </div>
 
@@ -208,6 +214,24 @@
                                     <i data-lucide="printer" class="w-4 h-4"></i>
                                     In hoá đơn
                                 </a>
+                            @endif
+
+                            @if(!in_array($o->trang_thai, [OrderStatus::WAITING_DELIVERY->value, OrderStatus::DELIVERED->value, OrderStatus::CANCELLED->value]))
+                                @if(strtolower($o->phuong_thuc_thanh_toan ?? '') === 'momo')
+                                    <div class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-50 border border-slate-200 text-slate-400 text-xs font-bold rounded-xl select-none">
+                                        <i data-lucide="info" class="w-4 h-4"></i>
+                                        <span>Liên hệ nhân viên để hỗ trợ hủy</span>
+                                    </div>
+                                @else
+                                    <form action="{{ route('order.cancel', ['ma_don_hang' => $o->ma_don_hang]) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')" class="inline">
+                                        @csrf
+                                        <button type="submit"
+                                                class="inline-flex items-center justify-center gap-1.5 border border-rose-200 hover:border-rose-350 hover:bg-rose-50 text-rose-600 px-4 py-2 rounded-xl font-black text-xs tracking-wider uppercase active:scale-95 transition-all cursor-pointer">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            Hủy đơn
+                                        </button>
+                                    </form>
+                                @endif
                             @endif
                         </div>
                     </div>

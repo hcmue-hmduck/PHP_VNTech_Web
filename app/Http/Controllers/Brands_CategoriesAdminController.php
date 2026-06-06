@@ -9,10 +9,29 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class Brands_CategoriesAdminController extends Controller
 {
-    public function viewBrandsCategories()
+    public function viewBrandsCategories(Request $request)
     {
-        $brands = Brand::where('trang_thai', '!=', 'deleted')->latest()->paginate(10, ['*'], 'brands_page');
-        $categories = Category::where('trang_thai', '!=', 'deleted')->latest()->paginate(10, ['*'], 'categories_page');
+        $searchBrands = $request->input('search_brands');
+        $brandsQuery = Brand::where('trang_thai', '!=', 'deleted')->latest();
+        if ($searchBrands) {
+            $brandsQuery->where('ten_thuong_hieu', 'like', '%' . $searchBrands . '%');
+        }
+        $brands = $brandsQuery->paginate(10, ['*'], 'brands_page');
+
+        $searchCategories = $request->input('search_categories');
+        $categoriesQuery = Category::where('trang_thai', '!=', 'deleted')->latest();
+        if ($searchCategories) {
+            $categoriesQuery->where('ten_danh_muc', 'like', '%' . $searchCategories . '%');
+        }
+        $categories = $categoriesQuery->paginate(10, ['*'], 'categories_page');
+
+        // Fetch all active categories to populate dropdowns and resolve parent names
+        $allCategories = Category::where('trang_thai', 'active')->get();
+        
+        // Also map parent categories by their ID for fast lookup in blade
+        $categoryMap = Category::where('trang_thai', '!=', 'deleted')
+            ->pluck('ten_danh_muc', 'ma_danh_muc')
+            ->toArray();
 
         $totalBrandsCount = Brand::where('trang_thai', '!=', 'deleted')->count();
         $activeBrandsCount = Brand::where('trang_thai', 'active')->count();
@@ -23,6 +42,8 @@ class Brands_CategoriesAdminController extends Controller
         return view('adminUI.brands_categories', compact(
             'brands',
             'categories',
+            'allCategories',
+            'categoryMap',
             'totalBrandsCount',
             'activeBrandsCount',
             'totalCategoriesCount',

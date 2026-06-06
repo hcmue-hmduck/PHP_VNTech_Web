@@ -23,7 +23,7 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
             <div class="flex justify-between items-start z-10">
                 <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Tổng sản phẩm</p>
-                <i data-lucide="badge-check" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+                <i data-lucide="package" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
             </div>
             <div class="z-10">
                 <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $totalProducts }}</h3>
@@ -35,11 +35,11 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
             <div class="flex justify-between items-start z-10">
                 <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Đang mở bán</p>
-                <i data-lucide="trending-up" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+                <i data-lucide="shopping-bag" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
             </div>
             <div class="z-10">
                 <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $activeProducts }}</h3>
-                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Active</p>
+                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Đang hoạt động</p>
             </div>
         </div>
 
@@ -47,23 +47,23 @@
             <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
             <div class="flex justify-between items-start z-10">
                 <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Cảnh báo tồn kho</p>
-                <i data-lucide="layers-3" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+                <i data-lucide="alert-triangle" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
             </div>
             <div class="z-10">
-                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $products->count() }}</h3>
-                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Đang quản lý</p>
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $lowStockProducts }}</h3>
+                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Biến thể sắp hết hàng (số lượng tồn <= 20)</p>
             </div>
         </div>
 
         <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
             <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
             <div class="flex justify-between items-start z-10">
-                <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Tổng giá trị</p>
-                <i data-lucide="folder-tree" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
+                <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">Tổng giá trị kho</p>
+                <i data-lucide="banknote" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
             </div>
             <div class="z-10">
-                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ $products->count() }}</h3>
-                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Active</p>
+                <h3 class="text-2xl font-display font-bold text-white tracking-tight leading-tight">{{ number_format($inventoryValue, 0, ',', '.') }}₫</h3>
+                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Giá trị vốn hàng hóa</p>
             </div>
         </div>
     </div>
