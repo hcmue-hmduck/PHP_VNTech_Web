@@ -34,6 +34,7 @@ return new class extends Migration
             $collection->decimal('so_sao_trung_binh', 3, 2)->default(0);
             $collection->integer('so_luot_danh_gia')->default(0);
             $collection->integer('tong_so_sao')->default(0);
+            $collection->integer('tong_luot_ban')->default(0);
 
             $collection->timestamps();
         });

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('vouchers', function (Blueprint $collection) {
             $collection->string('ma_voucher')->unique();
+            $collection->string('ten_voucher')->nullable();
             $collection->string('mo_ta');
             
             // Loại: 'bill' (toàn hóa đơn), 'shipping' (phí vận chuyển)

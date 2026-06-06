@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('carts', function (Blueprint $collection) {
+            $collection->string('ma_gio_hang')->unique();
             $collection->string('ma_nguoi_dung')->unique();
             $collection->string('trang_thai')->default('active');
             $collection->timestamps();
