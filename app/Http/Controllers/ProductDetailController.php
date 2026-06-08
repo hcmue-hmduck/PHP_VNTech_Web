@@ -10,7 +10,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 
 class ProductDetailController extends Controller {
-    public function viewProductDetail(Request $request, string $ma_san_pham, string $ma_bien_the = null) {
+    public function viewProductDetail(Request $request, string $ma_san_pham, ?string $ma_bien_the = null) {
         $productDetail = Product::where('ma_san_pham', $ma_san_pham)->firstOrFail();
         
         $variants = ProductVariant::with(['activeFlashSaleItem.campaign'])
@@ -25,7 +25,7 @@ class ProductDetailController extends Controller {
                     $thong_tin_bien_the .= $specItem['gia_tri'] . '/';
                 }
             } 
-            $variant->thong_tin_hien_thi = rtrim($thong_tin_bien_the, '/');
+            $variant->thong_tin_hien_thi = rtrim($thong_tin_bien_the, '/') ?: $variant->ten_bien_the;
         }
 
         $selectedVariant = null;

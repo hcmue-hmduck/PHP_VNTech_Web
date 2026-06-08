@@ -71,7 +71,7 @@ class CompareController extends Controller
                     'gia_ban' => ($variant->gia_ban ?? 0),
                     'link_anh' => $variant->link_anh_bien_the ?: ($product?->link_anh_dai_dien ?? null),
                     'thong_so_rieng' => $variant->thong_so_ky_thuat_rieng ?? [],
-                    'url' => $product ? route('viewProductDetail', ['ma_san_pham' => $product->ma_san_pham, 'ma_bien_the' => (string) $variant->ma_bien_the]) : null,
+                    'url' => $product ? route('home.product_detail', ['ma_san_pham' => $product->ma_san_pham, 'ma_bien_the' => (string) $variant->ma_bien_the]) : null,
                 ];
             })->all(),
         ]);
@@ -79,6 +79,8 @@ class CompareController extends Controller
 
     public function aiCompare(Request $request): JsonResponse
     {
+        set_time_limit(120);
+
         $validated = $request->validate([
             'variant_ids' => ['required', 'array', 'min:2', 'max:' . self::MAX_COMPARE_ITEMS],
             'variant_ids.*' => ['required', 'string', 'distinct'],

@@ -30,7 +30,7 @@ Route::view('/compare', 'homeUI.compare')->name('compare.view');
 Route::post('/compare/variants', [CompareController::class, 'variants'])->name('compare.variants');
 Route::post('/compare/ai', [CompareController::class, 'aiCompare'])->name('compare.ai');
 
-Route::get('/products/{ma_san_pham}/product-detail/{ma_bien_the?}', [ProductDetailController::class, "viewProductDetail"])->name('home.product_detail');
+Route::get('/products/{ma_san_pham}/product-detail/{ma_bien_the?}', [ProductDetailController::class, 'viewProductDetail'])->name('home.product_detail');
 
 Route::get('/products/{ma_san_pham}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 

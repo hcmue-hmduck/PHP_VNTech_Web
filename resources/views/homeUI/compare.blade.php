@@ -164,8 +164,8 @@
         return div.innerHTML;
     }
 
-    const compareVariantsUrl = @json(route('compare.variants'));
-    const compareAiUrl = @json(route('compare.ai'));
+    const compareVariantsUrl = "{{ route('compare.variants') }}";
+    const compareAiUrl = "{{ route('compare.ai') }}";
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
     function formatCurrency(value) {
@@ -262,7 +262,6 @@
     }
 
     function renderVariantCard(item) {
-        const specs = normalizeSpecs(item.thong_so_rieng);
         const productName = escapeHtml(item.ten_san_pham || 'Sản phẩm');
         const variantName = escapeHtml(item.ten_bien_the || 'Bản mặc định');
         const categoryName = escapeHtml(item.ten_danh_muc || 'Chưa phân loại');
@@ -271,38 +270,31 @@
         const variantId = escapeHtml(item.ma_bien_the);
 
         return `
-            <article class="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs">
-                <div class="mb-4 flex items-start justify-between gap-3">
-                    <a href="${productUrl}"
-                       title="Xem chi tiết sản phẩm"
-                       class="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-slate-50 p-2 transition hover:border-brand-500 hover:bg-orange-50/30 hover:ring-2 hover:ring-orange-100">
-                        <img src="${imageUrl}" alt="${productName}" class="h-full w-full object-contain">
-                    </a>
-                    <button type="button"
-                            data-compare-remove="${variantId}"
-                            class="rounded-xl p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
-                            title="Xóa khỏi danh sách">
-                        <i data-lucide="x" class="h-4 w-4"></i>
-                    </button>
-                </div>
-                <p class="text-[10px] font-black uppercase tracking-widest text-brand-500">${categoryName}</p>
-                <a href="${productUrl}" class="mt-1 block font-display text-base font-black leading-tight text-slate-900 hover:text-brand-500">
-                    ${productName}
+            <article class="relative rounded-3xl border border-slate-200 bg-white p-4 shadow-xs flex gap-4 items-center hover:shadow-md transition-all duration-300">
+                <!-- Left: Image -->
+                <a href="${productUrl}"
+                   title="Xem chi tiết sản phẩm"
+                   class="flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-2xl bg-slate-50 p-2 transition hover:border-brand-500 hover:bg-orange-50/30 hover:ring-2 hover:ring-orange-100">
+                    <img src="${imageUrl}" alt="${productName}" class="h-full w-full object-contain">
                 </a>
-                <p class="mt-1 text-xs font-bold text-slate-500">${variantName}</p>
-                <p class="mt-3 font-display text-xl font-black text-[#E04F2A]">${formatCurrency(item.gia_ban)}</p>
-                <div class="mt-4 space-y-2">
-                    ${specs.length ? specs.map((spec) => `
-                        <div class="rounded-xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
-                            <span class="text-slate-400">${escapeHtml(spec.ten || 'Thông số')}:</span>
-                            <span class="text-slate-700">${escapeHtml(spec.gia_tri || '')}</span>
-                        </div>
-                    `).join('') : `
-                        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-3 text-xs font-semibold text-slate-400">
-                            Chưa có thông số riêng cho biến thể này.
-                        </div>
-                    `}
+
+                <!-- Right: Information -->
+                <div class="flex-grow min-w-0 pr-6">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-brand-500">${categoryName}</p>
+                    <a href="${productUrl}" class="mt-0.5 block font-display text-sm font-black leading-snug text-slate-900 hover:text-brand-500 line-clamp-2" title="${productName}">
+                        ${productName}
+                    </a>
+                    <p class="mt-0.5 text-[11px] font-bold text-slate-500 truncate">${variantName}</p>
+                    <p class="mt-1.5 font-display text-base font-black text-[#E04F2A]">${formatCurrency(item.gia_ban)}</p>
                 </div>
+
+                <!-- Absolute Close Button on Top-Right -->
+                <button type="button"
+                        data-compare-remove="${variantId}"
+                        class="absolute top-3 right-3 rounded-xl p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+                        title="Xóa khỏi danh sách">
+                    <i data-lucide="x" class="h-3.5 w-3.5"></i>
+                </button>
             </article>
         `;
     }
