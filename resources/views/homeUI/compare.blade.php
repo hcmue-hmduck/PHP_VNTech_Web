@@ -129,6 +129,18 @@
                         So sánh
                     </button>
                 </div>
+
+                <div class="mt-4">
+                    <label for="compare-user-request" class="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        Yêu cầu so sánh thêm
+                    </label>
+                    <textarea
+                        id="compare-user-request"
+                        rows="3"
+                        maxlength="1000"
+                        class="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium leading-relaxed text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-orange-100"
+                        placeholder="VD: Ưu tiên pin trâu, camera đẹp, chơi game mượt hoặc chọn máy phù hợp cho sinh viên..."></textarea>
+                </div>
             </div>
 
             {{-- Variant cards are fetched from the backend using IDs stored in localStorage --}}
@@ -320,6 +332,7 @@
     async function runAiComparison(button) {
         const ids = window.getCompareVariantIds ? window.getCompareVariantIds() : [];
         const result = document.getElementById('compare-ai-result');
+        const userRequest = document.getElementById('compare-user-request')?.value.trim() || '';
 
         if (ids.length < 2 || !result) return;
 
@@ -335,7 +348,10 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                 },
-                body: JSON.stringify({ variant_ids: ids }),
+                body: JSON.stringify({
+                    variant_ids: ids,
+                    comparison_request: userRequest,
+                }),
             });
 
             const payload = await response.json();

@@ -12,19 +12,24 @@ class ProductComparisonAgent implements Agent, HasTools
 {
     use Promptable;
 
-    public static function buildPrompt(array $products): string
+    public static function buildPrompt(array $products, ?string $comparisonRequest = null): string
     {
         $json = json_encode($products, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $comparisonRequest = trim((string) $comparisonRequest);
+        $comparisonRequestBlock = $comparisonRequest !== ''
+            ? "\n\n            YÊU CẦU THÊM TỪ KHÁCH:\n            {$comparisonRequest}"
+            : '';
 
         return <<<EOD
             Hãy so sánh các sản phẩm/biến thể sau cho khách VNTech.
 
             DỮ LIỆU SHOP:
-            {$json}
+            {$json}{$comparisonRequestBlock}
 
             YÊU CẦU PHẢN HỒI:
             - Cùng danh mục: so sánh thông số tương đồng, có thể dùng bảng.
             - Khác danh mục: không lập bảng thông số, chỉ so sánh theo nhu cầu/mục đích mua.
+            - Nếu khách có yêu cầu thêm, ưu tiên phân tích theo đúng nhu cầu đó.
             - Kết luận rõ anh/chị nên chọn sản phẩm nào theo từng trường hợp.
         EOD;
     }

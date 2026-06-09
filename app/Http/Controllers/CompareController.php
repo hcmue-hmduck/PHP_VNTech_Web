@@ -84,10 +84,12 @@ class CompareController extends Controller
         $validated = $request->validate([
             'variant_ids' => ['required', 'array', 'min:2', 'max:' . self::MAX_COMPARE_ITEMS],
             'variant_ids.*' => ['required', 'string', 'distinct'],
+            'comparison_request' => ['nullable', 'string', 'max:1000'],
         ]);
 
         try {
             $items = $this->comparisonData(array_values($validated['variant_ids']));
+            $comparisonRequest = trim((string) ($validated['comparison_request'] ?? ''));
 
             if (count($items) < 2) {
                 return response()->json([
@@ -97,7 +99,7 @@ class CompareController extends Controller
             }
 
             $response = ProductComparisonAgent::make()
-                ->prompt(ProductComparisonAgent::buildPrompt($items));
+                ->prompt(ProductComparisonAgent::buildPrompt($items, $comparisonRequest));
 
             return response()->json([
                 'success' => true,
