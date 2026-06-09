@@ -20,6 +20,15 @@
         OrderStatus::DELIVERED,
         OrderStatus::CANCELLED,
     ];
+
+    $statusLabels = [
+        OrderStatus::PENDING_PAYMENT->value => 'Chờ thanh toán',
+        OrderStatus::PENDING_CONFIRMATION->value => 'Chờ xác nhận',
+        OrderStatus::WAITING_PICKUP->value => 'Đã xác nhận',
+        OrderStatus::WAITING_DELIVERY->value => 'Đang giao hàng',
+        OrderStatus::DELIVERED->value => 'Hoàn thành',
+        OrderStatus::CANCELLED->value => 'Đã huỷ',
+    ];
 @endphp
 
 <div class="w-full">
@@ -90,41 +99,58 @@
     </div>
 
     <!-- Filters Bar -->
-    <div class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+    <form method="GET" action="{{ route('admin.order.index') }}" class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
         <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Search Orders</label>
+            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Tìm kiếm đơn hàng</label>
             <div class="relative">
                 <input
                     type="text"
+                    name="search"
+                    value="{{ request('search') }}"
                     placeholder="MÃ ĐƠN HOẶC TÊN KHÁCH..."
-                    class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none transition-colors"
+                    class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none transition-colors rounded-lg text-white"
                 />
             </div>
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Status</label>
-            <select class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer">
-                <option>TẤT CẢ TRẠNG THÁI</option>
-                @foreach($statusOptions as $statusOption)
-                    <option value="{{ $statusOption->value }}">{{ str_replace('_', ' ', ucwords($statusOption->value, '_')) }}</option>
-                @endforeach
-            </select>
+            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Trạng thái</label>
+            <div class="relative">
+                <select name="status" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
+                    <option value="all" {{ request('status') === 'all' || !request()->has('status') ? 'selected' : '' }}>TẤT CẢ TRẠNG THÁI</option>
+                    @foreach($statusOptions as $statusOption)
+                        <option value="{{ $statusOption->value }}" {{ request('status') === $statusOption->value ? 'selected' : '' }}>
+                            {{ mb_strtoupper($statusLabels[$statusOption->value] ?? $statusOption->value, 'UTF-8') }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 text-xs">▼</div>
+            </div>
         </div>
 
         <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Payment</label>
-            <select class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer">
-                <option>TẤT CẢ PHƯƠNG THỨC</option>
-                <option>MoMo</option>
-                <option>COD</option>
-            </select>
+            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Thanh toán</label>
+            <div class="relative">
+                <select name="payment" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
+                    <option value="all" {{ request('payment') === 'all' || !request()->has('payment') ? 'selected' : '' }}>TẤT CẢ PHƯƠNG THỨC</option>
+                    <option value="momo" {{ request('payment') === 'momo' ? 'selected' : '' }}>MOMO</option>
+                    <option value="cod" {{ request('payment') === 'cod' ? 'selected' : '' }}>COD</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 text-xs">▼</div>
+            </div>
         </div>
 
-        <button class="h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all">
-            Apply Filter
-        </button>
-    </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button type="submit" class="h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-1.5 rounded-lg font-mono">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span>Áp dụng</span>
+            </button>
+            <a href="{{ route('admin.order.index') }}" class="h-11 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-400 hover:text-red-300 flex items-center justify-center text-[10px] font-bold uppercase tracking-[0.2em] transition-all gap-1.5 rounded-lg font-mono">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Xóa lọc</span>
+            </a>
+        </div>
+    </form>
 
     <!-- Order Table -->
     <div class="glass-panel overflow-hidden mb-8">

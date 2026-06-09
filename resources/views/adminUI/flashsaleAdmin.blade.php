@@ -90,37 +90,42 @@
         </div>
     </div>
 
-    <form action="/" method="GET" class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-        <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Search Campaigns</label>
+    <form action="{{ route('admin.flashsales.index') }}" method="GET" class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+        <div class="md:col-span-6 space-y-1.5">
+            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Tìm kiếm chiến dịch</label>
             <div class="relative">
                 <input
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
                     placeholder="MÃ HOẶC TÊN CHIẾN DỊCH..."
-                    class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono text-white focus:border-neon-green/50 outline-none transition-colors"
+                    class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono text-white focus:border-neon-green/50 outline-none transition-colors rounded-lg text-white"
                 />
             </div>
         </div>
 
-        <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">Status</label>
-            <select name="status" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono text-white focus:border-neon-green/50 outline-none appearance-none cursor-pointer">
-                <option value="">TẤT CẢ TRẠNG THÁI</option>
-                <option value="LIVE" {{ request('status') == 'LIVE' ? 'selected' : '' }}>LIVE NOW</option>
-                <option value="SCHEDULED" {{ request('status') == 'SCHEDULED' ? 'selected' : '' }}>SCHEDULED</option>
-                <option value="ENDED" {{ request('status') == 'ENDED' ? 'selected' : '' }}>ENDED</option>
-            </select>
+        <div class="md:col-span-4 space-y-1.5">
+            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Trạng thái</label>
+            <div class="relative">
+                <select name="status" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono text-white focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
+                    <option value="">TẤT CẢ TRẠNG THÁI</option>
+                    <option value="LIVE" {{ request('status') == 'LIVE' ? 'selected' : '' }}>ĐANG HOẠT ĐỘNG</option>
+                    <option value="SCHEDULED" {{ request('status') == 'SCHEDULED' ? 'selected' : '' }}>SẮP DIỄN RA</option>
+                    <option value="ENDED" {{ request('status') == 'ENDED' ? 'selected' : '' }}>ĐÃ KẾT THÚC</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 text-xs">▼</div>
+            </div>
         </div>
 
-        <div class="flex gap-4">
-            <a href="/" class="flex-1 h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center">
-                Clear Filters
-            </a>
-            <button type="submit" class="flex-1 h-11 bg-neon-green text-black text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:brightness-110">
-                Apply Filter
+        <div class="md:col-span-2 grid grid-cols-2 gap-3">
+            <button type="submit" class="h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-1.5 rounded-lg font-mono">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span>Áp dụng</span>
             </button>
+            <a href="{{ route('admin.flashsales.index') }}" class="h-11 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-400 hover:text-red-300 flex items-center justify-center text-[10px] font-bold uppercase tracking-[0.2em] transition-all gap-1.5 rounded-lg font-mono">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Xóa lọc</span>
+            </a>
         </div>
     </form>
 
@@ -199,50 +204,17 @@
                 </div>
 
                 <div class="flex items-center gap-4 w-full lg:w-auto shrink-0 border-t lg:border-t-0 lg:border-l border-white/10 pt-4 lg:pt-0 lg:pl-6 justify-between lg:justify-end">
-
                     <div class="flex items-center gap-2">
-                        @if($isEnded)
-                            <a href="/" class="py-1.5 px-6 rounded-lg border border-white/20 text-gray-300 font-bold hover:bg-white/10 hover:text-white transition-all duration-300 uppercase tracking-wider text-[11px] font-display">
-                                BÁO CÁO
-                            </a>
-                        @else
-                            <a href="{{ route('admin.flashsales.edit', $campaign->ma_flash_sales) }}" class="py-1.5 px-6 rounded-lg border border-neon-green text-neon-green font-bold hover:bg-neon-green hover:text-black transition-all duration-300 uppercase tracking-wider text-[11px] font-display">
-                                QUẢN LÝ
-                            </a>
-                        @endif
-
-                        <div class="relative" x-data="{ showDropdown: false }">
-                            <button @click="showDropdown = !showDropdown" @click.away="showDropdown = false" class="p-2 rounded-lg bg-surface-high border border-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer" title="More Actions">
-                                <i data-lucide="more-vertical" class="size-4"></i>
+                        <a href="{{ route('admin.flashsales.edit', $campaign->ma_flash_sales) }}" class="p-2 bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 hover:text-neon-green rounded-lg transition-all" title="Sửa chiến dịch">
+                            <i data-lucide="edit-2" class="size-4"></i>
+                        </a>
+                        <form action="{{ route('admin.flashsales.delete', $campaign->ma_flash_sales) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa chiến dịch này không?');" class="inline">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="p-2 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-lg transition-all" title="Xóa chiến dịch">
+                                <i data-lucide="trash-2" class="size-4"></i>
                             </button>
-
-                            <div x-show="showDropdown" style="display: none;" class="absolute right-0 mt-2 w-48 bg-surface-high border border-white/10 rounded-xl shadow-2xl py-1 z-30 animate-in fade-in slide-in-from-top-2 duration-150">
-                                
-                                <a href="{{ route('admin.flashsales.edit', $campaign->ma_flash_sales) }}" class="w-full text-left px-4 py-2.5 text-xs text-gray-200 hover:bg-white/5 hover:text-neon-green flex items-center gap-2 transition-colors">
-                                    <i data-lucide="edit-2" class="size-3.5"></i> Sửa thông tin
-                                </a>
-
-                                <form action="/" method="POST" class="w-full">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2.5 text-xs text-gray-200 hover:bg-white/5 hover:text-neon-green flex items-center gap-2 transition-colors">
-                                        <i data-lucide="copy" class="size-3.5"></i> Nhân bản chiến dịch
-                                    </button>
-                                </form>
-
-                                <a href="/" class="w-full text-left px-4 py-2.5 text-xs text-gray-200 hover:bg-white/5 hover:text-neon-green flex items-center gap-2 transition-colors">
-                                    <i data-lucide="bar-chart-2" class="size-3.5"></i> Xem báo cáo chi tiết
-                                </a>
-
-                                <form action="" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa chiến dịch này không?');" class="w-full">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2 border-t border-white/10 mt-1 transition-colors">
-                                        <i data-lucide="trash-2" class="size-3.5"></i> Xoá chiến dịch
-                                    </button>
-                                </form>
-                                
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -257,7 +229,7 @@
     @if(method_exists($flash_sales, 'hasPages') && $flash_sales->hasPages())
         <div class="flex flex-col sm:flex-row justify-between items-center gap-6 py-4">
             <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
-                Displaying <span class="text-neon-green font-bold">{{ $flash_sales->firstItem() }} - {{ $flash_sales->lastItem() }}</span> of <span class="text-gray-300">{{ $flash_sales->total() }}</span> Records Identified
+                Hiển thị <span class="text-neon-green font-bold">{{ $flash_sales->firstItem() }} - {{ $flash_sales->lastItem() }}</span> trên tổng số <span class="text-gray-300">{{ $flash_sales->total() }}</span> chiến dịch
             </div>
             <div class="flex items-center gap-1">
                 {{ $flash_sales->links('pagination::tailwind') }}

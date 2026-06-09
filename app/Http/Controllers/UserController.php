@@ -33,10 +33,23 @@ class UserController extends Controller
 
     public function viewUsersAdmin(Request $request)
     {
+        $query = User::select('ma_nguoi_dung', 'ho_ten', 'email', 'avatar_url', 'trang_thai')
+            ->where('vai_tro', 'user');
 
-        $users = User::select('ma_nguoi_dung', 'ho_ten', 'email', 'avatar_url', 'trang_thai')
-            ->where('vai_tro', 'user')
-            ->latest()->paginate(10);
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('email', 'like', '%' . $search . '%');
+        }
+
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            if ($request->input('status') === 'active') {
+                $query->where('trang_thai', 'active');
+            } else {
+                $query->where('trang_thai', '!=', 'active');
+            }
+        }
+
+        $users = $query->latest()->paginate(10)->appends($request->all());
 
         $totalUsersCount = User::where('vai_tro', 'user')->count();
         $activeUsersCount = User::where('vai_tro', 'user')->where('trang_thai', 'active')->count();

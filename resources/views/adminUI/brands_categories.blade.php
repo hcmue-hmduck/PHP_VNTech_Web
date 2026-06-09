@@ -215,22 +215,28 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="relative">
-                        <input type="text" 
-                               placeholder="Tìm thương hiệu..." 
-                               value="{{ request('search_brands') }}" 
-                               onkeydown="if(event.key === 'Enter') { 
-                                   const url = new URL(window.location.href);
-                                   if(this.value.trim() === '') {
-                                       url.searchParams.delete('search_brands');
-                                   } else {
-                                       url.searchParams.set('search_brands', this.value);
-                                   }
-                                   url.searchParams.delete('brands_page');
-                                   window.location.href = url.toString();
-                               }"
-                               class="w-40 sm:w-48 h-9 bg-dark-bg border border-white/10 px-3 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white" />
-                    </div>
+                    <form action="{{ route('admin.brandscategories.index') }}" method="GET" class="flex items-center">
+                        @if(request('search_categories'))
+                            <input type="hidden" name="search_categories" value="{{ request('search_categories') }}">
+                        @endif
+                        <div class="relative flex items-center">
+                            <input type="text" 
+                                   name="search_brands"
+                                   placeholder="Tìm thương hiệu..." 
+                                   value="{{ request('search_brands') }}" 
+                                   class="w-40 sm:w-48 h-9 bg-dark-bg border border-white/10 pl-3 pr-16 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white" />
+                            <div class="absolute right-2 flex items-center gap-1.5">
+                                @if(request('search_brands'))
+                                    <a href="{{ route('admin.brandscategories.index', array_merge(request()->query(), ['search_brands' => null, 'brands_page' => null])) }}" class="text-gray-500 hover:text-red-500 transition-colors" title="Xóa tìm kiếm">
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                @endif
+                                <button type="submit" class="text-gray-500 hover:text-neon-green transition-colors" title="Tìm kiếm">
+                                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     <button id="openBrandModal" type="button" class="group flex items-center gap-2 bg-neon-green text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:brightness-110 transition-all duration-300 shadow-[0_0_20px_rgba(0,229,91,0.2)] shrink-0 h-9">
                         <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"></i>
                         <span>THÊM</span>
@@ -318,22 +324,28 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="relative">
-                        <input type="text" 
-                               placeholder="Tìm danh mục..." 
-                               value="{{ request('search_categories') }}" 
-                               onkeydown="if(event.key === 'Enter') { 
-                                   const url = new URL(window.location.href);
-                                   if(this.value.trim() === '') {
-                                       url.searchParams.delete('search_categories');
-                                   } else {
-                                       url.searchParams.set('search_categories', this.value);
-                                   }
-                                   url.searchParams.delete('categories_page');
-                                   window.location.href = url.toString();
-                               }"
-                               class="w-40 sm:w-48 h-9 bg-dark-bg border border-white/10 px-3 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white" />
-                    </div>
+                    <form action="{{ route('admin.brandscategories.index') }}" method="GET" class="flex items-center">
+                        @if(request('search_brands'))
+                            <input type="hidden" name="search_brands" value="{{ request('search_brands') }}">
+                        @endif
+                        <div class="relative flex items-center">
+                            <input type="text" 
+                                   name="search_categories"
+                                   placeholder="Tìm danh mục..." 
+                                   value="{{ request('search_categories') }}" 
+                                   class="w-40 sm:w-48 h-9 bg-dark-bg border border-white/10 pl-3 pr-16 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white" />
+                            <div class="absolute right-2 flex items-center gap-1.5">
+                                @if(request('search_categories'))
+                                    <a href="{{ route('admin.brandscategories.index', array_merge(request()->query(), ['search_categories' => null, 'categories_page' => null])) }}" class="text-gray-500 hover:text-red-500 transition-colors" title="Xóa tìm kiếm">
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                    </a>
+                                @endif
+                                <button type="submit" class="text-gray-500 hover:text-neon-green transition-colors" title="Tìm kiếm">
+                                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     <button id="openCategoryModal" type="button" class="group flex items-center gap-2 bg-neon-green text-black px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:brightness-110 transition-all duration-300 shadow-[0_0_20px_rgba(0,229,91,0.2)] shrink-0 h-9">
                         <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform duration-300"></i>
                         <span>THÊM</span>

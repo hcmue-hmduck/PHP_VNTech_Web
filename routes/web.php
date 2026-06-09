@@ -124,20 +124,17 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/order/{ma_don_hang}/print', [OrderController::class, 'printInvoice'])->name('admin.order.print');
 
     Route::get('/brands_categories', [Brands_CategoriesAdminController::class, 'viewBrandsCategories'])->name('admin.brandscategories.index');
-
     Route::post('/brands_categories/brand', [Brands_CategoriesAdminController::class, 'storeCreateBrand'])->name('admin.brandscategories.brand.store');
     Route::put('/brands_categories/brand/{brand}', [Brands_CategoriesAdminController::class, 'updateEditBrand'])->name('admin.brandscategories.brand.update');
-
     Route::post('/brands_categories/category', [Brands_CategoriesAdminController::class, 'storeCreateCategory'])->name('admin.brandscategories.category.store');
     Route::put('/brands_categories/category/{category}', [Brands_CategoriesAdminController::class, 'updateEditCategory'])->name('admin.brandscategories.category.update');
 
     Route::get('/flash-sales', [FlashSalesController::class, 'viewFlashSalesAdmin'])->name('admin.flashsales.index');
-
     Route::get('/flash-sales/create', [FlashSalesController::class, 'viewCreateFlashSalesAdmin'])->name('admin.flashsales.create');
     Route::post('/flash-sales', [FlashSalesController::class, 'storeCreateFlashSalesAdmin'])->name('admin.flashsales.store');
-
     Route::get('/flash-sales/{flash_sales}/edit', [FlashSalesController::class, 'viewEditFlashSalesAdmin'])->name('admin.flashsales.edit');
     Route::put('/flash-sales/{flash_sales}', [FlashSalesController::class, 'updateEditFlashSalesAdmin'])->name('admin.flashsales.update');
+    Route::put('/flash-sales/{flash_sales}/delete', [FlashSalesController::class, 'deleteFlashSalesAdmin'])->name('admin.flashsales.delete');
 
     Route::get('/vouchers', [VoucherController::class, 'viewVoucherAdmin'])->name('admin.voucher.view');
     Route::get('/voucher/create', [VoucherController::class, 'viewCreateVoucherAdmin'])->name('admin.voucher.create');

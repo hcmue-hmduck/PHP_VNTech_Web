@@ -8,8 +8,15 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class BannerImagesController extends Controller
 {
-    public function viewBanner() {
-        $banner_images = BannerImage::where('trang_thai', 'active')->latest()->get();
+    public function viewBanner(Request $request) {
+        $query = BannerImage::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('tieu_de', 'like', '%' . $search . '%');
+        }
+
+        $banner_images = $query->latest()->get();
         return view('adminUI.bannerImagesAdmin', compact('banner_images'));
     }
 

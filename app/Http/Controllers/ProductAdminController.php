@@ -11,11 +11,25 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductAdminController extends Controller
 {
-    public function viewProductAdmin()
+    public function viewProductAdmin(Request $request)
     {
-        $products = Product::where('trang_thai', '!=', 'deleted')->with(['variants' => function ($query) {
+        $query = Product::where('trang_thai', '!=', 'deleted')->with(['variants' => function ($query) {
             $query->where('trang_thai', '!=', 'deleted');
-        }])->latest()->paginate(10);
+        }]);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('ten_san_pham', 'like', '%' . $search . '%')
+                  ->orWhere('ma_san_pham', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('ma_danh_muc', $request->input('category'));
+        }
+
+        $products = $query->latest()->paginate(10)->appends($request->all());
         
         $totalProducts = Product::where('trang_thai', '!=', 'deleted')->count();
         $activeProducts = Product::where('trang_thai', 'active')->count();

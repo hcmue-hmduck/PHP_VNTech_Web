@@ -21,9 +21,28 @@ use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
-    public function viewAdminOrder()
+    public function viewAdminOrder(Request $request)
     {
-        $orders = Order::latest()->paginate(10);
+        $query = Order::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('ma_don_hang', 'like', '%' . $search . '%')
+                  ->orWhere('ho_ten_nguoi_nhan', 'like', '%' . $search . '%')
+                  ->orWhere('so_dien_thoai_nhan', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $query->where('trang_thai', $request->input('status'));
+        }
+
+        if ($request->filled('payment') && $request->input('payment') !== 'all') {
+            $query->where('phuong_thuc_thanh_toan', strtolower($request->input('payment')));
+        }
+
+        $orders = $query->latest()->paginate(10)->appends($request->all());
         return view('adminUI.ordersAdmin', compact('orders'));
     }
 

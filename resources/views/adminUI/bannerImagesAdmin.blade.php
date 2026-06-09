@@ -71,17 +71,28 @@
     </div>
 
     <!-- Filters Bar -->
-    <div class="glass-panel p-6 border-l-4 border-l-neon-green mb-12">
-        <div class="space-y-1.5">
-            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Tìm kiếm tiêu đề hoặc liên kết</label>
+    <form action="{{ route('admin.banner.index') }}" method="GET" class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+        <div class="md:col-span-9 space-y-1.5">
+            <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Tìm kiếm tiêu đề</label>
             <input 
-                id="searchBanner"
+                name="search"
                 type="text" 
-                placeholder="Nhập tiêu đề hoặc link liên kết..." 
+                value="{{ request('search') }}"
+                placeholder="Nhập tiêu đề banner..." 
                 class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white"
             />
         </div>
-    </div>
+        <div class="md:col-span-3 grid grid-cols-2 gap-3">
+            <button type="submit" class="h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-1.5 rounded-lg font-mono">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span>Lọc</span>
+            </button>
+            <a href="{{ route('admin.banner.index') }}" class="h-11 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-400 hover:text-red-300 flex items-center justify-center text-[10px] font-bold uppercase tracking-[0.2em] transition-all gap-1.5 rounded-lg font-mono">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Xóa</span>
+            </a>
+        </div>
+    </form>
 
 
 
@@ -181,29 +192,6 @@
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
-
-        const searchInput = document.getElementById('searchBanner');
-        const tableBody = document.getElementById('bannerTableBody');
-        const rows = tableBody ? tableBody.querySelectorAll('tr[data-title]') : [];
-
-        function filterBanners() {
-            const query = searchInput.value.toLowerCase().trim();
-
-            rows.forEach(row => {
-                const title = (row.getAttribute('data-title') || '').toLowerCase();
-                const link = (row.getAttribute('data-link') || '').toLowerCase();
-
-                const matchesQuery = query === '' || title.includes(query) || link.includes(query);
-
-                if (matchesQuery) {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
-                }
-            });
-        }
-
-        if (searchInput) searchInput.addEventListener('input', filterBanners);
     });
 </script>
 @endpush

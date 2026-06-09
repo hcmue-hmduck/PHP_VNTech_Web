@@ -126,17 +126,13 @@
                         <div class="pt-5 border-t border-white/10 mt-auto space-y-1.5">
                             <label for="trang_thai" class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Trạng thái phát hành</label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <i data-lucide="activity" class="size-4 text-gray-500"></i>
-                                </div>
                                 <select
                                     id="trang_thai" name="trang_thai"
-                                    class="w-full h-12 bg-dark-bg/50 border border-white/10 pl-11 pr-10 text-sm font-mono text-white focus:border-neon-green focus:bg-neon-green/5 outline-none appearance-none cursor-pointer rounded-lg transition-all"
+                                    class="w-full h-12 bg-dark-bg/50 border border-white/10 pl-4 pr-10 text-sm font-mono text-white focus:border-neon-green focus:bg-neon-green/5 outline-none appearance-none cursor-pointer rounded-lg transition-all"
                                 >
                                     @php
-                                        $currentStatus = strtolower(old('trang_thai', $flash_sales->trang_thai ?? 'draft'));
+                                        $currentStatus = strtolower(old('trang_thai', $flash_sales->trang_thai ?? 'active'));
                                     @endphp
-                                    <option value="draft" {{ $currentStatus === 'draft' ? 'selected' : '' }}>BẢN NHÁP</option>
                                     <option value="active" {{ $currentStatus === 'active' ? 'selected' : '' }}>ĐANG HOẠT ĐỘNG</option>
                                     <option value="finished" {{ $currentStatus === 'finished' ? 'selected' : '' }}>ĐÃ KẾT THÚC</option>
                                 </select>
@@ -275,10 +271,6 @@
                 <a href="{{ route('admin.flashsales.index') }}" class="w-full md:w-auto flex justify-center items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all rounded-lg no-underline">
                     <span>Hủy bỏ</span>
                 </a>
-                <button type="submit" name="action_type" value="DRAFT" class="w-full md:w-auto group flex justify-center items-center gap-2 bg-transparent border border-white/20 text-white px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-white/5 hover:border-neon-green/45 transition-all rounded-lg">
-                    <i data-lucide="save" class="w-4 h-4 group-hover:scale-110 transition-all"></i>
-                    <span>Lưu bản tạm</span>
-                </button>
                 <button type="submit" name="action_type" value="ACTIVE" class="w-full md:w-auto group flex justify-center items-center gap-2 bg-neon-green text-black border border-neon-green px-6 py-3 text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all rounded-lg shadow-[0_0_15px_rgba(0,229,91,0.2)]">
                     <i data-lucide="zap" class="w-4 h-4 group-hover:scale-110 transition-all"></i>
                     <span>{{ isset($flash_sales) ? 'Cập nhật' : 'Tạo mới'}}</span>

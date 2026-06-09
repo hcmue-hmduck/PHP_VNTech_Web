@@ -152,31 +152,12 @@
                             Đã bán: <b class="text-slate-950">{{ $selectedVariant->da_ban ?? 0 }}</b>
                         </span>
                         <span class="h-4 w-[1px] bg-slate-200"></span>
-                        <span class="text-emerald-600 font-bold">Còn hàng</span>
-                    </div>
-
-                    <!-- Price Section (Matches layout in attachment) -->
-                    <div class="pt-2">
-                        <div class="flex items-baseline gap-3">
-                            <span class="text-4xl font-extrabold text-[#E04F2A] tracking-tight font-display">
-                                {{ number_format($currentPrice, 0, ',', '.') }}₫
-                            </span>
-                            <span class="text-base text-slate-400 line-through font-semibold">
-                                {{ number_format($originalPrice, 0, ',', '.') }}₫
-                            </span>
-                        </div>
-
-                        <!-- Savings Pink alert box (Matches attachment) -->
-                        <div class="bg-[#FFF5F5] border border-[#FFE3E3] text-[#D32F2F] p-3.5 rounded-2xl flex items-center justify-between text-xs font-bold mt-3.5">
-                            <span>Tiết kiệm {{ number_format($tietKiemVal, 0, ',', '.') }}₫</span>
-                            <span class="text-[#E04F2A] font-extrabold">Giá khuyến mãi</span>
-                        </div>
+                        <span class="text-emerald-600 font-bold">Còn {{ $selectedVariant->so_luong_ton_kho ?? 0 }} sản phẩm</span>
                     </div>
 
                     @if($isFlashSaleActive)
-                        <div class="overflow-hidden rounded-3xl border border-orange-200 bg-gradient-to-br from-[#fff7ed] via-white to-[#fff1f1] shadow-[0_18px_35px_rgba(255,92,0,0.10)]">
+                        <div class="overflow-hidden rounded-3xl border border-orange-200 bg-gradient-to-br from-[#fff7ed] via-white to-[#fff1f1] shadow-[0_18px_35px_rgba(255,92,0,0.10)] mb-4">
                             <div class="flex flex-col gap-4 p-4 sm:p-5">
-                                <div class="flex items-start justify-between gap-4">
                                     <div class="flex items-start gap-3">
                                         <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FF5C00] text-white shadow-[0_10px_22px_rgba(255,92,0,0.22)]">
                                             <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
@@ -188,15 +169,7 @@
                                             </h2>
                                         </div>
                                     </div>
-
-                                    <div class="rounded-2xl bg-white px-3 py-2 text-right shadow-sm ring-1 ring-orange-100">
-                                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-400">Giá flash</p>
-                                        <p class="font-display text-base font-black text-[#E04F2A]">
-                                            {{ number_format($flashSaleInfo->gia_flash_sale, 0, ',', '.') }}₫
-                                        </p>
-                                    </div>
-                                </div>
-
+                                
                                 <div
                                     id="flash-sale-countdown"
                                     data-endtime="{{ $endTimeStr }}"
@@ -232,6 +205,24 @@
                             </div>
                         </div>
                     @endif
+
+                    <!-- Price Section (Matches layout in attachment) -->
+                    <div class="pt-2">
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-4xl font-extrabold text-[#E04F2A] tracking-tight font-display">
+                                {{ number_format($currentPrice, 0, ',', '.') }}₫
+                            </span>
+                            <span class="text-base text-slate-400 line-through font-semibold">
+                                {{ number_format($originalPrice, 0, ',', '.') }}₫
+                            </span>
+                        </div>
+
+                        <!-- Savings Pink alert box (Matches attachment) -->
+                        <div class="bg-[#FFF5F5] border border-[#FFE3E3] text-[#D32F2F] p-3.5 rounded-2xl flex items-center justify-between text-xs font-bold mt-3.5">
+                            <span>Tiết kiệm {{ number_format($tietKiemVal, 0, ',', '.') }}₫</span>
+                            <span class="text-[#E04F2A] font-extrabold">Giá khuyến mãi</span>
+                        </div>
+                    </div>
                 </div>
 
                 @if ($productDetail->kiem_tra_bien_the)
@@ -248,20 +239,6 @@
                     </div>
                 </div>
                 @endif
-
-                <div class="border-t border-neutral-100 pt-5">
-                    <div class="inline-flex items-center gap-2.5 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-3.5 py-2 text-emerald-700">
-                        <span class="flex h-7 w-7 items-center justify-center rounded-xl bg-white text-emerald-600 shadow-xs">
-                            <i data-lucide="package-check" class="w-4 h-4"></i>
-                        </span>
-                        <div class="leading-tight">
-                            <p class="text-[10px] font-black uppercase tracking-wider text-emerald-600/80">Tình trạng kho</p>
-                            <p class="text-xs font-extrabold">
-                                Còn {{ $selectedVariant->so_luong_ton_kho ?? 142 }} sản phẩm
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Key call-to-actions buttons blocks (Matches layout buttons in mockup) -->
                 <div class="border-t border-neutral-100 pt-6 space-y-3.5">
@@ -304,51 +281,17 @@
         </div>
 
 
-        <!-- Interactive Tabbed Product Details -->
-        <div class="mt-20 border-t border-neutral-200 pt-12 text-left animate-fade-in" x-data="{ activeTab: 'specs' }">
-            <!-- Tabs Navigation -->
-            <div class="flex border-b border-neutral-200 gap-8 mb-8 pb-px">
-                <button
-                    x-on:click="activeTab = 'specs'"
-                    :class="activeTab === 'specs' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
-                    class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
-                >
-                    <i data-lucide="cpu" class="w-4 h-4"></i>
-                    Thông số kỹ thuật
-                </button>
-                @if ($productDetail->mo_ta_chi_tiet)
-                    <button
-                        x-on:click="activeTab = 'desc'"
-                        :class="activeTab === 'desc' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
-                        class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
-                    >
-                        <i data-lucide="info" class="w-4 h-4"></i>
-                        Mô tả chi tiết
-                    </button>
-                @endif
-                <button
-                    x-on:click="activeTab = 'reviews'"
-                    :class="activeTab === 'reviews' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
-                    class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
-                >
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    Đánh giá sản phẩm
-                </button>
-                @if($hasThongTinThem)
-                    <button
-                        x-on:click="activeTab = 'additional'"
-                        :class="activeTab === 'additional' ? 'border-[#FF5C00] text-[#FF5C00]' : 'border-transparent text-slate-400 hover:text-slate-700'"
-                        class="pb-4 font-display font-black text-base border-b-2 transition-all cursor-pointer flex items-center gap-2"
-                    >
-                        <i data-lucide="list" class="w-4 h-4"></i>
-                        Thông tin bổ sung
-                    </button>
-                @endif
-            </div>
-
-            <!-- Specs Tab -->
-            <div x-show="activeTab === 'specs'" class="space-y-8 animate-fade-in">
-                <div class="bg-white rounded-3xl border border-neutral-100 overflow-hidden shadow-xs">
+        <!-- Product Specifications Section -->
+        <div class="mt-20 border-t border-neutral-200 pt-16">
+            <div class="bg-white rounded-3xl border border-neutral-200/80 p-6 sm:p-10 shadow-xs space-y-8 text-left">
+                <div class="space-y-1 text-left">
+                    <h2 class="font-display font-black text-2xl text-neutral-900 border-l-4 border-[#ff5c00] pl-3.5 uppercase">
+                        Thông số kỹ thuật
+                    </h2>
+                    <p class="text-slate-400 text-xs font-bold">Cấu hình chi tiết của sản phẩm</p>
+                </div>
+                
+                <div class="overflow-hidden rounded-2xl border border-neutral-100">
                     <table class="w-full text-left">
                         <tbody class="divide-y divide-neutral-100">
                             @foreach($formattedChung as $row)
@@ -377,305 +320,332 @@
                     </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Description Tab -->
-            @if ($productDetail->mo_ta_chi_tiet)
-                <div x-show="activeTab === 'desc'" class="space-y-8 animate-fade-in" style="display: none;">
-                    <div class="bg-white rounded-3xl border border-neutral-100 p-6 sm:p-10 shadow-xs">
-                        <div class="prose prose-lg max-w-none 
-                                    prose-headings:font-display prose-headings:text-slate-900 prose-headings:font-black 
-                                    prose-p:text-slate-600 prose-p:leading-relaxed 
-                                    prose-img:rounded-3xl prose-img:shadow-[0_10px_30px_rgba(0,0,0,0.05)] prose-img:mx-auto prose-img:my-8
-                                    prose-a:text-[#FF5C00] hover:prose-a:text-orange-600 transition-colors
-                                    prose-strong:text-slate-900">
-                            {!! $productDetail->mo_ta_chi_tiet !!}
-                        </div>
-                    </div>
+        <!-- Additional Information Section -->
+        @if($hasThongTinThem)
+        <div class="mt-20 border-t border-neutral-200 pt-16">
+            <div class="bg-white rounded-3xl border border-neutral-200/80 p-6 sm:p-10 shadow-xs space-y-8 text-left">
+                <div class="space-y-1 text-left">
+                    <h2 class="font-display font-black text-2xl text-neutral-900 border-l-4 border-[#ff5c00] pl-3.5 uppercase">
+                        Thông tin bổ sung
+                    </h2>
+                    <p class="text-slate-400 text-xs font-bold">Các thông tin đi kèm khác của sản phẩm</p>
                 </div>
-            @endif
+                
+                <div class="overflow-hidden rounded-2xl border border-neutral-100">
+                    <table class="w-full text-left">
+                        <tbody class="divide-y divide-neutral-100">
+                            @foreach($formattedThem as $row)
+                            <tr class="hover:bg-neutral-50/50 transition-colors group">
+                                <td class="p-5 font-bold text-xs tracking-wider text-slate-400 w-1/3 uppercase">
+                                    {{ $row['ten'] }}
+                                </td>
+                                <td class="p-5 text-slate-800 font-semibold text-sm">
+                                    {{ $row['gia_tri'] }}
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
 
-            <!-- Reviews Tab -->
-            <div
-                x-show="activeTab === 'reviews'"
-                x-data="productReviews({{ json_encode(route('reviews.index', $productDetail->ma_san_pham)) }}, {{ json_encode(asset('images/AvatarDefault.jpg')) }})"
-                x-init="load(initialPage())"
-                class="space-y-6 animate-fade-in"
-                style="display: none;"
-            >
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white rounded-2xl border border-neutral-100 p-5 sm:p-6 gap-5 shadow-xs">
-                    <div class="text-left">
-                        <h3 class="font-display text-lg font-black text-slate-900">Đánh giá sản phẩm</h3>
-                        <p class="text-xs text-neutral-400 mt-1 font-bold">
-                            Chia sẻ thực tế từ khách hàng đã mua tại VNTech
-                        </p>
-                    </div>
-                    <div class="flex items-end gap-3">
-                        <div class="text-4xl font-display font-black text-[#FF5C00] leading-none">
-                            {{ number_format($averageRating, 1) }}
-                        </div>
-                        <div class="pb-0.5">
-                            <div class="flex text-sm leading-none">
-                                @for($i = 1; $i <= 5; $i++)
-                                    @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
-                                    <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-gray-200">
-                                        ★
-                                        <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-400" style="--fill: {{ $starFill }}%; width: var(--fill);">★</span>
-                                    </span>
-                                @endfor
-                            </div>
+        <!-- Product Description Section -->
+        @if ($productDetail->mo_ta_chi_tiet)
+        <div class="mt-20 border-t border-neutral-200 pt-16">
+            <div class="bg-white rounded-3xl border border-neutral-200/80 p-6 sm:p-10 shadow-xs space-y-8 text-left">
+                <div class="space-y-1 text-left">
+                    <h2 class="font-display font-black text-2xl text-neutral-900 border-l-4 border-[#ff5c00] pl-3.5 uppercase">
+                        Mô tả chi tiết sản phẩm
+                    </h2>
+                    <p class="text-slate-400 text-xs font-bold">Thông tin chi tiết về tính năng, cấu hình và thiết kế của sản phẩm</p>
+                </div>
+                
+                <div class="prose prose-lg max-w-none 
+                            prose-headings:font-display prose-headings:text-slate-900 prose-headings:font-black 
+                            prose-p:text-slate-600 prose-p:leading-relaxed 
+                            prose-img:rounded-3xl prose-img:shadow-[0_10px_30px_rgba(0,0,0,0.05)] prose-img:mx-auto prose-img:my-8
+                            prose-a:text-[#FF5C00] hover:prose-a:text-orange-600 transition-colors
+                            prose-strong:text-slate-900">
+                    {!! $productDetail->mo_ta_chi_tiet !!}
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Product Reviews Section -->
+        <div class="mt-20 border-t border-neutral-200 pt-16">
+            <div class="bg-neutral-50/50 rounded-3xl border border-neutral-200/80 p-6 sm:p-10 shadow-xs space-y-8">
+                <div class="space-y-1 text-left">
+                    <h2 class="font-display font-black text-2xl text-neutral-900 border-l-4 border-[#ff5c00] pl-3.5 uppercase">
+                        Đánh giá sản phẩm
+                    </h2>
+                    <p class="text-slate-400 text-xs font-bold">Chia sẻ thực tế từ khách hàng đã mua tại VNTech</p>
+                </div>
+
+                <div
+                    x-data="productReviews({{ json_encode(route('reviews.index', $productDetail->ma_san_pham)) }}, {{ json_encode(asset('images/AvatarDefault.jpg')) }})"
+                    x-init="load(initialPage())"
+                    class="space-y-6 text-left"
+                >
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white rounded-2xl border border-neutral-100 p-5 sm:p-6 gap-5 shadow-xs">
+                        <div class="text-left">
+                            <h3 class="font-display text-sm font-black text-slate-700 uppercase tracking-wider">Điểm số đánh giá trung bình</h3>
                             <p class="text-xs text-neutral-400 mt-1 font-bold">
-                                {{ number_format($reviewsCount, 0, ',', '.') }} đánh giá
+                                Dựa trên đóng góp của người mua hàng
                             </p>
                         </div>
+                        <div class="flex items-end gap-3">
+                            <div class="text-4xl font-display font-black text-[#FF5C00] leading-none">
+                                {{ number_format($averageRating, 1) }}
+                            </div>
+                            <div class="pb-0.5">
+                                <div class="flex text-sm leading-none">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @php $starFill = max(0, min(100, ($averageRating - ($i - 1)) * 100)); @endphp
+                                        <span class="relative inline-block w-3.5 h-3.5 overflow-hidden text-sm leading-none text-gray-200">
+                                            ★
+                                            <span class="absolute left-0 top-0 h-full overflow-hidden text-amber-400" style="--fill: {{ $starFill }}%; width: var(--fill);">★</span>
+                                        </span>
+                                    @endfor
+                                </div>
+                                <p class="text-xs text-neutral-400 mt-1 font-bold">
+                                    {{ number_format($reviewsCount, 0, ',', '.') }} đánh giá
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div x-show="loading" class="bg-white rounded-2xl border border-neutral-100 p-8 text-center text-sm font-bold text-neutral-400">
-                    Đang tải đánh giá...
-                </div>
+                    <div x-show="loading" class="bg-white rounded-2xl border border-neutral-100 p-8 text-center text-sm font-bold text-neutral-400">
+                        Đang tải đánh giá...
+                    </div>
 
-                <div x-show="!loading && reviews.length === 0" class="bg-white rounded-2xl border border-neutral-100 p-8 text-center">
-                    <i data-lucide="message-square" class="w-10 h-10 text-neutral-300 mx-auto mb-3"></i>
-                    <p class="text-sm font-bold text-slate-500">Sản phẩm chưa có đánh giá nào</p>
-                </div>
+                    <div x-show="!loading && reviews.length === 0" class="bg-white rounded-2xl border border-neutral-100 p-8 text-center">
+                        <i data-lucide="message-square" class="w-10 h-10 text-neutral-300 mx-auto mb-3"></i>
+                        <p class="text-sm font-bold text-slate-500">Sản phẩm chưa có đánh giá nào</p>
+                    </div>
 
-                <div x-show="!loading && reviews.length > 0" class="bg-white rounded-2xl border border-neutral-100 divide-y divide-neutral-100 shadow-xs overflow-hidden">
-                    <template x-for="review in reviews" :key="review.id || review.ma_danh_gia || review.created_at">
-                        <article class="p-5 sm:p-6">
-                            <div class="flex gap-4">
-                                <img
-                                    :src="review.is_anonymous ? defaultAvatar : (review.user?.avatar_url || defaultAvatar)"
-                                    alt="Avatar người đánh giá"
-                                    class="w-10 h-10 rounded-full object-cover border border-neutral-200 shrink-0 bg-neutral-50"
-                                >
+                    <div x-show="!loading && reviews.length > 0" class="bg-white rounded-2xl border border-neutral-100 divide-y divide-neutral-100 shadow-xs overflow-hidden">
+                        <template x-for="review in reviews" :key="review.id || review.ma_danh_gia || review.created_at">
+                            <article class="p-5 sm:p-6 text-left">
+                                <div class="flex gap-4">
+                                    <img
+                                        :src="review.is_anonymous ? defaultAvatar : (review.user?.avatar_url || defaultAvatar)"
+                                        alt="Avatar người đánh giá"
+                                        class="w-10 h-10 rounded-full object-cover border border-neutral-200 shrink-0 bg-neutral-50"
+                                    >
 
-                                <div class="min-w-0 flex-1 space-y-2">
-                                    <div class="flex flex-wrap items-start justify-between gap-2">
-                                        <div class="min-w-0">
-                                            <h4 class="text-sm font-extrabold text-slate-900 truncate" x-text="review.is_anonymous ? 'Ẩn danh' : (review.user?.ho_ten || 'Khách hàng VNTech')"></h4>
-                                            <div class="flex text-sm leading-none mt-1" :aria-label="`${review.so_sao} sao`">
-                                                <template x-for="star in 5" :key="star">
-                                                    <span :class="star <= Number(review.so_sao || 0) ? 'text-amber-400' : 'text-neutral-200'">★</span>
-                                                </template>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2 shrink-0">
-                                            <span
-                                                x-show="review.is_updated"
-                                                class="rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-neutral-500"
-                                            >
-                                                Đã chỉnh sửa
-                                            </span>
-                                            <time class="text-xs text-neutral-400 font-semibold" x-text="formatDate(review.updated_at)"></time>
-                                        </div>
-                                    </div>
-
-                                    <p x-show="review.ten_hien_thi || review.ten_bien_the" class="text-xs text-neutral-500 font-semibold">
-                                        Phân loại hàng: <span class="text-slate-600" x-text="review.ten_hien_thi || review.ten_bien_the"></span>
-                                    </p>
-
-                                    <p x-show="review.noi_dung" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line" x-text="review.noi_dung"></p>
-
-                                    <div x-show="mediaItems(review).length > 0" class="flex flex-wrap gap-2 pt-1">
-                                        <template x-for="item in mediaItems(review)" :key="`${item.type}-${item.url}`">
-                                            <a :href="item.url" target="_blank" rel="noopener" class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border border-neutral-200 bg-neutral-50 group">
-                                                <template x-if="item.type === 'video'">
-                                                    <video :src="item.url" class="w-full h-full object-cover bg-slate-900" muted preload="metadata"></video>
-                                                </template>
-                                                <template x-if="item.type === 'image'">
-                                                    <img :src="item.url" alt="Ảnh đánh giá" class="w-full h-full object-cover" loading="lazy">
-                                                </template>
-                                                <div x-show="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/25 text-white">
-                                                    <i data-lucide="play" class="w-7 h-7 fill-current"></i>
+                                    <div class="min-w-0 flex-1 space-y-2">
+                                        <div class="flex flex-wrap items-start justify-between gap-2">
+                                            <div class="min-w-0">
+                                                <h4 class="text-sm font-extrabold text-slate-900 truncate" x-text="review.is_anonymous ? 'Ẩn danh' : (review.user?.ho_ten || 'Khách hàng VNTech')"></h4>
+                                                <div class="flex text-sm leading-none mt-1" :aria-label="`${review.so_sao} sao`">
+                                                    <template x-for="star in 5" :key="star">
+                                                        <span :class="star <= Number(review.so_sao || 0) ? 'text-amber-400' : 'text-neutral-200'">★</span>
+                                                    </template>
                                                 </div>
-                                            </a>
-                                        </template>
-                                    </div>
-
-                                    <div x-show="hasEditHistory(review)" class="mt-4 rounded-xl border border-dashed border-neutral-200 bg-neutral-50/70 p-4 space-y-3">
-                                        <div class="flex flex-wrap items-center justify-between gap-2">
-                                            <div class="flex items-center gap-2 text-xs font-extrabold text-slate-600">
-                                                <i data-lucide="history" class="w-4 h-4 text-neutral-400"></i>
-                                                <span>Lịch sử chỉnh sửa</span>
                                             </div>
-                                            <time
-                                                x-show="review.created_at"
-                                                class="text-[11px] font-semibold text-neutral-400"
-                                                x-text="formatDate(review.created_at)"
-                                            ></time>
+                                            <div class="flex items-center gap-2 shrink-0">
+                                                <span
+                                                    x-show="review.is_updated"
+                                                    class="rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-neutral-500"
+                                                >
+                                                    Đã chỉnh sửa
+                                                </span>
+                                                <time class="text-xs text-neutral-400 font-semibold" x-text="formatDate(review.updated_at)"></time>
+                                            </div>
                                         </div>
 
-                                        <div class="flex text-xs leading-none" :aria-label="`${review.lich_su_chinh_sua?.so_sao || 0} sao trước chỉnh sửa`">
-                                            <template x-for="star in 5" :key="star">
-                                                <span :class="star <= Number(review.lich_su_chinh_sua?.so_sao || 0) ? 'text-amber-400' : 'text-neutral-200'">★</span>
-                                            </template>
-                                        </div>
+                                        <p x-show="review.ten_hien_thi || review.ten_bien_the" class="text-xs text-neutral-500 font-semibold">
+                                            Phân loại hàng: <span class="text-slate-600" x-text="review.ten_hien_thi || review.ten_bien_the"></span>
+                                        </p>
 
-                                        <p
-                                            x-show="review.lich_su_chinh_sua?.noi_dung"
-                                            class="text-xs text-slate-500 leading-relaxed whitespace-pre-line"
-                                            x-text="review.lich_su_chinh_sua?.noi_dung"
-                                        ></p>
+                                        <p x-show="review.noi_dung" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line" x-text="review.noi_dung"></p>
 
-                                        <div x-show="historyMediaItems(review).length > 0" class="flex flex-wrap gap-2">
-                                            <template x-for="item in historyMediaItems(review)" :key="`history-${item.type}-${item.url}`">
-                                                <a :href="item.url" target="_blank" rel="noopener" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-neutral-200 bg-white group">
+                                        <div x-show="mediaItems(review).length > 0" class="flex flex-wrap gap-2 pt-1">
+                                            <template x-for="item in mediaItems(review)" :key="`${item.type}-${item.url}`">
+                                                <a :href="item.url" target="_blank" rel="noopener" class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border border-neutral-200 bg-neutral-50 group">
                                                     <template x-if="item.type === 'video'">
                                                         <video :src="item.url" class="w-full h-full object-cover bg-slate-900" muted preload="metadata"></video>
                                                     </template>
                                                     <template x-if="item.type === 'image'">
-                                                        <img :src="item.url" alt="Media đánh giá trước chỉnh sửa" class="w-full h-full object-cover" loading="lazy">
+                                                        <img :src="item.url" alt="Ảnh đánh giá" class="w-full h-full object-cover" loading="lazy">
                                                     </template>
                                                     <div x-show="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/25 text-white">
-                                                        <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                                                        <i data-lucide="play" class="w-7 h-7 fill-current"></i>
                                                     </div>
                                                 </a>
                                             </template>
                                         </div>
-                                    </div>
 
-                                    <div x-show="review.admin_reply" class="mt-4 rounded-xl border border-orange-100 bg-orange-50/50 p-4 space-y-2">
-                                        <div class="flex flex-wrap items-center justify-between gap-2">
-                                            <div class="flex items-center gap-2 text-xs font-extrabold text-[#E04F2A]">
-                                                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                                                <span>Phản hồi từ VNTech</span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <span
-                                                    x-show="review.admin_reply?.is_updated"
-                                                    class="rounded-full bg-white px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-orange-500"
-                                                >
-                                                    Đã chỉnh sửa
-                                                </span>
+                                        <div x-show="hasEditHistory(review)" class="mt-4 rounded-xl border border-dashed border-neutral-200 bg-neutral-50/70 p-4 space-y-3">
+                                            <div class="flex flex-wrap items-center justify-between gap-2 text-left">
+                                                <div class="flex items-center gap-2 text-xs font-extrabold text-slate-600">
+                                                    <i data-lucide="history" class="w-4 h-4 text-neutral-400"></i>
+                                                    <span>Lịch sử chỉnh sửa</span>
+                                                </div>
                                                 <time
-                                                    x-show="review.admin_reply?.updated_at"
+                                                    x-show="review.created_at"
                                                     class="text-[11px] font-semibold text-neutral-400"
-                                                    x-text="formatDate(review.admin_reply?.updated_at)"
+                                                    x-text="formatDate(review.created_at)"
                                                 ></time>
                                             </div>
+
+                                            <div class="flex text-xs leading-none" :aria-label="`${review.lich_su_chinh_sua?.so_sao || 0} sao trước chỉnh sửa`">
+                                                <template x-for="star in 5" :key="star">
+                                                    <span :class="star <= Number(review.lich_su_chinh_sua?.so_sao || 0) ? 'text-amber-400' : 'text-neutral-200'">★</span>
+                                                </template>
+                                            </div>
+
+                                            <p
+                                                x-show="review.lich_su_chinh_sua?.noi_dung"
+                                                class="text-xs text-slate-500 leading-relaxed whitespace-pre-line"
+                                                x-text="review.lich_su_chinh_sua?.noi_dung"
+                                            ></p>
+
+                                            <div x-show="historyMediaItems(review).length > 0" class="flex flex-wrap gap-2">
+                                                <template x-for="item in historyMediaItems(review)" :key="`history-${item.type}-${item.url}`">
+                                                    <a :href="item.url" target="_blank" rel="noopener" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-neutral-200 bg-white group">
+                                                        <template x-if="item.type === 'video'">
+                                                            <video :src="item.url" class="w-full h-full object-cover bg-slate-900" muted preload="metadata"></video>
+                                                        </template>
+                                                        <template x-if="item.type === 'image'">
+                                                            <img :src="item.url" alt="Media đánh giá trước chỉnh sửa" class="w-full h-full object-cover" loading="lazy">
+                                                        </template>
+                                                        <div x-show="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/25 text-white">
+                                                            <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                                                        </div>
+                                                    </a>
+                                                </template>
+                                            </div>
                                         </div>
-                                        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line" x-text="review.admin_reply?.noi_dung"></p>
+
+                                        <div x-show="review.admin_reply" class="mt-4 rounded-xl border border-orange-100 bg-orange-50/50 p-4 space-y-2 text-left">
+                                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                                <div class="flex items-center gap-2 text-xs font-extrabold text-[#E04F2A]">
+                                                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                                    <span>Phản hồi từ VNTech</span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <span
+                                                        x-show="review.admin_reply?.is_updated"
+                                                        class="rounded-full bg-white px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-orange-500"
+                                                    >
+                                                        Đã chỉnh sửa
+                                                    </span>
+                                                    <time
+                                                        x-show="review.admin_reply?.updated_at"
+                                                        class="text-[11px] font-semibold text-neutral-400"
+                                                        x-text="formatDate(review.admin_reply?.updated_at)"
+                                                    ></time>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line text-left" x-text="review.admin_reply?.noi_dung"></p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </article>
-                    </template>
-                </div>
+                            </article>
+                        </template>
+                    </div>
 
-                <div x-show="!loading && lastPage > 1" class="flex flex-wrap items-center justify-center gap-2">
-                    <button
-                        type="button"
-                        x-on:click="goToPage(page - 1)"
-                        :disabled="page <= 1"
-                        class="w-9 h-9 rounded-lg border border-neutral-200 bg-white text-slate-500 hover:border-[#FF5C00] hover:text-[#FF5C00] disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-slate-500 transition-colors text-xs font-extrabold"
-                    >
-                        Trước
-                    </button>
+                    <div x-show="!loading && lastPage > 1" class="flex flex-wrap items-center justify-center gap-2">
+                        <button
+                            type="button"
+                            x-on:click="goToPage(page - 1)"
+                            :disabled="page <= 1"
+                            class="w-9 h-9 rounded-lg border border-neutral-200 bg-white text-slate-500 hover:border-[#FF5C00] hover:text-[#FF5C00] disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-slate-500 transition-colors text-xs font-extrabold"
+                        >
+                            Trước
+                        </button>
 
-                    <template x-for="item in paginationItems()" :key="item.key">
-                        <span>
-                            <span x-show="item.type === 'ellipsis'" class="w-9 h-9 flex items-center justify-center text-xs font-extrabold text-neutral-400">...</span>
-                            <button
-                                x-show="item.type === 'page'"
-                                type="button"
-                                x-on:click="goToPage(item.page)"
-                                :class="item.page === page ? 'bg-[#FF5C00] border-[#FF5C00] text-white' : 'bg-white border-neutral-200 text-slate-600 hover:border-[#FF5C00] hover:text-[#FF5C00]'"
-                                class="w-9 h-9 rounded-lg border transition-colors text-xs font-extrabold"
-                                x-text="item.page"
-                            ></button>
-                        </span>
-                    </template>
+                        <template x-for="item in paginationItems()" :key="item.key">
+                            <span>
+                                <span x-show="item.type === 'ellipsis'" class="w-9 h-9 flex items-center justify-center text-xs font-extrabold text-neutral-400">...</span>
+                                <button
+                                    x-show="item.type === 'page'"
+                                    type="button"
+                                    x-on:click="goToPage(item.page)"
+                                    :class="item.page === page ? 'bg-[#FF5C00] border-[#FF5C00] text-white' : 'bg-white border-neutral-200 text-slate-600 hover:border-[#FF5C00] hover:text-[#FF5C00]'"
+                                    class="w-9 h-9 rounded-lg border transition-colors text-xs font-extrabold"
+                                    x-text="item.page"
+                                ></button>
+                            </span>
+                        </template>
 
-                    <button
-                        type="button"
-                        x-on:click="goToPage(page + 1)"
-                        :disabled="page >= lastPage"
-                        class="w-9 h-9 rounded-lg border border-neutral-200 bg-white text-slate-500 hover:border-[#FF5C00] hover:text-[#FF5C00] disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-slate-500 transition-colors text-xs font-extrabold"
-                    >
-                        Sau
-                    </button>
-                </div>
-            </div>
-
-            <!-- Additional Info Tab -->
-            @if($hasThongTinThem)
-                <div x-show="activeTab === 'additional'" class="space-y-8 animate-fade-in" style="display: none;">
-                    <div class="bg-white rounded-3xl border border-neutral-100 overflow-hidden shadow-xs">
-                        <table class="w-full text-left">
-                            <tbody class="divide-y divide-neutral-100">
-                                @foreach($formattedThem as $row)
-                                <tr class="hover:bg-neutral-50/50 transition-colors group">
-                                    <td class="p-5 font-bold text-xs tracking-wider text-slate-400 w-1/3 uppercase">
-                                        {{ $row['ten'] }}
-                                    </td>
-                                    <td class="p-5 text-slate-800 font-semibold text-sm">
-                                        {{ $row['gia_tri'] }}
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <button
+                            type="button"
+                            x-on:click="goToPage(page + 1)"
+                            :disabled="page >= lastPage"
+                            class="w-9 h-9 rounded-lg border border-neutral-200 bg-white text-slate-500 hover:border-[#FF5C00] hover:text-[#FF5C00] disabled:opacity-40 disabled:hover:border-neutral-200 disabled:hover:text-slate-500 transition-colors text-xs font-extrabold"
+                        >
+                            Sau
+                        </button>
                     </div>
                 </div>
-            @endif
+            </div>
         </div>
 
         <!-- Related Products Section -->
         @if($relatedProducts->isNotEmpty())
-        <div class="mt-24 border-t border-neutral-200 pt-16">
-            <div class="space-y-1 text-left mb-10">
-                <h2 class="font-display font-black text-2xl text-neutral-900 border-l-4 border-[#ff5c00] pl-3.5 uppercase">
-                    Sản phẩm liên quan
-                </h2>
-                <p class="text-neutral-400 text-xs font-semibold">Các thiết bị công nghệ cùng danh mục dành cho bạn</p>
-            </div>
+        <div class="mt-20 border-t border-neutral-200 pt-16">
+            <div class="bg-white rounded-3xl border border-neutral-200/80 p-6 sm:p-10 shadow-xs space-y-8 text-left">
+                <div class="space-y-1 text-left">
+                    <h2 class="font-display font-black text-2xl text-neutral-900 border-l-4 border-[#ff5c00] pl-3.5 uppercase">
+                        Sản phẩm liên quan
+                    </h2>
+                    <p class="text-slate-400 text-xs font-bold">Các thiết bị công nghệ cùng danh mục dành cho bạn</p>
+                </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                @foreach($relatedProducts as $prod)
-                <a href="{{ route('home.product_detail', ['ma_san_pham' => $prod->ma_san_pham, 'ma_bien_the' => $prod->default_ma_bien_the]) }}" 
-                   class="bg-white border border-neutral-150/70 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group text-left shadow-xs">
-                    <!-- Image Wrapper -->
-                    <div class="relative bg-neutral-50/50 aspect-square overflow-hidden flex items-center justify-center p-4 border-b border-neutral-100/60">
-                        <img src="{{ $prod->link_anh_dai_dien ?: asset('images/no-image.png') }}" 
-                             alt="{{ $prod->ten_san_pham }}" 
-                             class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-                        
-                        <!-- Badge -->
-                        <div class="absolute top-4 left-4 z-10">
-                            <span class="bg-[#ff5c00] text-white px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider shadow-sm">
-                                Chính hãng
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Details -->
-                    <div class="p-5 flex flex-col flex-1">
-                        <span class="font-sans text-xs text-neutral-400 font-semibold tracking-wide mb-1.5 uppercase">
-                            {{ $categoryName }}
-                        </span>
-                        <h3 class="font-display text-sm font-black text-neutral-800 line-clamp-2 group-hover:text-[#FF5C00] transition-colors min-h-[40px] leading-snug">
-                            {{ $prod->ten_san_pham }}
-                        </h3>
-                        <p class="text-[11px] text-neutral-450 line-clamp-2 leading-relaxed mt-1">
-                            {{ $prod->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.' }}
-                        </p>
-
-                        <!-- Price & CTA -->
-                        <div class="flex justify-between items-center mt-auto pt-4 border-t border-neutral-100/50 w-full">
-                            <div class="text-left">
-                                <span class="text-[11px] text-slate-700 uppercase tracking-wider block font-extrabold leading-none mb-1.5">Đã bán: {{ $prod->tong_luot_ban ?? 0 }}</span>
-                                <span class="text-[9px] text-neutral-400 uppercase tracking-widest block font-bold leading-none mb-1">Chỉ từ</span>
-                                <span class="font-display text-[15px] font-black text-[#E04F2A] tracking-tight block leading-none">
-                                    {{ number_format($prod->current_price, 0, ',', '.') }}₫
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                    @foreach($relatedProducts as $prod)
+                    <a href="{{ route('home.product_detail', ['ma_san_pham' => $prod->ma_san_pham, 'ma_bien_the' => $prod->default_ma_bien_the]) }}" 
+                       class="bg-white border border-neutral-150/70 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group text-left shadow-xs">
+                        <!-- Image Wrapper -->
+                        <div class="relative bg-neutral-50/50 aspect-square overflow-hidden flex items-center justify-center p-4 border-b border-neutral-100/60">
+                            <img src="{{ $prod->link_anh_dai_dien ?: asset('images/no-image.png') }}" 
+                                 alt="{{ $prod->ten_san_pham }}" 
+                                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
+                            
+                            <!-- Badge -->
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="bg-[#ff5c00] text-white px-2.5 py-1 rounded-xl text-[9px] font-black uppercase tracking-wider shadow-sm">
+                                    Chính hãng
                                 </span>
                             </div>
-                            <div class="w-9 h-9 bg-neutral-50 border border-neutral-150/70 group-hover:bg-[#ff5c00] group-hover:border-[#ff5c00] text-slate-400 group-hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 transform active:scale-90 shadow-xs">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
+                        </div>
+
+                        <!-- Details -->
+                        <div class="p-5 flex flex-col flex-1">
+                            <span class="font-sans text-xs text-neutral-400 font-semibold tracking-wide mb-1.5 uppercase">
+                                {{ $categoryName }}
+                            </span>
+                            <h3 class="font-display text-sm font-black text-neutral-800 line-clamp-2 group-hover:text-[#FF5C00] transition-colors min-h-[40px] leading-snug">
+                                {{ $prod->ten_san_pham }}
+                            </h3>
+                            <p class="text-[11px] text-neutral-450 line-clamp-2 leading-relaxed mt-1">
+                                {{ $prod->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.' }}
+                            </p>
+
+                            <!-- Price & CTA -->
+                            <div class="flex justify-between items-center mt-auto pt-4 border-t border-neutral-100/50 w-full">
+                                <div class="text-left">
+                                    <span class="text-[11px] text-slate-700 uppercase tracking-wider block font-extrabold leading-none mb-1.5">Đã bán: {{ $prod->tong_luot_ban ?? 0 }}</span>
+                                    <span class="text-[9px] text-neutral-400 uppercase tracking-widest block font-bold leading-none mb-1">Chỉ từ</span>
+                                    <span class="font-display text-[15px] font-black text-[#E04F2A] tracking-tight block leading-none">
+                                        {{ number_format($prod->current_price, 0, ',', '.') }}₫
+                                    </span>
+                                </div>
+                                <div class="w-9 h-9 bg-neutral-50 border border-neutral-150/70 group-hover:bg-[#ff5c00] group-hover:border-[#ff5c00] text-slate-400 group-hover:text-white rounded-xl flex items-center justify-center transition-all duration-300 transform active:scale-90 shadow-xs">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
-                @endforeach
+                    </a>
+                    @endforeach
+                </div>
             </div>
         </div>
         @endif

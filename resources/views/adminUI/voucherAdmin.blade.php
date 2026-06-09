@@ -84,39 +84,56 @@
     </div>
 
     <!-- Filters Bar -->
-    <div class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-        <div class="space-y-1.5">
+    <form method="GET" action="{{ route('admin.voucher.view') }}" class="glass-panel p-6 border-l-4 border-l-neon-green mb-12 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+        <div class="md:col-span-4 space-y-1.5">
             <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Tìm kiếm Voucher</label>
-            <input 
-                id="searchTerm"
-                type="text" 
-                placeholder="MÃ VOUCHER..." 
-                class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white"
-            />
+            <div class="relative">
+                <input 
+                    name="search"
+                    type="text" 
+                    value="{{ request('search') }}"
+                    placeholder="MÃ VOUCHER HOẶC TÊN VOUCHER..." 
+                    class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none transition-all rounded-lg text-white"
+                />
+            </div>
         </div>
         
-        <div class="space-y-1.5">
+        <div class="md:col-span-3 space-y-1.5">
             <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Trạng thái</label>
-            <select id="statusFilter" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
-                <option value="all">TẤT CẢ TRẠNG THÁI</option>
-                <option value="active">ĐANG HOẠT ĐỘNG</option>
-                <option value="inactive">VÔ HIỆU HÓA</option>
-            </select>
+            <div class="relative">
+                <select name="status" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
+                    <option value="all" {{ request('status') === 'all' || !request()->has('status') ? 'selected' : '' }}>TẤT CẢ TRẠNG THÁI</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>ĐANG HOẠT ĐỘNG</option>
+                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>VÔ HIỆU HÓA</option>
+                    <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>QUÁ HẠN</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 text-xs">▼</div>
+            </div>
         </div>
 
-        <div class="space-y-1.5">
+        <div class="md:col-span-3 space-y-1.5">
             <label class="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500 font-mono">Hình thức giảm</label>
-            <select id="typeFilter" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
-                <option value="all">TẤT CẢ HÌNH THỨC</option>
-                <option value="percent">PHẦN TRĂM (%)</option>
-                <option value="fixed">SỐ TIỀN CỐ ĐỊNH (đ)</option>
-            </select>
+            <div class="relative">
+                <select name="type" class="w-full h-11 bg-dark-bg border border-white/10 px-4 text-xs font-mono focus:border-neon-green/50 outline-none appearance-none cursor-pointer rounded-lg text-gray-300">
+                    <option value="all" {{ request('type') === 'all' || !request()->has('type') ? 'selected' : '' }}>TẤT CẢ HÌNH THỨC</option>
+                    <option value="percent" {{ request('type') === 'percent' ? 'selected' : '' }}>PHẦN TRĂM (%)</option>
+                    <option value="fixed" {{ request('type') === 'fixed' ? 'selected' : '' }}>SỐ TIỀN CỐ ĐỊNH (đ)</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 text-xs">▼</div>
+            </div>
         </div>
 
-        <button id="resetFilters" class="h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all rounded-lg">
-            Xóa bộ lọc
-        </button>
-    </div>
+        <div class="md:col-span-2 grid grid-cols-2 gap-3">
+            <button type="submit" class="h-11 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-1.5 rounded-lg font-mono">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                <span>Áp dụng</span>
+            </button>
+            <a href="{{ route('admin.voucher.view') }}" class="h-11 bg-red-500/10 border border-red-500/20 hover:bg-red-500/25 text-red-400 hover:text-red-300 flex items-center justify-center text-[10px] font-bold uppercase tracking-[0.2em] transition-all gap-1.5 rounded-lg font-mono">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Xóa lọc</span>
+            </a>
+        </div>
+    </form>
 
     <!-- Voucher Table -->
     <div class="glass-panel overflow-hidden mb-8">
@@ -166,7 +183,7 @@
                                 <div class="text-[9px] text-gray-500 font-mono">Tối đa: {{ number_format((float)($voucher->muc_giam_toi_da ?? 0), 0, ',', '.') }}đ</div>
                             @else
                                 <div class="text-sm font-mono font-bold text-white">{{ number_format((float)$voucher->gia_tri_giam, 0, ',', '.') }}đ</div>
-                                <div class="text-[9px] text-gray-500 font-mono">Khấu trừ cố định</div>
+                                <div class="text-[9px] text-gray-500 font-mono">Trừ thẳng vào giá</div>
                             @endif
                         </td>
 
@@ -259,47 +276,7 @@
             lucide.createIcons();
         }
 
-        // ==================== FILTER & SEARCH LOGIC ====================
-        const searchInput = document.getElementById('searchTerm');
-        const statusSelect = document.getElementById('statusFilter');
-        const typeSelect = document.getElementById('typeFilter');
-        const resetButton = document.getElementById('resetFilters');
-        const tableBody = document.getElementById('voucherTableBody');
-        const rows = tableBody ? tableBody.querySelectorAll('tr[data-code]') : [];
-
-        function filterVouchers() {
-            const query = searchInput.value.toLowerCase().trim();
-            const status = statusSelect.value;
-            const type = typeSelect.value;
-
-            rows.forEach(row => {
-                const rowCode = row.getAttribute('data-code').toLowerCase();
-                const rowStatus = row.getAttribute('data-status').toLowerCase();
-                const rowType = row.getAttribute('data-type').toLowerCase();
-
-                const matchesQuery = query === '' || rowCode.includes(query);
-                const matchesStatus = status === 'all' || rowStatus === status;
-                const matchesType = type === 'all' || rowType === type;
-
-                if (matchesQuery && matchesStatus && matchesType) {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
-                }
-            });
-        }
-
-        if (searchInput) searchInput.addEventListener('input', filterVouchers);
-        if (statusSelect) statusSelect.addEventListener('change', filterVouchers);
-        if (typeSelect) typeSelect.addEventListener('change', filterVouchers);
-        if (resetButton) {
-            resetButton.addEventListener('click', function() {
-                if (searchInput) searchInput.value = '';
-                if (statusSelect) statusSelect.value = 'all';
-                if (typeSelect) typeSelect.value = 'all';
-                filterVouchers();
-            });
-        }
+        // Lucide Icons redraw only
     });
 </script>
 @endpush

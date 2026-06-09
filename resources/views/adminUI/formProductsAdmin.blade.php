@@ -32,7 +32,7 @@
     .bg-neon-green { background-color: #00e55b; }
     
     .image-preview-slot { position: relative; aspect-ratio: 1/1; background: white; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    #gallery-previews .image-preview-slot { width: calc((100% - 24px) / 4); flex-shrink: 0; }
+    #gallery-previews .image-preview-slot { width: 72px; flex-shrink: 0; }
     #gallery-previews::-webkit-scrollbar { height: 4px; }
     #gallery-previews::-webkit-scrollbar-track { background: transparent; }
     #gallery-previews::-webkit-scrollbar-thumb { background: rgba(0, 229, 91, 0.15); border-radius: 99px; }
@@ -56,7 +56,7 @@
 @endphp
 
 <form action="{{ isset($product) ? route('admin.products.update', $product) : route('admin.products.store') }}" 
-      method="POST" id="createProductForm" class="pb-32 px-2 md:px-6 w-full" enctype="multipart/form-data"
+      method="POST" id="createProductForm" class="pb-32 w-full" enctype="multipart/form-data"
       data-is-edit="{{ isset($product) ? 'true' : 'false' }}"
       data-spec-count="{{ count($techSpecs) }}"
       data-info-count="{{ count($moreInfo) }}"
@@ -77,25 +77,38 @@
         </div>
     @endif
     
-    <header class="mb-8 animate-section" style="animation-delay: 0.1s">
-        <h1 class="text-clamp-lg font-display font-black text-white uppercase tracking-tighter leading-tight">
-            {{ isset($product) ? 'CẬP NHẬT' : 'THÊM' }} SẢN PHẨM <span class="text-neon-green italic drop-shadow-[0_0_10px_rgba(0,229,91,0.5)]">{{ isset($product) ? 'CHỈNH SỬA' : 'MỚI' }}</span>
-        </h1>
-        <div class="h-1 w-20 bg-gradient-to-r from-neon-green to-transparent mt-3"></div>
-    </header>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 animate-section" style="animation-delay: 0.1s">
+        <div>
+            <a href="{{ route('admin.products.index') }}"
+               class="group inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-neon-green transition-colors mb-3 no-underline">
+                <i data-lucide="arrow-left" class="size-3 group-hover:-translate-x-0.5 transition-transform"></i>
+                <span>Trở lại danh sách</span>
+            </a>
+            <h1 class="text-4xl md:text-6xl font-display font-bold text-neon-green drop-shadow-[0_0_15px_rgba(0,229,91,0.3)] uppercase leading-none">
+                {{ isset($product) ? 'CẬP NHẬT SẢN PHẨM' : 'TẠO MỚI SẢN PHẨM' }}
+            </h1>
+            @if(isset($product))
+            <div class="mt-3 flex items-center gap-2 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+                <span class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></span>
+                <span>Mã sản phẩm:</span>
+                <span class="text-neon-green font-bold">{{ $product->ma_san_pham }}</span>
+            </div>
+            @endif
+        </div>
+    </div>
 
-    <div class="space-y-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+    <div class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Cột trái - Giờ là Full Width -->
-            <div class="lg:col-span-12 space-y-12">
-                <section class="glass-panel p-6 md:p-10 rounded-3xl border border-white/5 bg-surface/20 animate-section" style="animation-delay: 0.2s">
-                    <div class="flex items-center gap-4 mb-10">
-                        <i data-lucide="database" class="text-neon-green size-6"></i>
-                        <h2 class="font-display text-2xl font-bold uppercase text-white">Thông tin cơ bản</h2>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                        <!-- Cột trái: Thông tin chữ, Giá & Trạng thái (Chiếm 8 phần) -->
-                        <div class="lg:col-span-8 space-y-6">
+            <div class="lg:col-span-12 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Khối Thông tin cơ bản (Bên trái) -->
+                    <section class="lg:col-span-8 glass-panel p-5 md:p-8 rounded-3xl border border-white/5 bg-surface/20 animate-section w-full" style="animation-delay: 0.2s">
+                        <div class="flex items-center gap-4 mb-6">
+                            <i data-lucide="database" class="text-neon-green size-6"></i>
+                            <h2 class="font-display text-2xl font-bold uppercase text-white">Thông tin cơ bản</h2>
+                        </div>
+                        <div class="space-y-6">
                             <div class="group space-y-3">
                                 <label class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Tên sản phẩm</label>
                                 <input name="ten_san_pham" id="ten_san_pham" value="{{ old('ten_san_pham', $product->ten_san_pham ?? '') }}" required class="w-full bg-white/[0.03] border border-white/10 p-5 text-white text-lg font-display uppercase tracking-widest rounded-2xl" placeholder="Nhập tên thiết bị..." />
@@ -173,81 +186,84 @@
                                 </div>
                             </div>
                         </div>
+                    </section>
 
-                        <!-- Cột phải: Chỉ làm Quản lý Hình ảnh (Chiếm 4 phần) -->
-                        <div class="lg:col-span-4 space-y-6">
-                            
-                            <div class="space-y-6">
-                                <!-- Ảnh chính (To như cũ) -->
-                                <div class="group relative aspect-square bg-black/40 border-2 border-dashed border-white/10 rounded-3xl overflow-hidden flex flex-col items-center justify-center hover:border-neon-green/40 transition-all cursor-pointer">
-                                    @if(isset($product) && $product->link_anh_dai_dien)
-                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center bg-white"><img src="{{ $product->link_anh_dai_dien }}" class="max-w-full max-h-full object-contain"></div>
-                                        <div id="main-upload-ui" class="flex flex-col items-center hidden">
-                                            <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
-                                            <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Thay đổi ảnh</span>
-                                        </div>
-                                    @else
-                                        <div id="main-preview" class="absolute inset-0 flex items-center justify-center hidden bg-white"><img src="" class="max-w-full max-h-full object-contain"></div>
-                                        <div id="main-upload-ui" class="flex flex-col items-center">
-                                            <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
-                                            <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Ảnh đại diện chính</span>
-                                        </div>
-                                    @endif
-                                    <input type="file" name="link_anh_dai_dien" onchange="previewMain(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                    <!-- Khối Hình ảnh sản phẩm (Bên phải) -->
+                    <section class="lg:col-span-4 glass-panel p-5 md:p-8 rounded-3xl border border-white/5 bg-surface/20 animate-section w-full" style="animation-delay: 0.22s">
+                        <div class="flex items-center gap-4 mb-6">
+                            <i data-lucide="image" class="text-neon-green size-6"></i>
+                            <h2 class="font-display text-2xl font-bold uppercase text-white">Hình ảnh sản phẩm</h2>
+                        </div>
+                        <div class="space-y-6">
+                            <!-- Ảnh chính (Thu nhỏ lại) -->
+                            <div class="group relative aspect-square max-w-[420px] mx-auto bg-black/40 border-2 border-dashed border-white/10 rounded-3xl overflow-hidden flex flex-col items-center justify-center hover:border-neon-green/40 transition-all cursor-pointer">
+                                @if(isset($product) && $product->link_anh_dai_dien)
+                                    <div id="main-preview" class="absolute inset-0 flex items-center justify-center bg-white"><img src="{{ $product->link_anh_dai_dien }}" class="max-w-full max-h-full object-contain"></div>
+                                    <div id="main-upload-ui" class="flex flex-col items-center hidden">
+                                        <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
+                                        <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Thay đổi ảnh</span>
+                                    </div>
+                                @else
+                                    <div id="main-preview" class="absolute inset-0 flex items-center justify-center hidden bg-white"><img src="" class="max-w-full max-h-full object-contain"></div>
+                                    <div id="main-upload-ui" class="flex flex-col items-center">
+                                        <i data-lucide="upload-cloud" class="size-12 text-gray-700 group-hover:text-neon-green transition-all mb-4"></i>
+                                        <span class="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Ảnh đại diện chính</span>
+                                    </div>
+                                @endif
+                                <input type="file" name="link_anh_dai_dien" onchange="previewMain(this)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                            </div>
+
+                            <!-- Gallery -->
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Bộ sưu tập ảnh phụ</span>
+                                    <label class="cursor-pointer bg-white/5 hover:bg-neon-green hover:text-black px-3 py-1.5 rounded-lg border border-white/10 transition-all text-[9px] font-bold uppercase tracking-widest">
+                                        + Tải lên
+                                        <input type="file" name="hinh_anh[]" multiple onchange="previewGallery(this)" class="hidden" accept="image/*">
+                                    </label>
                                 </div>
-
-                                <!-- Gallery -->
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Bộ sưu tập ảnh phụ</span>
-                                        <label class="cursor-pointer bg-white/5 hover:bg-neon-green hover:text-black px-3 py-1.5 rounded-lg border border-white/10 transition-all text-[9px] font-bold uppercase tracking-widest">
-                                            + Tải lên
-                                            <input type="file" name="hinh_anh[]" multiple onchange="previewGallery(this)" class="hidden" accept="image/*">
-                                        </label>
-                                    </div>
-                                    <div id="gallery-previews" class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                                        @if(isset($product) && is_array($product->hinh_anh))
-                                            @foreach($product->hinh_anh as $img)
-                                                <div class="image-preview-slot">
-                                                    <img src="{{ $img }}">
-                                                    <input type="hidden" name="existing_hinh_anh[]" value="{{ $img }}">
-                                                    <div class="remove-img-btn" onclick="this.parentElement.remove()">
-                                                        <i data-lucide="x" class="size-3"></i>
-                                                    </div>
+                                <div id="gallery-previews" class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                                    @if(isset($product) && is_array($product->hinh_anh))
+                                        @foreach($product->hinh_anh as $img)
+                                            <div class="image-preview-slot">
+                                                <img src="{{ $img }}">
+                                                <input type="hidden" name="existing_hinh_anh[]" value="{{ $img }}">
+                                                <div class="remove-img-btn" onclick="this.parentElement.remove()">
+                                                    <i data-lucide="x" class="size-3"></i>
                                                 </div>
-                                            @endforeach
-                                        @endif
-                                    </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                </div>
 
                 <!-- Thông số kỹ thuật chung -->
-                <section class="glass-panel p-6 md:p-10 rounded-3xl border border-white/5 bg-surface/20 animate-section mt-12" style="animation-delay: 0.22s">
-                    <div class="flex items-center justify-between mb-8">
+                <section class="glass-panel p-5 md:p-8 rounded-3xl border border-white/5 bg-surface/20 animate-section mt-6" style="animation-delay: 0.22s">
+                    <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-4">
                             <i data-lucide="cpu" class="text-neon-green size-6"></i>
                             <h2 class="font-display text-2xl font-bold uppercase text-white">Thông số kỹ thuật chung</h2>
                         </div>
                         <button type="button" onclick="addSpecRow()" class="px-6 py-3 bg-white/5 border border-white/10 text-white text-[12px] font-bold uppercase tracking-[0.1em] hover:bg-neon-green hover:text-black transition-all rounded-xl">+ Thêm dòng</button>
                     </div>
-                    <div class="bg-white/[0.03] border border-white/10 p-5 rounded-3xl space-y-4" id="techSpecsBody">
+                    <div class="bg-white/[0.03] border border-white/10 p-5 rounded-3xl space-y-3" id="techSpecsBody">
                         @foreach($techSpecs as $index => $spec)
-                        <div class="grid grid-cols-12 gap-4 items-center sortable-row">
-                            <div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div>
-                            <div class="col-span-3"><input name="thong_so_ky_thuat_chung[{{ $index }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div>
-                            <div class="col-span-7"><input name="thong_so_ky_thuat_chung[{{ $index }}][gia_tri]" value="{{ $spec['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div>
-                            <div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>
+                        <div class="flex items-center gap-3 sortable-row">
+                            <div class="cursor-move handle text-gray-500 hover:text-white transition-colors p-1 flex items-center justify-center"><i data-lucide="grip-vertical" class="size-5"></i></div>
+                            <div class="w-1/4"><input name="thong_so_ky_thuat_chung[{{ $index }}][ten]" value="{{ $spec['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div>
+                            <div class="flex-1"><input name="thong_so_ky_thuat_chung[{{ $index }}][gia_tri]" value="{{ $spec['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div>
+                            <button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all p-1 flex items-center justify-center"><i data-lucide="x" class="size-5"></i></button>
                         </div>
                         @endforeach
                     </div>
                 </section>
 
                 <!-- Quản lý Biến thể (Variants) - ĐƯỢC ƯU TIÊN ĐƯA LÊN TRÊN -->
-                <section class="glass-panel p-6 md:p-10 rounded-3xl border border-neon-green/30 bg-neon-green/5 animate-section mt-12" style="animation-delay: 0.25s">
-                    <div class="flex items-center justify-between mb-10">
+                <section class="glass-panel p-5 md:p-8 rounded-3xl border border-neon-green/30 bg-neon-green/5 animate-section mt-6" style="animation-delay: 0.25s">
+                    <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-4">
                             <i data-lucide="boxes" class="text-neon-green size-6"></i>
                             <h2 class="font-display text-2xl font-bold uppercase text-white" id="variantSectionTitle">{{ $hasVariants ? 'Quản lý Biến thể' : 'Thông tin Giá & Kho hàng' }}</h2>
@@ -377,28 +393,28 @@
                 </section>
 
                 <!-- Nhận thông tin thêm -->
-                <section class="glass-panel p-6 md:p-10 rounded-3xl border border-white/5 bg-surface/20 animate-section mt-12" style="animation-delay: 0.28s">
-                    <div class="flex items-center justify-between mb-10">
+                <section class="glass-panel p-5 md:p-8 rounded-3xl border border-white/5 bg-surface/20 animate-section mt-6" style="animation-delay: 0.28s">
+                    <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-4">
                             <i data-lucide="info" class="text-neon-green size-6"></i>
                             <h2 class="font-display text-2xl font-bold uppercase text-white">Thông tin thêm</h2>
                         </div>
                         <button type="button" onclick="addInfoRow()" class="px-4 py-2 bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase tracking-[0.1em] hover:bg-neon-green hover:text-black transition-all rounded-xl">+ Thêm dòng</button>
                     </div>
-                    <div class="space-y-4" id="moreInfoBody">
+                    <div class="space-y-3" id="moreInfoBody">
                         @foreach($moreInfo as $index => $info)
-                        <div class="grid grid-cols-12 gap-4 items-center sortable-row">
-                            <div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div>
-                            <div class="col-span-3"><input name="thong_tin_them[{{ $index }}][ten]" value="{{ $info['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Tên thông tin" /></div>
-                            <div class="col-span-7"><input name="thong_tin_them[{{ $index }}][gia_tri]" value="{{ $info['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div>
-                            <div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>
+                        <div class="flex items-center gap-3 sortable-row">
+                            <div class="cursor-move handle text-gray-500 hover:text-white transition-colors p-1 flex items-center justify-center"><i data-lucide="grip-vertical" class="size-5"></i></div>
+                            <div class="w-1/4"><input name="thong_tin_them[{{ $index }}][ten]" value="{{ $info['ten'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Tên thông tin" /></div>
+                            <div class="flex-1"><input name="thong_tin_them[{{ $index }}][gia_tri]" value="{{ $info['gia_tri'] ?? '' }}" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div>
+                            <button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all p-1 flex items-center justify-center"><i data-lucide="x" class="size-5"></i></button>
                         </div>
                         @endforeach
                     </div>
                 </section>
 
-                <section class="glass-panel p-6 md:p-10 rounded-3xl border border-white/5 bg-surface/20 animate-section" style="animation-delay: 0.3s">
-                    <div class="flex items-center gap-4 mb-10">
+                <section class="glass-panel p-5 md:p-8 rounded-3xl border border-white/5 bg-surface/20 animate-section" style="animation-delay: 0.3s">
+                    <div class="flex items-center gap-4 mb-6">
                         <i data-lucide="file-text" class="text-neon-green size-6"></i>
                         <h2 class="font-display text-2xl font-bold uppercase text-white">Mô tả chi tiết</h2>
                     </div>
@@ -411,16 +427,13 @@
         </div>
     </div>
 
-    <footer class="fixed bottom-0 left-0 lg:left-72 right-0 glass-panel border-t border-white/10 px-6 md:px-12 py-4 flex justify-between items-center z-50 bg-black/80 backdrop-blur-2xl">
-        <a href="{{ route('admin.products.index') }}" class="px-8 py-3 border border-white/10 text-white font-bold uppercase text-[10px] tracking-[0.2em] hover:bg-white/5 rounded-xl transition-all">HỦY BỎ</a>
-        <div class="flex gap-4">
-            @if(!isset($product))
-            <button type="button" onclick="document.getElementById('createProductForm').reset()" class="px-8 py-3 border border-white/10 text-white font-bold uppercase text-[10px] tracking-[0.2em] hover:bg-white/5 rounded-xl transition-all">LÀM MỚI</button>
-            @endif
-            <button type="submit" class="px-10 py-3 bg-neon-green text-black font-black uppercase text-[10px] tracking-[0.4em] shadow-[0_0_30px_rgba(0,229,91,0.2)] rounded-xl transition-all hover:scale-105 active:scale-95">
-                {{ isset($product) ? 'CẬP NHẬT SẢN PHẨM' : 'LƯU SẢN PHẨM' }}
-            </button>
-        </div>
+    <footer class="fixed bottom-0 left-0 lg:left-72 right-0 glass-panel border-t border-white/10 px-6 md:px-12 py-4 flex justify-end items-center gap-4 z-50 bg-black/80 backdrop-blur-2xl">
+        @if(!isset($product))
+        <button type="button" onclick="document.getElementById('createProductForm').reset()" class="px-8 py-3 border border-white/10 text-white font-bold uppercase text-[10px] tracking-[0.2em] hover:bg-white/5 rounded-xl transition-all">LÀM MỚI</button>
+        @endif
+        <button type="submit" class="px-10 py-3 bg-neon-green text-black font-black uppercase text-[10px] tracking-[0.4em] rounded-xl transition-all">
+            {{ isset($product) ? 'CẬP NHẬT SẢN PHẨM' : 'LƯU SẢN PHẨM' }}
+        </button>
     </footer>
 </form>
 
@@ -536,14 +549,14 @@
     function addSpecRow() {
         const body = document.getElementById('techSpecsBody');
         const row = document.createElement('div');
-        row.className = 'grid grid-cols-12 gap-4 items-center sortable-row mt-4';
-        row.innerHTML = `<div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div><div class="col-span-3"><input name="thong_so_ky_thuat_chung[${specIndex}][ten]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div><div class="col-span-7"><input name="thong_so_ky_thuat_chung[${specIndex}][gia_tri]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div><div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>`;
+        row.className = 'flex items-center gap-3 sortable-row mt-3';
+        row.innerHTML = `<div class="cursor-move handle text-gray-500 hover:text-white transition-colors p-1 flex items-center justify-center"><i data-lucide="grip-vertical" class="size-5"></i></div><div class="w-1/4"><input name="thong_so_ky_thuat_chung[${specIndex}][ten]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Thuộc tính" /></div><div class="flex-1"><input name="thong_so_ky_thuat_chung[${specIndex}][gia_tri]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all p-1 flex items-center justify-center"><i data-lucide="x" class="size-5"></i></button>`;
         body.appendChild(row); 
         lucide.createIcons(); 
         specIndex++;
     }
     
-    function removeRow(btn) { btn.closest('.grid').remove(); }
+    function removeRow(btn) { btn.closest('.sortable-row').remove(); }
 
     function previewVariantImage(input, index) {
         const preview = document.getElementById(`preview-${index}`);
@@ -582,8 +595,8 @@
     function addInfoRow() {
         const body = document.getElementById('moreInfoBody');
         const row = document.createElement('div');
-        row.className = 'grid grid-cols-12 gap-4 items-center sortable-row mt-4';
-        row.innerHTML = `<div class="col-span-1 text-center cursor-move handle"><i data-lucide="grip-vertical" class="text-gray-500 size-5"></i></div><div class="col-span-3"><input name="thong_tin_them[${infoIndex}][ten]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Tên thông tin" /></div><div class="col-span-7"><input name="thong_tin_them[${infoIndex}][gia_tri]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div><div class="col-span-1 text-center"><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all"><i data-lucide="x" class="size-5"></i></button></div>`;
+        row.className = 'flex items-center gap-3 sortable-row mt-3';
+        row.innerHTML = `<div class="cursor-move handle text-gray-500 hover:text-white transition-colors p-1 flex items-center justify-center"><i data-lucide="grip-vertical" class="size-5"></i></div><div class="w-1/4"><input name="thong_tin_them[${infoIndex}][ten]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Tên thông tin" /></div><div class="flex-1"><input name="thong_tin_them[${infoIndex}][gia_tri]" class="w-full bg-white/[0.03] border border-white/5 p-2 text-white rounded-xl focus:border-neon-green/30" placeholder="Giá trị" /></div><button type="button" onclick="removeRow(this)" class="text-gray-600 hover:text-red-500 transition-all p-1 flex items-center justify-center"><i data-lucide="x" class="size-5"></i></button>`;
         body.appendChild(row); 
         lucide.createIcons(); 
         infoIndex++;

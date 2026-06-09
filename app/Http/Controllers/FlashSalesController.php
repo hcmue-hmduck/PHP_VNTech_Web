@@ -11,27 +11,48 @@ use Illuminate\Http\Request;
 
 class FlashSalesController extends Controller
 {
-    public function viewFlashSalesAdmin() {
-        $flash_sales = FlashSales::latest()->get();
-        return view('adminUi.flashsales', compact('flash_sales'));
+    public function viewFlashSalesAdmin(Request $request) {
+        $query = FlashSales::where('trang_thai', '!=', 'deleted');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('ten_flash_sales', 'like', '%' . $search . '%')
+                  ->orWhere('_id', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('status') && $request->input('status') !== '') {
+            $status = strtoupper($request->input('status'));
+            if ($status === 'LIVE') {
+                $query->whereIn('trang_thai', ['live', 'active', 'đang hoạt động']);
+            } elseif ($status === 'SCHEDULED') {
+                $query->whereIn('trang_thai', ['scheduled', 'upcoming', 'sắp diễn ra', 'draft', 'bản nháp']);
+            } elseif ($status === 'ENDED') {
+                $query->whereIn('trang_thai', ['ended', 'expired', 'đã kết thúc', 'finished']);
+            }
+        }
+
+        $flash_sales = $query->latest()->get();
+        return view('adminUI.flashsaleAdmin', compact('flash_sales'));
     }
 
     public function viewCreateFlashSalesAdmin() {
         $productWithVariants = Product::with(['variants' => function ($query) {
             $query->where('trang_thai', '!=', 'delete');
         }])->get();
-        return view('adminUI.formFlashSales', compact('productWithVariants'));
+        return view('adminUI.formFlashSalesAdmin', compact('productWithVariants'));
     }
 
     public function viewEditFlashSalesAdmin(FlashSales $flash_sales) {
         $flash_sale_products = FlashSaleItem::with('variant.product')
             ->where('ma_flash_sales', $flash_sales->ma_flash_sales)
-            ->where('trang_thai', '!=', 'delete')
+            ->where('trang_thai', '!=', 'deleted')
             ->get();
         $productWithVariants = Product::with(['variants' => function ($query) {
             $query->where('trang_thai', '!=', 'delete');
         }])->get();
-        return view('adminUI.formFlashSales', compact('flash_sales', 'flash_sale_products', 'productWithVariants'));
+        return view('adminUI.formFlashSalesAdmin', compact('flash_sales', 'flash_sale_products', 'productWithVariants'));
     }
 
     public function storeCreateFlashSalesAdmin(Request $request) {
@@ -110,14 +131,20 @@ class FlashSalesController extends Controller
             } 
             foreach ($allFlashSaleItems as $existingItems) {
                 if (!in_array($existingItems->ma_chi_tiet_flash_sales, $keptFlashSaleItems)) {
-                    FlashSaleItem::where('ma_chi_tiet_flash_sales', $existingItems->ma_chi_tiet_flash_sales)->update(['trang_thai' => 'delete']);
+                    FlashSaleItem::where('ma_chi_tiet_flash_sales', $existingItems->ma_chi_tiet_flash_sales)->update(['trang_thai' => 'deleted']);
                 }
             }
         }
         else {
-            FlashSaleItem::where('ma_flash_sales', $flash_sales->ma_flash_sales)->update(['trang_thai' => 'delete']);
+            FlashSaleItem::where('ma_flash_sales', $flash_sales->ma_flash_sales)->update(['trang_thai' => 'deleted']);
         }
 
         return redirect()->back()->with('success', 'Cập nhật Flash Sales thành công');
+    }
+
+    public function deleteFlashSalesAdmin(FlashSales $flash_sales) {
+        $flash_sales->update(['trang_thai' => 'deleted']);
+        FlashSaleItem::where('ma_flash_sales', $flash_sales->ma_flash_sales)->update(['trang_thai' => 'deleted']);
+        return redirect()->back()->with('success', 'Xóa chiến dịch Flash Sale thành công');
     }
 }

@@ -7,9 +7,35 @@ use App\Models\Voucher;
 
 class VoucherController extends Controller
 {
-    public function viewVoucherAdmin()
+    public function viewVoucherAdmin(Request $request)
     {
-        $voucher = Voucher::where('trang_thai', '!=', 'deleted')->latest()->get();
+        $query = Voucher::where('trang_thai', '!=', 'deleted');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('ma_voucher', 'like', '%' . $search . '%')
+                  ->orWhere('ten_voucher', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $status = $request->input('status');
+            if ($status === 'expired') {
+                $query->where('ket_thuc', '<', now());
+            } elseif ($status === 'active') {
+                $query->where('trang_thai', 'active')
+                      ->where('ket_thuc', '>=', now());
+            } else {
+                $query->where('trang_thai', $status);
+            }
+        }
+
+        if ($request->filled('type') && $request->input('type') !== 'all') {
+            $query->where('hinh_thuc_giam', $request->input('type'));
+        }
+
+        $voucher = $query->latest()->get();
         return view('adminUI.voucherAdmin', compact('voucher'));
     }
 
