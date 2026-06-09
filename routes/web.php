@@ -34,6 +34,8 @@ Route::get('/products/{ma_san_pham}/product-detail/{ma_bien_the?}', [ProductDeta
 
 Route::get('/products/{ma_san_pham}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 
+Route::get('/products/search-sugggestion', [HomeController::class, 'searchSuggest'])->name('home.product.search');
+
 Route::post('/momo/ipn', [PaymentController::class, 'momoIpn'])->name('momo.ipn');
 
 // chatbot

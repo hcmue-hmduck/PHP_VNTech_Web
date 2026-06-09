@@ -122,4 +122,27 @@ class HomeController extends Controller {
     public function viewHomeNews() {
         return view('homeUI.news');
     }
+
+    public function searchSuggest(Request $request) {
+        $query = $request->query('q');
+
+        if (empty($query) || strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('ten_san_pham', 'LIKE', '%' . $query . '%')
+            ->where('trang_thai', 'active')
+            ->limit(6)
+            ->get();
+            
+        $result = $products->map(function ($product) {
+            return [
+                'ten_san_pham' => $product->ten_san_pham,
+                'link_anh_dai_dien' => $product->link_anh_dai_dien,
+                'gia_thap_nhat' => $product->gia_thap_nhat,
+                'url' => route('home.product_detail', ['ma_san_pham' => $product->ma_san_pham])
+            ];
+        });
+        return response()->json($result);
+    }
 }

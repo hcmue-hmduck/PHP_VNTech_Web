@@ -89,17 +89,25 @@
                     </a>
 
                     <!-- Interactive Products Search Command Box -->
-                    <div class="flex-grow max-w-xl relative hidden md:block">
+                    <div class="flex-grow max-w-xl relative hidden md:block" id="global-search-container">
                         <div class="relative">
                             <input
+                                id="global-search-input"
                                 type="text"
                                 placeholder="Bạn cần tìm siêu phẩm công nghệ gì hôm nay?..."
                                 class="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 focus:border-accent-500 focus:bg-slate-950 text-xs rounded-full py-3 px-6 pl-11 pr-12 focus:ring-4 focus:ring-accent-500/10 transition-all duration-300 text-slate-100 placeholder-slate-400 outline-none"
+                                autocomplete="off"
                             />
                             <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-[15px] h-[15px]"></i>
-                            <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-brand-500 hover:bg-brand-600 p-1.5 rounded-full hover:shadow-[0_2px_10px_rgba(255,79,0,0.3)] transition-all duration-300 text-white">
+                            <button id="global-search-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-brand-500 hover:bg-brand-600 p-1.5 rounded-full hover:shadow-[0_2px_10px_rgba(255,79,0,0.3)] transition-all duration-300 text-white">
                                 <i data-lucide="search" class="w-3 h-3"></i>
                             </button>
+                        </div>
+                        <!-- Search Suggestions Dropdown Overlay -->
+                        <div id="global-search-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-slate-200">
+                            <div id="global-search-results" class="max-h-80 overflow-y-auto divide-y divide-slate-800/60 no-scrollbar">
+                                <!-- Results populated dynamically -->
+                            </div>
                         </div>
                     </div>
 
@@ -604,6 +612,99 @@
             if (event.key === window.VNTECH_COMPARE_STORAGE_KEY) {
                 window.updateCompareCount();
             }
+        });
+
+        // Global Live Search Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('global-search-input');
+            const searchBtn = document.getElementById('global-search-btn');
+            const dropdown = document.getElementById('global-search-dropdown');
+            const resultsContainer = document.getElementById('global-search-results');
+            let debounceTimer = null;
+
+            if (!searchInput || !dropdown || !resultsContainer) return;
+
+            const formatVnCurrency = (val) => {
+                return new Intl.NumberFormat('vi-VN').format(Number(val || 0)) + '₫';
+            };
+
+            const performSearchRedirect = () => {
+                const term = searchInput.value.trim();
+                if (term) {
+                    window.location.href = `/products?search=${encodeURIComponent(term)}`;
+                }
+            };
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    performSearchRedirect();
+                }
+            });
+
+            if (searchBtn) {
+                searchBtn.addEventListener('click', performSearchRedirect);
+            }
+
+            searchInput.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                const query = searchInput.value.trim();
+
+                if (query.length < 2) {
+                    dropdown.classList.add('hidden');
+                    resultsContainer.innerHTML = '';
+                    return;
+                }
+
+                debounceTimer = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/products/search-sugggestion?q=${encodeURIComponent(query)}`);
+                        if (!response.ok) throw new Error('API error');
+                        const data = await response.json();
+
+                        resultsContainer.innerHTML = '';
+
+                        if (data.length === 0) {
+                            resultsContainer.innerHTML = `
+                                <div class="px-5 py-4 text-xs font-semibold text-slate-400 text-center">
+                                    Không tìm thấy sản phẩm phù hợp.
+                                </div>
+                            `;
+                        } else {
+                            data.forEach(item => {
+                                const displayPrice = item.gia_thap_nhat ? formatVnCurrency(item.gia_thap_nhat) : 'Liên hệ';
+                                const itemHtml = `
+                                    <a href="${item.url}" class="flex items-center gap-3 px-5 py-3 hover:bg-slate-800/50 transition-colors duration-200">
+                                        <div class="h-10 w-10 shrink-0 rounded-lg bg-slate-800 p-1 flex items-center justify-center border border-slate-700">
+                                            <img src="${item.link_anh_dai_dien || '/images/no-image.png'}" alt="" class="h-full w-full object-contain" />
+                                        </div>
+                                        <div class="flex-grow min-w-0 text-left">
+                                            <p class="text-xs font-bold text-slate-100 truncate">${item.ten_san_pham}</p>
+                                            <p class="text-[10px] font-black text-brand-500 mt-0.5">${displayPrice}</p>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.insertAdjacentHTML('beforeend', itemHtml);
+                            });
+                        }
+                        dropdown.classList.remove('hidden');
+                    } catch (err) {
+                        console.error('Search suggestion error:', err);
+                    }
+                }, 300);
+            });
+
+            // Click outside to close dropdown
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim().length >= 2 && resultsContainer.children.length > 0) {
+                    dropdown.classList.remove('hidden');
+                }
+            });
         });
     </script>
 
