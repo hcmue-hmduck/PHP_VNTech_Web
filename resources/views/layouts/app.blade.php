@@ -476,6 +476,9 @@
     </main>
 
     <!-- Footer -->
+    @php
+        $footerContact = config('support_policies.contact');
+    @endphp
     <footer class="bg-[#0b0f19] border-t border-slate-800 relative text-slate-300">
         <div class="max-w-7xl mx-auto px-8 pt-12 pb-8">
             <!-- Top Section with Grid (2 Columns) -->
@@ -486,7 +489,7 @@
                     <div class="space-y-3">
                         <span class="text-4xl font-black bg-gradient-to-r from-brand-500 via-orange-400 to-cyber-pink bg-clip-text text-transparent font-space uppercase italic tracking-tighter block leading-none">VNTech</span>
                         <p class="text-xs text-slate-400 leading-relaxed max-w-md">
-                            Nhà cung cấp máy tính, laptop và linh kiện phần cứng thế hệ mới hàng đầu. Mang lại hiệu năng đỉnh cao cho mọi tác vụ gaming và thiết kế chuyên nghiệp.
+                            {{ $footerContact['brand_description'] }}
                         </p>
                     </div>
                 </div>
@@ -496,16 +499,16 @@
                     <h4 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 md:text-right font-space">Thông tin liên hệ</h4>
                     <ul class="space-y-3.5 text-xs text-slate-400 font-sans">
                         <li class="flex items-start md:flex-row-reverse md:justify-start gap-2.5 text-left md:text-right">
-                            <i data-lucide="map-pin" class="w-4 h-4 text-brand-500 shrink-0 mt-0.5"></i>
-                            <span>Công ty TNHH Công nghệ VNTech, Quận 5, TP. Hồ Chí Minh</span>
+                            <i data-lucide="{{ $footerContact['address']['lucide_icon'] }}" class="w-4 h-4 text-brand-500 shrink-0 mt-0.5"></i>
+                            <span>{{ $footerContact['address']['footer_value'] }}</span>
                         </li>
                         <li class="flex items-center md:flex-row-reverse md:justify-start gap-2.5">
-                            <i data-lucide="phone" class="w-4 h-4 text-brand-500 shrink-0"></i>
-                            <span class="font-sans">1900 1234 (Hotline chăm sóc)</span>
+                            <i data-lucide="{{ $footerContact['hotline']['lucide_icon'] }}" class="w-4 h-4 text-brand-500 shrink-0"></i>
+                            <span class="font-sans">{{ $footerContact['hotline']['display'] }}</span>
                         </li>
                         <li class="flex items-center md:flex-row-reverse md:justify-start gap-2.5">
-                            <i data-lucide="mail" class="w-4 h-4 text-brand-500 shrink-0"></i>
-                            <span class="font-sans">support@vntech.vn</span>
+                            <i data-lucide="{{ $footerContact['email']['lucide_icon'] }}" class="w-4 h-4 text-brand-500 shrink-0"></i>
+                            <span class="font-sans">{{ $footerContact['email']['value'] }}</span>
                         </li>
                     </ul>
                 </div>

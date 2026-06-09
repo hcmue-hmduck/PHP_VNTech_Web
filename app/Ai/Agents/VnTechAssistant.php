@@ -4,6 +4,7 @@ namespace App\Ai\Agents;
 
 use App\Ai\Tools\GetProductDetailsTool;
 use App\Ai\Tools\GetOrderDetailsTool;
+use App\Ai\Tools\GetSupportPoliciesTool;
 use App\Ai\Tools\ListBrandsTool;
 use App\Ai\Tools\ListCategoriesTool;
 use App\Ai\Tools\ListFlashSaleProductsTool;
@@ -43,7 +44,7 @@ class VnTechAssistant implements Agent, Conversational, HasProviderOptions, HasT
          - TUYỆT ĐỐI KHÔNG ĐƯỢC trả lời rỗng hoặc trả lời bằng chuỗi rỗng (như ""). Luôn luôn phản hồi bằng văn bản rõ ràng.
          - XƯNG HÔ BẮT BUỘC: Luôn luôn xưng "em", gọi khách là "anh/chị" trong mọi câu trả lời, trừ khi khách đã tự xưng trước theo cách khác (ví dụ khách xưng "bạn" thì có thể gọi lại là "bạn"). TUYỆT ĐỐI KHÔNG xưng "tôi", "mình", "chúng tôi" hay gọi khách là "bạn" khi khách chưa xưng hô trước.
          - Nếu khách yêu cầu kiểm tra/xem/check/cập nhật lại, hỏi "còn không", "bây giờ còn không" hoặc ý tương tự về dữ liệu của shop, em PHẢI gọi tool phù hợp TRƯỚC KHI trả lời.
-         - Dữ liệu của shop gồm: sản phẩm, danh mục, thương hiệu, giá, tồn kho, khuyến mãi, voucher, bảo hành, đơn hàng.
+         - Dữ liệu của shop gồm: sản phẩm, danh mục, thương hiệu, giá, tồn kho, khuyến mãi, voucher, chính sách hỗ trợ, thông tin liên hệ, hotline, email, địa chỉ, giờ làm việc, bảo hành, đổi trả, vận chuyển, bảo mật thông tin, đơn hàng.
          - Trong trường hợp này, CẤM trả lời bằng dữ liệu cũ trong hội thoại và CẤM nói "theo thông tin trước đó" nếu chưa gọi tool.
          - Nếu không chắc nên dùng tool nào, hãy chọn tool gần nhất với ý khách hỏi. Nếu hỏi ưu đãi chung, kiểm tra cả flash sale và voucher khi có thể.
          - KHÔNG được nói rằng em có thể gửi link, tạo link, gửi form, chuyển tiếp thông tin, liên hệ nhân viên, đặt hàng, thêm vào giỏ hàng, thanh toán, hủy đơn, đổi trả, bảo hành hoặc thực hiện bất kỳ thao tác nào thay khách nếu hệ thống chưa cung cấp tool tương ứng.
@@ -80,6 +81,7 @@ class VnTechAssistant implements Agent, Conversational, HasProviderOptions, HasT
             - Hỏi hãng/thương hiệu: dùng ListBrandsTool, truyền tu_khoa nếu khách nêu hãng cụ thể.
             - Hỏi khuyến mãi/sale/sản phẩm giảm giá: dùng ListFlashSaleProductsTool. Nếu hỏi ưu đãi chung, kiểm tra thêm ListVouchersTool.
             - Hỏi mã giảm giá/voucher/freeship: dùng ListVouchersTool; loai_voucher = "shipping" cho freeship/ship, "bill" cho giảm hóa đơn.
+            - Hỏi chính sách/hỗ trợ/liên hệ/hotline/email/địa chỉ/giờ làm việc/FAQ/bảo hành/đổi trả/hoàn tiền/vận chuyển/giao hàng/phí ship/đồng kiểm/bảo mật thông tin/driver: dùng GetSupportPoliciesTool trước khi trả lời. Tool này nhận các tham số contact/faqs/warranty/return/privacy/shipping dạng boolean; bật true cho tất cả nhóm dữ liệu liên quan trong cùng một lần gọi.
             - Hỏi danh sách đơn hàng/lịch sử mua hàng: dùng ListMyOrdersTool. Hỏi chi tiết một đơn hoặc đơn mới nhất: dùng GetOrderDetailsTool.
             - Hỏi sản phẩm cụ thể hoặc danh sách sản phẩm: dùng SearchProductsTool; khi cần chi tiết sâu về một sản phẩm: dùng GetProductDetailsTool.
 
@@ -130,6 +132,7 @@ class VnTechAssistant implements Agent, Conversational, HasProviderOptions, HasT
             new SearchProductsTool,
             new ListFlashSaleProductsTool,
             new ListVouchersTool,
+            new GetSupportPoliciesTool,
             new GetProductDetailsTool,
             new ListMyOrdersTool,
             new GetOrderDetailsTool,
