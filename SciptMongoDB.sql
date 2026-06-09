@@ -517,7 +517,34 @@ db.reviews.createIndex({ "ma_chi_tiet_don_hang": 1 });
 
 
 // -------------------------------------------------------------
-// 18. Collection: user_address (Model: UserAddress)
+// 18. Collection: review_replies (Model: ReviewReply)
+// -------------------------------------------------------------
+db.createCollection('review_replies', {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["ma_danh_gia", "ma_admin", "noi_dung", "is_updated", "trang_thai"],
+      properties: {
+        ma_phan_hoi: { bsonType: ["string", "null"] },
+        ma_danh_gia: { bsonType: "string" },
+        ma_admin: { bsonType: "string" },
+        noi_dung: { bsonType: "string" },
+        lich_su_phan_hoi: { bsonType: ["array", "null"] },
+        is_updated: { bsonType: "bool" },
+        trang_thai: { bsonType: "string" },
+        created_at: { bsonType: ["date", "null"] },
+        updated_at: { bsonType: ["date", "null"] }
+      }
+    }
+  }
+});
+db.review_replies.createIndex({ "ma_phan_hoi": 1 }, { unique: true, sparse: true });
+db.review_replies.createIndex({ "ma_danh_gia": 1 });
+db.review_replies.createIndex({ "ma_admin": 1 });
+
+
+// -------------------------------------------------------------
+// 19. Collection: user_address (Model: UserAddress)
 // -------------------------------------------------------------
 db.createCollection('user_address', {
   validator: {
@@ -545,7 +572,7 @@ db.user_address.createIndex({ "ma_nguoi_dung": 1 });
 
 
 // -------------------------------------------------------------
-// 19. Collection: agent_conversations (Model: AgentConversation)
+// 20. Collection: agent_conversations (Model: AgentConversation)
 // -------------------------------------------------------------
 db.createCollection('agent_conversations', {
   validator: {
@@ -566,7 +593,7 @@ db.agent_conversations.createIndex({ "user_id": 1, "updated_at": -1 });
 
 
 // -------------------------------------------------------------
-// 20. Collection: agent_conversation_messages (Model: AgentConversationMessage)
+// 21. Collection: agent_conversation_messages (Model: AgentConversationMessage)
 // -------------------------------------------------------------
 db.createCollection('agent_conversation_messages', {
   validator: {
@@ -595,7 +622,7 @@ db.agent_conversation_messages.createIndex({ "user_id": 1 });
 
 
 // -------------------------------------------------------------
-// 21. Collection: notifications (Model: Notification)
+// 22. Collection: notifications (Model: Notification)
 // -------------------------------------------------------------
 db.createCollection('notifications', {
   validator: {
@@ -621,7 +648,7 @@ db.notifications.createIndex({ "ma_nguoi_dung": 1 });
 
 
 // -------------------------------------------------------------
-// 22. Collection: banner_images (Model: BannerImage)
+// 23. Collection: banner_images (Model: BannerImage)
 // -------------------------------------------------------------
 db.createCollection('banner_images', {
   validator: {
