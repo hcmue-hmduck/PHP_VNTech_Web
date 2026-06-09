@@ -20,12 +20,14 @@ use App\Http\Controllers\BannerImagesController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewReplyController;
 use App\Http\Controllers\CompareController;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('home.index');
 Route::get('/products', [HomeController::class, 'viewHomeProducts'])->name('home.products');
 Route::get('/news', [HomeController::class, 'viewHomeNews'])->name('home.news');
 Route::view('/support', 'homeUI.support')->name('support');
 Route::view('/contact', 'homeUI.contact')->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 Route::view('/compare', 'homeUI.compare')->name('compare.view');
 Route::post('/compare/variants', [CompareController::class, 'variants'])->name('compare.variants');

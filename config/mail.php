@@ -119,4 +119,6 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'adminEmails' => array_filter(array_map('trim', explode(',', env('ADMIN_EMAILS')))),
+
 ];

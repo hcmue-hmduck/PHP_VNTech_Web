@@ -75,23 +75,53 @@
 
             <!-- Right Column: Contact form -->
             <div class="lg:col-span-7">
-                <form action="#" method="POST" class="bg-white border border-[#e4beb1]/30 p-6 md:p-8 rounded-3xl space-y-5 text-left shadow-xs">
+                <form action="{{ route('contact.submit') }}" method="POST" class="bg-white border border-[#e4beb1]/30 p-6 md:p-8 rounded-3xl space-y-5 text-left shadow-xs">
                     @csrf
                     <h2 class="font-display text-lg font-bold uppercase tracking-wider text-[#a73a00] flex items-center gap-2">
                         <span class="material-symbols-outlined text-xl">send</span>
                         Gửi yêu cầu liên hệ
                     </h2>
 
+                    @if (session('success'))
+                        <div class="p-4 text-sm text-emerald-800 rounded-xl bg-emerald-50 border border-emerald-250/30 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="p-4 text-sm text-red-800 rounded-xl bg-red-50 border border-red-250/30 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">error</span>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="p-4 text-sm text-red-850 rounded-xl bg-red-50 border border-red-250/30">
+                            <div class="flex items-center gap-2 mb-2 text-red-900 font-bold">
+                                <span class="material-symbols-outlined text-lg">warning</span>
+                                <span>Vui lòng kiểm tra lại thông tin:</span>
+                            </div>
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
                             <label class="text-[10px] font-bold uppercase tracking-widest text-gray-550">Họ và tên</label>
                             <input type="text" name="name" required 
+                                   value="{{ old('name') }}"
                                    class="w-full bg-gray-50/50 border border-gray-200 focus:border-[#ff5c00] focus:ring-1 focus:ring-[#ff5c00] p-3 text-gray-900 text-sm rounded-xl outline-none transition-all duration-300" 
                                    placeholder="Họ tên của bạn..." />
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-[10px] font-bold uppercase tracking-widest text-gray-550">Địa chỉ Email</label>
                             <input type="email" name="email" required 
+                                   value="{{ old('email') }}"
                                    class="w-full bg-gray-50/50 border border-gray-200 focus:border-[#ff5c00] focus:ring-1 focus:ring-[#ff5c00] p-3 text-gray-900 text-sm rounded-xl outline-none transition-all duration-300" 
                                    placeholder="example@gmail.com" />
                         </div>
@@ -100,6 +130,7 @@
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-bold uppercase tracking-widest text-gray-550">Chủ đề liên hệ</label>
                         <input type="text" name="subject" required 
+                               value="{{ old('subject') }}"
                                class="w-full bg-gray-50/50 border border-gray-200 focus:border-[#ff5c00] focus:ring-1 focus:ring-[#ff5c00] p-3 text-gray-900 text-sm rounded-xl outline-none transition-all duration-300" 
                                placeholder="Hỏi về bảo hành, tư vấn sản phẩm, v.v..." />
                     </div>
@@ -108,7 +139,7 @@
                         <label class="text-[10px] font-bold uppercase tracking-widest text-gray-550">Nội dung tin nhắn</label>
                         <textarea name="message" rows="5" required 
                                   class="w-full bg-gray-50/50 border border-gray-200 focus:border-[#ff5c00] focus:ring-1 focus:ring-[#ff5c00] p-3 text-gray-900 text-sm rounded-xl outline-none transition-all duration-300 resize-none leading-relaxed" 
-                                  placeholder="Nhập nội dung chi tiết ở đây..."></textarea>
+                                  placeholder="Nhập nội dung chi tiết ở đây...">{{ old('message') }}</textarea>
                     </div>
 
                     <button type="submit" 
