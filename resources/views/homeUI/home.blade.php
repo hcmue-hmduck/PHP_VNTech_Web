@@ -144,7 +144,7 @@
                 </div>
                 <div>
                     <h4 class="font-extrabold text-neutral-900 text-sm">Hỗ trợ 24/7</h4>
-                    <p class="text-xs text-neutral-500">Hotline: 1900 1234</p>
+                    <p class="text-xs text-neutral-500">Hotline: 1900 9999</p>
                 </div>
             </div>
         </div>
@@ -564,12 +564,12 @@
             </style>
             <div class="flex items-center flex-nowrap overflow-x-auto gap-1.5 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/10 shadow-xs max-w-full no-scrollbar" style="scrollbar-width: none; -ms-overflow-style: none;">
                 <template x-for="cat in categories" :key="cat.id">
-                    <button
-                        @click="selectedCategory = cat.id"
+                    <a
+                        :href="cat.id === 'all' ? '{{ route('home.products') }}' : '{{ route('home.products') }}?category=' + encodeURIComponent(cat.name)"
                         :class="selectedCategory === cat.id ? 'bg-white text-accent-600 shadow-[0_2px_8px_rgba(0,0,0,0.04)]' : 'text-slate-500 hover:text-slate-900'"
-                        class="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap shrink-0"
+                        class="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap shrink-0 no-underline"
                         x-text="cat.name"
-                    ></button>
+                    ></a>
                 </template>
             </div>
         </div>
@@ -598,8 +598,8 @@
                             <!-- Dynamic Badge Overlays -->
                             <div class="absolute top-3 left-3 flex gap-2 z-10">
                                 <span
-                                    :class="product.promoBg"
-                                    class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm"
+                                    x-show="product.promoText"
+                                    class="bg-amber-500 text-white px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm"
                                     x-text="product.promoText"
                                 ></span>
                             </div>

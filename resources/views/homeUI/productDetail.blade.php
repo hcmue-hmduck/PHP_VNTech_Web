@@ -122,10 +122,21 @@
                 <!-- Product header information -->
                 <div class="space-y-4">
                     <!-- Badges (Matching mockup layout) -->
-                    <div class="flex gap-2">
-                        <span class="bg-orange-50 text-[#FF5C00] px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">Trả góp 0%</span>
-                        <span class="bg-purple-50 text-purple-600 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">Bán chạy</span>
+                    <!-- Badges from thong_tin_them -->
+                    @if(!empty($productDetail->thong_tin_them) && is_array($productDetail->thong_tin_them))
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($productDetail->thong_tin_them as $info)
+                            @php
+                                $ten = (string)($info['ten'] ?? '');
+                                $giaTri = (string)($info['gia_tri'] ?? '');
+                                $label = trim($ten . ' ' . $giaTri);
+                            @endphp
+                            @if($label)
+                            <span class="bg-orange-50 text-[#FF5C00] px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">{{ $label }}</span>
+                            @endif
+                        @endforeach
                     </div>
+                    @endif
 
                     <!-- Title -->
                     <h1 class="text-3xl font-black text-slate-900 tracking-tight leading-tight">
@@ -322,36 +333,7 @@
             </div>
         </div>
 
-        <!-- Additional Information Section -->
-        @if($hasThongTinThem)
-        <div class="mt-20 border-t border-neutral-200 pt-16">
-            <div class="bg-white rounded-3xl border border-neutral-200/80 p-6 sm:p-10 shadow-xs space-y-8 text-left">
-                <div class="space-y-1 text-left">
-                    <h2 class="font-display font-black text-2xl text-neutral-900 border-l-4 border-[#ff5c00] pl-3.5 uppercase">
-                        Thông tin bổ sung
-                    </h2>
-                    <p class="text-slate-400 text-xs font-bold">Các thông tin đi kèm khác của sản phẩm</p>
-                </div>
-                
-                <div class="overflow-hidden rounded-2xl border border-neutral-100">
-                    <table class="w-full text-left">
-                        <tbody class="divide-y divide-neutral-100">
-                            @foreach($formattedThem as $row)
-                            <tr class="hover:bg-neutral-50/50 transition-colors group">
-                                <td class="p-5 font-bold text-xs tracking-wider text-slate-400 w-1/3 uppercase">
-                                    {{ $row['ten'] }}
-                                </td>
-                                <td class="p-5 text-slate-800 font-semibold text-sm">
-                                    {{ $row['gia_tri'] }}
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        @endif
+
 
         <!-- Product Description Section -->
         @if ($productDetail->mo_ta_chi_tiet)

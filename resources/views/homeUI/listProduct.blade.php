@@ -88,17 +88,25 @@
         }
     }
 
-    $promoLabels = [
-        ['text' => 'Trả Góp 0%', 'bg' => 'bg-amber-500 text-white'],
-        ['text' => 'Bảo Hành 24T', 'bg' => 'bg-[#0058bc] text-white'],
-        ['text' => 'Chính Hãng 100%', 'bg' => 'bg-emerald-600 text-white'],
-        ['text' => 'Freeship Toàn Quốc', 'bg' => 'bg-[#ff5c00] text-white'],
-    ];
 
     $productsData = [];
     foreach ($products as $index => $prod) {
         $categoryName = $categoriesMap[$prod->ma_danh_muc] ?? 'Khác';
-        $selectedLabel = $promoLabels[$index % count($promoLabels)];
+
+        $thongTinThem = $prod->thong_tin_them;
+        $promoText = '';
+        if (is_array($thongTinThem) && count($thongTinThem) > 0) {
+            $first = reset($thongTinThem);
+            if (is_array($first)) {
+                $ten = (string) ($first['ten'] ?? '');
+                $giaTri = (string) ($first['gia_tri'] ?? '');
+                $promoText = trim($ten . ' ' . $giaTri);
+            } else {
+                $promoText = (string) $first;
+            }
+        } elseif (is_string($thongTinThem) && !empty($thongTinThem)) {
+            $promoText = $thongTinThem;
+        }
 
         $productsData[] = [
             'id' => (string) $prod->ma_san_pham,
@@ -107,8 +115,7 @@
             'mo_ta_ngan' => (string) ($prod->mo_ta_ngan ?? 'Chưa có mô tả ngắn cho sản phẩm này.'),
             'price' => (int) $prod->gia_thap_nhat,
             'image' => (string) ($prod->link_anh_dai_dien ?: asset('images/no-image.png')),
-            'promoText' => $selectedLabel['text'],
-            'promoBg' => $selectedLabel['bg'],
+            'promoText' => $promoText,
             'rating' => $prod->so_sao_trung_binh ?? 0,
             'reviewsCount' => $prod->so_luot_danh_gia ?? 0,
             'tong_da_ban' => (int) ($prod->tong_luot_ban ?? 0),
@@ -396,9 +403,11 @@
                                     />
 
                                     <div class="absolute top-3 left-3 flex gap-2 z-10">
-                                        <span class="{{ $product['promoBg'] }} px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm">
+                                        @if(!empty($product['promoText']))
+                                        <span class="bg-amber-500 text-white px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider shadow-sm">
                                             {{ $product['promoText'] }}
                                         </span>
+                                        @endif
                                     </div>
                                 </div>
 

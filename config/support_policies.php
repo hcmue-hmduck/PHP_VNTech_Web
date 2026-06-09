@@ -3,7 +3,7 @@
 return [
     'contact' => [
         'company_name' => 'Công ty TNHH Công nghệ VNTech',
-        'brand_description' => 'Nhà cung cấp máy tính, laptop và linh kiện phần cứng thế hệ mới hàng đầu. Mang lại hiệu năng đỉnh cao cho mọi tác vụ gaming và thiết kế chuyên nghiệp.',
+        'brand_description' => 'VNTech cung cấp đa dạng thiết bị công nghệ chính hãng: laptop, PC, linh kiện phần cứng, màn hình, điện thoại, tablet, thiết bị ngoại vi và phụ kiện thông minh. Chúng tôi hướng đến trải nghiệm mua sắm tin cậy, tư vấn đúng nhu cầu và chính sách bảo hành minh bạch cho từng nhóm sản phẩm.',
         'address' => [
             'label' => 'Địa chỉ văn phòng',
             'icon' => 'map',
@@ -15,9 +15,9 @@ return [
             'label' => 'Hotline hỗ trợ',
             'icon' => 'call',
             'lucide_icon' => 'phone',
-            'value' => '1900 8198',
+            'value' => '1900 9999',
             'note' => '8:00 - 22:00 hàng ngày',
-            'display' => '1900 8198 (8:00 - 22:00 hàng ngày)',
+            'display' => '1900 9999 (8:00 - 22:00 hàng ngày)',
         ],
         'email' => [
             'label' => 'Hòm thư điện tử',
@@ -89,7 +89,7 @@ return [
             'tab' => 'warranty',
             'icon' => 'verified_user',
             'title' => 'Bảo hành & Sửa chữa',
-            'description' => 'Quy trình đăng ký bảo hành phần cứng, thời hạn bảo hành cho phím cơ, chuột Gaming và linh kiện.',
+            'description' => 'Quy trình đăng ký bảo hành và thời hạn hỗ trợ cho laptop, PC, linh kiện, màn hình, thiết bị ngoại vi, điện thoại, tablet và phụ kiện công nghệ.',
             'cta' => 'Xem chính sách',
         ],
         [
@@ -133,16 +133,17 @@ return [
 
     'policies' => [
         'warranty' => [
-            'title' => 'Chính sách bảo hành thiết bị',
+            'title' => 'Chính sách bảo hành thiết bị công nghệ',
             'icon' => 'verified_user',
             'blocks' => [
                 [
                     'heading' => '1. Thời gian bảo hành tiêu chuẩn:',
                     'type' => 'list',
                     'items' => [
-                        'Bàn phím cơ cơ học: Bảo hành 24 tháng (lỗi switch, mạch điện tử).',
-                        'Chuột Gaming & Tai nghe: Bảo hành 12 tháng (lỗi mắt đọc, double click, âm thanh).',
-                        'Tay cầm chơi game & Phụ kiện khác: Bảo hành 6 tháng.',
+                        'Laptop, PC đồng bộ, màn hình, điện thoại và tablet: Bảo hành theo tiêu chuẩn của hãng sản xuất, thông thường từ 12 - 36 tháng tùy dòng sản phẩm.',
+                        'Linh kiện phần cứng như CPU, mainboard, RAM, SSD, HDD, VGA, nguồn và tản nhiệt: Bảo hành theo tem, serial hoặc chính sách từng nhà phân phối.',
+                        'Thiết bị ngoại vi như bàn phím, chuột, tai nghe, loa, webcam, tay cầm chơi game và phụ kiện thông minh: Bảo hành từ 6 - 24 tháng tùy thương hiệu và loại sản phẩm.',
+                        'Phụ kiện tiêu hao hoặc phụ kiện phổ thông như cáp, sạc, hub, bao da, túi chống sốc, miếng dán và phụ kiện nhỏ: Áp dụng chính sách đổi/bảo hành riêng được ghi trên hóa đơn hoặc trang sản phẩm.',
                     ],
                 ],
                 [
@@ -151,16 +152,18 @@ return [
                     'items' => [
                         'Sản phẩm còn trong thời hạn bảo hành điện tử đăng ký trên hệ thống.',
                         'Sản phẩm gặp lỗi kỹ thuật từ nhà sản xuất phát sinh trong quá trình sử dụng bình thường.',
-                        'Tem bảo hành (nếu có) phải còn nguyên vẹn, không có dấu hiệu bị cạy mở, rách nát.',
+                        'Thông tin serial, IMEI, mã đơn hàng hoặc tem bảo hành còn đối chiếu được trên hệ thống.',
+                        'Sản phẩm còn đầy đủ điều kiện tiếp nhận theo chính sách của hãng, nhà phân phối hoặc VNTech đối với từng nhóm hàng.',
                     ],
                 ],
                 [
                     'heading' => '3. Trường hợp bị từ chối bảo hành:',
                     'type' => 'list',
                     'items' => [
-                        'Sản phẩm bị dính nước, chất lỏng hoặc có vết ẩm mốc bên trong mạch.',
-                        'Sản phẩm bị va đập, nứt vỡ, trầy xước nặng, biến dạng do lỗi của người dùng.',
-                        'Đã tự ý mở sản phẩm để sửa chữa trước khi mang đến VNTech.',
+                        'Sản phẩm bị dính nước, chất lỏng, ẩm mốc, cháy nổ, chập điện hoặc sử dụng sai nguồn điện khuyến nghị.',
+                        'Sản phẩm bị va đập, nứt vỡ, trầy xước nặng, móp méo, cong chân socket, gãy cổng kết nối hoặc biến dạng do lỗi sử dụng.',
+                        'Sản phẩm bị can thiệp, tháo mở, sửa chữa tại nơi không được ủy quyền hoặc mất/rách tem bảo hành quan trọng.',
+                        'Lỗi phát sinh do phần mềm không bản quyền, virus, dữ liệu cá nhân, hao mòn tự nhiên hoặc phụ kiện tiêu hao ngoài phạm vi bảo hành.',
                     ],
                 ],
             ],
