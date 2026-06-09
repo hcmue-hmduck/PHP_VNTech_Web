@@ -20,14 +20,17 @@ class Review extends Model {
         'noi_dung',
         'danh_sach_anh',
         'video',
+        'lich_su_chinh_sua',
         'is_anonymous',
         'trang_thai',
+        'is_updated'
     ];
 
     protected $casts = [
         'so_sao'   => 'integer',
         'danh_sach_anh' => 'array',
         'video' => 'array',
+        'lich_su_chinh_sua' => 'array',
         'is_anonymous' => 'boolean',
     ];
 
@@ -54,5 +57,10 @@ class Review extends Model {
     public function user()
     {
         return $this->belongsTo(User::class, 'ma_nguoi_dung', 'ma_nguoi_dung');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(ReviewReply::class, 'ma_danh_gia', 'ma_danh_gia');
     }
 }

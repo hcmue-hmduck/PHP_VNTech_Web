@@ -466,7 +466,7 @@
                                             >
                                                 Đã chỉnh sửa
                                             </span>
-                                            <time class="text-xs text-neutral-400 font-semibold" x-text="formatDate(review.created_at)"></time>
+                                            <time class="text-xs text-neutral-400 font-semibold" x-text="formatDate(review.updated_at)"></time>
                                         </div>
                                     </div>
 
@@ -490,6 +490,71 @@
                                                 </div>
                                             </a>
                                         </template>
+                                    </div>
+
+                                    <div x-show="hasEditHistory(review)" class="mt-4 rounded-xl border border-dashed border-neutral-200 bg-neutral-50/70 p-4 space-y-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <div class="flex items-center gap-2 text-xs font-extrabold text-slate-600">
+                                                <i data-lucide="history" class="w-4 h-4 text-neutral-400"></i>
+                                                <span>Lịch sử chỉnh sửa</span>
+                                            </div>
+                                            <time
+                                                x-show="review.created_at"
+                                                class="text-[11px] font-semibold text-neutral-400"
+                                                x-text="formatDate(review.created_at)"
+                                            ></time>
+                                        </div>
+
+                                        <div class="flex text-xs leading-none" :aria-label="`${review.lich_su_chinh_sua?.so_sao || 0} sao trước chỉnh sửa`">
+                                            <template x-for="star in 5" :key="star">
+                                                <span :class="star <= Number(review.lich_su_chinh_sua?.so_sao || 0) ? 'text-amber-400' : 'text-neutral-200'">★</span>
+                                            </template>
+                                        </div>
+
+                                        <p
+                                            x-show="review.lich_su_chinh_sua?.noi_dung"
+                                            class="text-xs text-slate-500 leading-relaxed whitespace-pre-line"
+                                            x-text="review.lich_su_chinh_sua?.noi_dung"
+                                        ></p>
+
+                                        <div x-show="historyMediaItems(review).length > 0" class="flex flex-wrap gap-2">
+                                            <template x-for="item in historyMediaItems(review)" :key="`history-${item.type}-${item.url}`">
+                                                <a :href="item.url" target="_blank" rel="noopener" class="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-neutral-200 bg-white group">
+                                                    <template x-if="item.type === 'video'">
+                                                        <video :src="item.url" class="w-full h-full object-cover bg-slate-900" muted preload="metadata"></video>
+                                                    </template>
+                                                    <template x-if="item.type === 'image'">
+                                                        <img :src="item.url" alt="Media đánh giá trước chỉnh sửa" class="w-full h-full object-cover" loading="lazy">
+                                                    </template>
+                                                    <div x-show="item.type === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/25 text-white">
+                                                        <i data-lucide="play" class="w-6 h-6 fill-current"></i>
+                                                    </div>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <div x-show="review.admin_reply" class="mt-4 rounded-xl border border-orange-100 bg-orange-50/50 p-4 space-y-2">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <div class="flex items-center gap-2 text-xs font-extrabold text-[#E04F2A]">
+                                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                                <span>Phản hồi từ VNTech</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span
+                                                    x-show="review.admin_reply?.is_updated"
+                                                    class="rounded-full bg-white px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-orange-500"
+                                                >
+                                                    Đã chỉnh sửa
+                                                </span>
+                                                <time
+                                                    x-show="review.admin_reply?.updated_at"
+                                                    class="text-[11px] font-semibold text-neutral-400"
+                                                    x-text="formatDate(review.admin_reply?.updated_at)"
+                                                ></time>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line" x-text="review.admin_reply?.noi_dung"></p>
                                     </div>
                                 </div>
                             </div>
@@ -744,6 +809,44 @@
                 }
 
                 (review.danh_sach_anh || []).forEach((image) => {
+                    const url = typeof image === 'string' ? image : image?.url;
+
+                    if (url) {
+                        media.push({
+                            type: 'image',
+                            url,
+                        });
+                    }
+                });
+
+                return media;
+            },
+
+            hasEditHistory(review) {
+                const history = review.lich_su_chinh_sua;
+
+                if (!history) return false;
+
+                return Boolean(
+                    history.noi_dung
+                    || history.so_sao
+                    || this.historyMediaItems(review).length > 0
+                );
+            },
+
+            historyMediaItems(review) {
+                const history = review.lich_su_chinh_sua || {};
+                const mediaSource = history.media || {};
+                const media = [];
+
+                if (mediaSource.video?.url) {
+                    media.push({
+                        type: 'video',
+                        url: mediaSource.video.url,
+                    });
+                }
+
+                (mediaSource.danh_sach_anh || []).forEach((image) => {
                     const url = typeof image === 'string' ? image : image?.url;
 
                     if (url) {

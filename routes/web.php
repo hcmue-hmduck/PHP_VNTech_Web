@@ -18,6 +18,7 @@ use App\Http\Controllers\AiController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\BannerImagesController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReviewReplyController;
 use App\Http\Controllers\CompareController;
 
 Route::get('/', [HomeController::class, 'viewHome'])->name('home.index');
@@ -105,6 +106,10 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard.index');
+
+    Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('admin.reviews.index');
+    Route::post('/reviews/{review}/replies', [ReviewReplyController::class, 'store'])->name('admin.review-replies.store');
+    Route::put('/reviews/{review}/replies/{reviewReply}', [ReviewReplyController::class, 'update'])->name('admin.review-replies.update');
 
     Route::get('/products', [ProductAdminController::class, 'viewProductAdmin'])->name('admin.products.index');
     Route::get('/products/create', [ProductAdminController::class, 'viewCreateProductAdmin'])->name('admin.products.create');

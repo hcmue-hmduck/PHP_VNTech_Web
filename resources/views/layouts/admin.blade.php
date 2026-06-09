@@ -91,6 +91,7 @@
                         $navItems = [
                             ['name' => 'Dashboard', 'icon' => 'layout-dashboard', 'route' => 'admin.dashboard.index', 'active' => 'admin.dashboard*'],
                             ['name' => 'Sản phẩm', 'icon' => 'package', 'route' => 'admin.products.index', 'active' => 'admin.products*'],
+                            ['name' => 'Đánh giá', 'icon' => 'message-square-text', 'route' => 'admin.reviews.index', 'active' => 'admin.reviews*'],
                             ['name' => 'Hãng / Danh mục', 'icon' => 'layers', 'route' => 'admin.brandscategories.index', 'active' => 'admin.brandscategories*'],
                             ['name' => 'Đơn hàng', 'icon' => 'shopping-cart', 'route' => 'admin.order.index', 'active' => 'admin.order*'],
                             ['name' => 'Flash Sales', 'icon' => 'zap', 'route' => 'admin.flashsales.index', 'active'=>'admin.flashsales*'],

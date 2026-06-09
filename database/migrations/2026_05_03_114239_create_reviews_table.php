@@ -27,6 +27,9 @@ return new class extends Migration
             
             $collection->boolean('is_anonymous')->default(false);
             $collection->string('trang_thai')->default('active'); // active, hidden
+
+            $collection->array('lich_su_chinh_sua')->nullable();
+            
             $collection->timestamps();
         });
     }

@@ -5,18 +5,68 @@ namespace App\Http\Controllers;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\ReviewReply;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
+    public function adminIndex(Request $request)
+    {
+        $rating = (int) $request->query('so_sao');
+        $query = Review::with(['product:ma_san_pham,ten_san_pham', 'user:ma_nguoi_dung,ho_ten,email'])
+            ->latest();
+
+        if ($rating >= 1 && $rating <= 5) {
+            $query->where('so_sao', $rating);
+        }
+
+        $reviews = $query->paginate(12)->withQueryString();
+        $reviewIds = $reviews->getCollection()
+            ->pluck('ma_danh_gia')
+            ->filter()
+            ->values()
+            ->all();
+        $latestReplies = ReviewReply::whereIn('ma_danh_gia', $reviewIds)
+            ->where('trang_thai', 'active')
+            ->orderBy('updated_at', 'desc')
+            ->get(['_id', 'ma_phan_hoi', 'ma_danh_gia', 'noi_dung', 'updated_at', 'is_updated'])
+            ->groupBy('ma_danh_gia')
+            ->map(fn($replies) => $replies->first());
+
+        $reviews->getCollection()->transform(function ($review) use ($latestReplies) {
+            $review->ten_hien_thi = trim((string) ($review->product?->ten_san_pham ?? '') . ' ' . (string) ($review->ten_bien_the ?? ''));
+            $review->admin_reply = $latestReplies->get($review->ma_danh_gia);
+
+            return $review;
+        });
+
+        $totalReviews = Review::count();
+        $averageRating = (float) Review::avg('so_sao');
+        $repliedReviewCount = ReviewReply::where('trang_thai', 'active')
+            ->pluck('ma_danh_gia')
+            ->filter()
+            ->unique()
+            ->count();
+        $pendingReplyCount = max(0, $totalReviews - $repliedReviewCount);
+
+        return view('adminUI.reviewsAdmin', compact(
+            'reviews',
+            'rating',
+            'totalReviews',
+            'averageRating',
+            'repliedReviewCount',
+            'pendingReplyCount'
+        ));
+    }
+
     // GET /products/{ma_san_pham}/reviews
     public function index(Request $request, string $ma_san_pham)
     {
         $query = Review::where('ma_san_pham', $ma_san_pham)
             ->where('trang_thai', 'active')
             ->with(['user:ma_nguoi_dung,ho_ten,avatar_url', 'product:ma_san_pham,ten_san_pham'])
-            ->select(['ma_san_pham', 'ma_nguoi_dung', 'ten_bien_the', 'so_sao', 'noi_dung', 'danh_sach_anh', 'video', 'is_anonymous', 'created_at', 'is_updated']);
+            ->select(['ma_danh_gia', 'ma_san_pham', 'ma_nguoi_dung', 'ten_bien_the', 'so_sao', 'noi_dung', 'danh_sach_anh', 'video', 'lich_su_chinh_sua', 'is_anonymous', 'created_at', 'is_updated', 'updated_at']);
 
         if ($request->boolean('co_media')) {
             $query->where(function ($query) {
@@ -46,8 +96,26 @@ class ReviewController extends Controller
         }
 
         $reviews = $query->latest()->paginate(10);
-        $reviews->getCollection()->transform(function ($review) {
+        $reviewIds = $reviews->getCollection()
+            ->pluck('ma_danh_gia')
+            ->filter()
+            ->values()
+            ->all();
+        $latestReplies = ReviewReply::whereIn('ma_danh_gia', $reviewIds)
+            ->where('trang_thai', 'active')
+            ->orderBy('updated_at', 'desc')
+            ->get(['ma_phan_hoi', 'ma_danh_gia', 'noi_dung', 'updated_at', 'is_updated'])
+            ->groupBy('ma_danh_gia')
+            ->map(fn($replies) => $replies->first());
+
+        $reviews->getCollection()->transform(function ($review) use ($latestReplies) {
             $review->ten_hien_thi = trim((string) ($review->product?->ten_san_pham ?? '') . ' ' . (string) ($review->ten_bien_the ?? ''));
+            $reply = $latestReplies->get($review->ma_danh_gia);
+            $review->admin_reply = $reply ? [
+                'noi_dung' => $reply->noi_dung,
+                'updated_at' => $reply->updated_at,
+                'is_updated' => (bool) $reply->is_updated,
+            ] : null;
 
             return $review;
         });
@@ -182,6 +250,15 @@ class ReviewController extends Controller
         $data['is_anonymous'] = $request->boolean('is_anonymous');
         $data['so_sao'] = (int) $data['so_sao'];
 
+        $review->lich_su_chinh_sua = [
+            'noi_dung' => $review->noi_dung,
+            'so_sao' => (int) $review->so_sao,
+            'media' => [
+                'danh_sach_anh' => $review->danh_sach_anh ?? [],
+                'video' => $review->video,
+            ],
+        ];
+
         $review->fill($data);
         $review->is_updated = true;
 
@@ -220,18 +297,6 @@ class ReviewController extends Controller
                 }
             }
 
-            if ($deleteImagePublicIds->isNotEmpty()) {
-                // đảm bảo danh sách ảnh cần xoá phải tồn tại trong đúng review
-                $deletedImages = $currentImages
-                    ->filter(fn($image) => $deleteImagePublicIds->contains($image['public_id'] ?? null));
-
-                foreach ($deletedImages as $image) {
-                    cloudinary()->uploadApi()->destroy($image['public_id'], [
-                        'resource_type' => 'image',
-                    ]);
-                }
-            }
-
             $review->danh_sach_anh = array_merge($keptImages, $newImages);
         }
 
@@ -241,10 +306,6 @@ class ReviewController extends Controller
 
 
         if ($deleteVideoPublicId && $currentVideoPublicId === $deleteVideoPublicId) {
-            cloudinary()->uploadApi()->destroy($deleteVideoPublicId, [
-                'resource_type' => 'video',
-            ]);
-
             $review->video = null;
         }
 
