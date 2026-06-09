@@ -82,6 +82,13 @@ class ProductAdminController extends Controller
             'kiem_tra_bien_the'         => 'required|boolean',
         ]);
 
+        if (isset($data['thong_tin_them']) && is_array($data['thong_tin_them'])) {
+            $data['thong_tin_them'] = array_values($data['thong_tin_them']);
+        }
+        if (isset($data['thong_so_ky_thuat_chung']) && is_array($data['thong_so_ky_thuat_chung'])) {
+            $data['thong_so_ky_thuat_chung'] = array_values($data['thong_so_ky_thuat_chung']);
+        }
+
         $product = Product::create($data);
         $product->ma_san_pham = $product->_id;
         $product->save();
@@ -187,6 +194,14 @@ class ProductAdminController extends Controller
             'existing_hinh_anh'         => 'nullable|array',
             'kiem_tra_bien_the'         => 'required|boolean',
         ]);
+
+        if (isset($data['thong_tin_them']) && is_array($data['thong_tin_them'])) {
+            $data['thong_tin_them'] = array_values($data['thong_tin_them']);
+        }
+        if (isset($data['thong_so_ky_thuat_chung']) && is_array($data['thong_so_ky_thuat_chung'])) {
+            $data['thong_so_ky_thuat_chung'] = array_values($data['thong_so_ky_thuat_chung']);
+        }
+
         $existing_hinh_anh = $request->existing_hinh_anh ?? [];
         $filePath = $product->ma_san_pham;
 

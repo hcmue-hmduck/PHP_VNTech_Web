@@ -461,6 +461,24 @@
     document.getElementById('createProductForm').onsubmit = function() { 
         document.getElementById('mo_ta_chi_tiet').value = quill.root.innerHTML; 
 
+        // Re-index thong_tin_them
+        const infoRows = document.querySelectorAll('#moreInfoBody .sortable-row');
+        infoRows.forEach((row, index) => {
+            const tenInput = row.querySelector('input[name*="[ten]"]');
+            const giaTriInput = row.querySelector('input[name*="[gia_tri]"]');
+            if (tenInput) tenInput.name = `thong_tin_them[${index}][ten]`;
+            if (giaTriInput) giaTriInput.name = `thong_tin_them[${index}][gia_tri]`;
+        });
+
+        // Re-index thong_so_ky_thuat_chung
+        const specRows = document.querySelectorAll('#techSpecsBody .sortable-row');
+        specRows.forEach((row, index) => {
+            const tenInput = row.querySelector('input[name*="[ten]"]');
+            const giaTriInput = row.querySelector('input[name*="[gia_tri]"]');
+            if (tenInput) tenInput.name = `thong_so_ky_thuat_chung[${index}][ten]`;
+            if (giaTriInput) giaTriInput.name = `thong_so_ky_thuat_chung[${index}][gia_tri]`;
+        });
+
         const hasVariantsToggle = document.getElementById('has_variants_toggle');
         
         if (!hasVariantsToggle.checked) {
