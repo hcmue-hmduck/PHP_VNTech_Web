@@ -5,7 +5,6 @@ vendor
 storage/*.key
 /public/build
 npm-debug.log
-composer.lock
 .phpunit.result.cache
 docker-compose.yml
 Dockerfile
