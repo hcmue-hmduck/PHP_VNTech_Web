@@ -45,12 +45,6 @@ class HomeController extends Controller {
             $categoriesMap[(string)$cat->ma_danh_muc] = $cat->ten_danh_muc;
         }
 
-        $promoLabels = [
-            ['text' => 'Trả Góp 0%', 'bg' => 'bg-amber-500 text-white'],
-            ['text' => 'Bảo Hành 24T', 'bg' => 'bg-[#0058bc] text-white'],
-            ['text' => 'Chính Hãng 100%', 'bg' => 'bg-emerald-600 text-white'],
-            ['text' => 'Freeship Toàn Quốc', 'bg' => 'bg-[#ff5c00] text-white'],
-        ];
 
         // 3. Thu thập danh mục thực tế và danh sách biến thể bán chạy
         $bestSellerCategoriesMap = [];
@@ -72,7 +66,21 @@ class HomeController extends Controller {
                 $bestSellerCategoriesMap[$maDanhMuc] = $categoryName;
             }
 
-            $selectedLabel = $promoLabels[$index % count($promoLabels)];
+            $thongTinThem = $prod->thong_tin_them;
+            $promoText = '';
+            if (is_array($thongTinThem) && count($thongTinThem) > 0) {
+                $first = reset($thongTinThem);
+                if (is_array($first)) {
+                    $ten = (string) ($first['ten'] ?? '');
+                    $giaTri = (string) ($first['gia_tri'] ?? '');
+                    $promoText = trim($ten . ' ' . $giaTri);
+                } else {
+                    $promoText = (string) $first;
+                }
+            } elseif (is_string($thongTinThem) && !empty($thongTinThem)) {
+                $promoText = $thongTinThem;
+            }
+
             $bestSellerProductsList[] = [
                 'ma_san_pham' => (string)$prod->ma_san_pham,
                 'ma_bien_the' => (string)$variant->ma_bien_the,
@@ -83,8 +91,7 @@ class HomeController extends Controller {
                 'price' => (int)$variant->gia_ban,
                 'originalPrice' => (int)$variant->gia_niem_yet,
                 'image' => (string)($variant->link_anh_bien_the ?: ($prod->link_anh_dai_dien ?: asset('images/no-image.png'))),
-                'promoText' => $selectedLabel['text'],
-                'promoBg' => $selectedLabel['bg'],
+                'promoText' => $promoText,
                 'rating' => $prod->so_sao_trung_binh ?? 0,
                 'reviewsCount' => $prod->so_luot_danh_gia ?? 0,
                 'da_ban' => (int)($variant->da_ban ?? 0),

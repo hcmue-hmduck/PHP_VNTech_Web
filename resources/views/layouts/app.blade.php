@@ -357,7 +357,7 @@
                                 @endphp
                                 <div class="px-2">
                                     <a 
-                                        href="/?category={{ $parent->ma_danh_muc }}#product-grid-section"
+                                        href="{{ route('home.products', ['category' => $parent->ten_danh_muc]) }}"
                                         @mouseenter="setActiveL1('{{ $parent->ma_danh_muc }}', '{{ $firstChildId }}')"
                                         class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left"
                                         :class="activeL1 === '{{ $parent->ma_danh_muc }}' ? 'bg-accent-50/60 text-accent-600' : 'text-slate-600 hover:bg-slate-50'"
@@ -396,7 +396,7 @@
                                         @foreach($l2Children as $l2)
                                             <div class="px-2">
                                                 <a 
-                                                    href="/?category={{ $l2->ma_danh_muc }}#product-grid-section"
+                                                    href="{{ route('home.products', ['category' => $l2->ten_danh_muc]) }}"
                                                     @mouseenter="activeL2 = '{{ $l2->ma_danh_muc }}'"
                                                     class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-left"
                                                     :class="activeL2 === '{{ $l2->ma_danh_muc }}' ? 'bg-accent-50/60 text-accent-600' : 'text-slate-600 hover:bg-slate-50'"
@@ -437,7 +437,7 @@
                                         @foreach($l3Children as $l3)
                                             <div class="px-2">
                                                 <a 
-                                                    href="/?category={{ $l3->ma_danh_muc }}#product-grid-section"
+                                                    href="{{ route('home.products', ['category' => $l3->ten_danh_muc]) }}"
                                                     class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-slate-500 hover:bg-accent-50/60 hover:text-accent-600 transition-all duration-300"
                                                 >
                                                     @if(!empty($l3->logo_url))
