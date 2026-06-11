@@ -12,9 +12,9 @@ use Illuminate\Http\Request;
 class HomeController extends Controller {
     public function viewHome() {
         $products = Product::where('trang_thai', 'active')->latest()->get();
-        $brands = Brand::latest()->get();
-        $categories = Category::latest()->get();
-        $banner_images = BannerImage::latest()->get();
+        $brands = Brand::where('trang_thai', '!=', 'deleted')->latest()->get();
+        $categories = Category::where('trang_thai', '!=', 'deleted')->latest()->get();
+        $banner_images = BannerImage::where('trang_thai', '!=', 'deleted')->latest()->get();
 
         $now = now();
         $flashSales = FlashSales::where('trang_thai', 'active')
@@ -121,8 +121,8 @@ class HomeController extends Controller {
 
     public function viewHomeProducts() {
         $products = Product::where('trang_thai', 'active')->latest()->get();
-        $categories = Category::latest()->get();
-        $brands = Brand::latest()->get();
+        $categories = Category::where('trang_thai', '!=', 'deleted')->latest()->get();
+        $brands = Brand::where('trang_thai', '!=', 'deleted')->latest()->get();
         return view('homeUI.listProduct', compact('products', 'categories', 'brands'));
     }
 

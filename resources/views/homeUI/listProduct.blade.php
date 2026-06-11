@@ -3,6 +3,7 @@
 
 @section('content')
 @php
+    $categories = $categories->filter(fn($cat) => ($cat->trang_thai ?? '') !== 'deleted');
     $categoriesMap = [];
     foreach ($categories as $cat) {
         $categoriesMap[$cat->ma_danh_muc] = $cat->ten_danh_muc;
