@@ -161,4 +161,16 @@ class Brands_CategoriesAdminController extends Controller
 
         return redirect()->back()->with('success', 'Cập nhật category thành công!');
     }
+
+    public function deleteBrand(Brand $brand) {
+        $brand->trang_thai = 'deleted';
+        $brand->save();
+        return redirect()->back()->with('success', 'Xoá brand thành công!');
+    }
+
+    public function deleteCategory(Category $category) {
+        $category->trang_thai = 'deleted';
+        $category->save();
+        return redirect()->back()->with('success', 'Xoá category thành công!');
+    }
 }

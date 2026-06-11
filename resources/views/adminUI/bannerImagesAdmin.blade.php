@@ -5,8 +5,7 @@
 @section('content')
 @php
     $totalBanners = $banner_images->count();
-    $activeBanners = $banner_images->filter(fn($b) => $b->trang_thai && $b->trang_thai !== 'deleted')->count();
-    $deletedBanners = $banner_images->filter(fn($b) => $b->trang_thai === 'deleted')->count();
+    $activeBanners = $banner_images->filter(fn($b) => $b->trang_thai === 'active')->count();
 @endphp
 
 <div class="w-full">
@@ -29,7 +28,7 @@
     </div>
 
     <!-- Stat Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <!-- Total Banners -->
         <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
             <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
@@ -53,19 +52,6 @@
             <div class="z-10">
                 <h3 class="text-3xl font-display font-bold text-white tracking-tight leading-tight">{{ $activeBanners }}</h3>
                 <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Hiển thị trên trang khách hàng</p>
-            </div>
-        </div>
-
-        <!-- Deleted Banners -->
-        <div class="glass-panel p-6 rounded-xl flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-neon-green/5 -rotate-45 translate-x-12 -translate-y-12 transition-transform group-hover:scale-110"></div>
-            <div class="flex justify-between items-start z-10">
-                <p class="text-[10px] font-bold text-gray-500 tracking-widest uppercase font-mono">Đã xoá tạm thời</p>
-                <i data-lucide="trash" class="size-5 text-neon-green opacity-40 group-hover:opacity-100 transition-opacity"></i>
-            </div>
-            <div class="z-10">
-                <h3 class="text-3xl font-display font-bold text-white tracking-tight leading-tight">{{ $deletedBanners }}</h3>
-                <p class="text-[10px] text-gray-500 mt-1.5 uppercase font-medium tracking-wide">Lịch sử banner đã ẩn/xoá</p>
             </div>
         </div>
     </div>
@@ -110,10 +96,7 @@
                 </thead>
                 <tbody id="bannerTableBody" class="divide-y divide-white/5">
                     @forelse($banner_images as $b)
-                    @php
-                        $isDeleted = ($b->trang_thai === 'deleted');
-                    @endphp
-                    <tr class="group hover:bg-white/[0.02] transition-colors {{ $isDeleted ? 'opacity-50' : '' }}"
+                    <tr class="group hover:bg-white/[0.02] transition-colors"
                         data-title="{{ $b->tieu_de }}"
                         data-link="{{ $b->lien_ket }}">
                         
@@ -152,23 +135,19 @@
                         <!-- Actions -->
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2.5">
-                                @if(!$isDeleted)
-                                    <a href="{{ route('admin.banner.edit', $b->ma_banner) }}" class="inline-flex items-center gap-1 bg-neon-green/10 hover:bg-neon-green text-neon-green hover:text-black border border-neon-green/30 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 rounded-lg">
-                                        <i data-lucide="edit" class="w-3.5 h-3.5"></i>
-                                        <span>Sửa</span>
-                                    </a>
-                                    
-                                    <form action="{{ route('admin.banner.delete', $b->ma_banner) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xoá banner này không?')">
-                                        @csrf
-                                        @method('PUT')
-                                        <button type="submit" class="inline-flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-black border border-rose-500/30 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 rounded-lg">
-                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                            <span>Xoá</span>
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="text-[10px] text-rose-500 border border-rose-500/30 bg-rose-500/5 px-2 py-1 rounded font-bold uppercase tracking-widest font-mono">Đã xoá</span>
-                                @endif
+                                <a href="{{ route('admin.banner.edit', $b->ma_banner) }}" class="inline-flex items-center gap-1 bg-neon-green/10 hover:bg-neon-green text-neon-green hover:text-black border border-neon-green/30 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 rounded-lg">
+                                    <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                                    <span>Sửa</span>
+                                </a>
+                                
+                                <form action="{{ route('admin.banner.delete', $b->ma_banner) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc muốn xoá banner này không?')">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="inline-flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-black border border-rose-500/30 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 rounded-lg">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                        <span>Xoá</span>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

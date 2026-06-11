@@ -16,7 +16,7 @@ class BannerImagesController extends Controller
             $query->where('tieu_de', 'like', '%' . $search . '%');
         }
 
-        $banner_images = $query->latest()->get();
+        $banner_images = $query->where('trang_thai', '!=', 'deleted')->latest()->get();
         return view('adminUI.bannerImagesAdmin', compact('banner_images'));
     }
 

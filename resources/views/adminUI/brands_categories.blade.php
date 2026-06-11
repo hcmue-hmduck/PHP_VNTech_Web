@@ -293,9 +293,13 @@
                                                 data-action="{{ route('admin.brandscategories.brand.update', $brand) }}">
                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                         </button>
-                                        <button class="p-2 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
+                                        <form action="{{ route('admin.brandscategories.brand.delete', $brand) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xoá thương hiệu này không?')">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="p-2 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -409,9 +413,13 @@
                                                 data-action="{{ route('admin.brandscategories.category.update', $category) }}">
                                             <i data-lucide="pencil" class="w-4 h-4"></i>
                                         </button>
-                                        <button class="p-2 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </button>
+                                        <form action="{{ route('admin.brandscategories.category.delete', $category) }}" method="POST" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xoá danh mục này không?')">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="p-2 hover:text-red-500 hover:bg-red-500/10 transition-colors border border-transparent hover:border-white/10 rounded-lg">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
