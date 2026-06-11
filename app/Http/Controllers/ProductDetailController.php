@@ -16,6 +16,7 @@ class ProductDetailController extends Controller {
         $variants = ProductVariant::with(['activeFlashSaleItem.campaign'])
             ->where('ma_san_pham', $productDetail->ma_san_pham)
             ->where('trang_thai', '!=', 'deleted')
+            ->where('trang_thai', '!=', 'inactive')
             ->get();
             
         // Pre-process display names of variants
@@ -109,7 +110,8 @@ class ProductDetailController extends Controller {
 
         // Fetch related products and pre-process their prices
         $relatedProducts = Product::with(['variants' => function($q) {
-                $q->where('trang_thai', '!=', 'deleted');
+                $q->where('trang_thai', '!=', 'deleted')
+                  ->where('trang_thai', '!=', 'inactive');
             }])
             ->where('ma_danh_muc', $productDetail->ma_danh_muc)
             ->where('ma_san_pham', '!=', $productDetail->ma_san_pham)
