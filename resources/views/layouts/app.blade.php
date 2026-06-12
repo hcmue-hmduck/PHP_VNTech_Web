@@ -711,7 +711,18 @@
         });
     </script>
 
-    @include('layouts.chatbot')
+    @unless (
+        request()->routeIs(
+            'login',
+            'register',
+            'password.forgot',
+            'otp.*',
+            'user.email.change.verify.show',
+            'user.email.change.verify'
+        )
+    )
+        @include('layouts.chatbot')
+    @endunless
     @yield('scripts')
 </body>
 </html>
