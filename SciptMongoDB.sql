@@ -1,13 +1,9 @@
-// VNTech E-Commerce Database Schema Script
-// MongoDB Shell (mongosh) Compatible with JSON Schema Validation
-// Generated to align strictly with Laravel Eloquent Models ($fillable, $casts, and property names)
-
-// Select database
+-- Create Database
 db = db.getSiblingDB('vntech');
 
-// -------------------------------------------------------------
-// 1. Collection: users (Model: User)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+1. Collection: users (Model: User)
+-------------------------------------------------------------*/
 db.createCollection('users', {
   validator: {
     $jsonSchema: {
@@ -36,149 +32,9 @@ db.users.createIndex({ "email": 1 }, { unique: true });
 db.users.createIndex({ "vai_tro": 1 });
 db.users.createIndex({ "trang_thai": 1 });
 
-
-// -------------------------------------------------------------
-// 2. Collection: password_reset_tokens (Laravel Auth Token)
-// -------------------------------------------------------------
-db.createCollection('password_reset_tokens', {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["email", "token"],
-      properties: {
-        email: { bsonType: "string" },
-        token: { bsonType: "string" },
-        created_at: { bsonType: ["date", "null"] }
-      }
-    }
-  }
-});
-db.password_reset_tokens.createIndex({ "email": 1 }, { unique: true });
-
-
-// -------------------------------------------------------------
-// 3. Collection: sessions (Laravel Session Driver)
-// -------------------------------------------------------------
-db.createCollection('sessions', {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["id", "payload", "last_activity"],
-      properties: {
-        id: { bsonType: "string" },
-        user_id: { bsonType: ["string", "null"] },
-        ip_address: { bsonType: ["string", "null"] },
-        user_agent: { bsonType: ["string", "null"] },
-        payload: { bsonType: "string" },
-        last_activity: { bsonType: "int" }
-      }
-    }
-  }
-});
-db.sessions.createIndex({ "id": 1 }, { unique: true });
-db.sessions.createIndex({ "user_id": 1 });
-db.sessions.createIndex({ "last_activity": 1 });
-
-
-// -------------------------------------------------------------
-// 4. Collection: cache & cache_locks
-// -------------------------------------------------------------
-db.createCollection('cache', {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["key", "value", "expiration"],
-      properties: {
-        key: { bsonType: "string" },
-        value: { bsonType: "string" },
-        expiration: { bsonType: "int" }
-      }
-    }
-  }
-});
-db.cache.createIndex({ "key": 1 }, { unique: true });
-
-db.createCollection('cache_locks', {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["key", "owner", "expiration"],
-      properties: {
-        key: { bsonType: "string" },
-        owner: { bsonType: "string" },
-        expiration: { bsonType: "int" }
-      }
-    }
-  }
-});
-db.cache_locks.createIndex({ "key": 1 }, { unique: true });
-
-
-// -------------------------------------------------------------
-// 5. Collection: jobs, failed_jobs, job_batches
-// -------------------------------------------------------------
-db.createCollection('jobs', {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["queue", "payload", "attempts", "available_at", "created_at"],
-      properties: {
-        queue: { bsonType: "string" },
-        payload: { bsonType: "string" },
-        attempts: { bsonType: "int" },
-        reserved_at: { bsonType: ["int", "null"] },
-        available_at: { bsonType: "int" },
-        created_at: { bsonType: "int" }
-      }
-    }
-  }
-});
-db.jobs.createIndex({ "queue": 1 });
-
-db.createCollection('failed_jobs', {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["uuid", "connection", "queue", "payload", "exception"],
-      properties: {
-        uuid: { bsonType: "string" },
-        connection: { bsonType: "string" },
-        queue: { bsonType: "string" },
-        payload: { bsonType: "string" },
-        exception: { bsonType: "string" },
-        failed_at: { bsonType: "date" }
-      }
-    }
-  }
-});
-db.failed_jobs.createIndex({ "uuid": 1 }, { unique: true });
-
-db.createCollection('job_batches', {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["id", "name", "total_jobs", "pending_jobs", "failed_jobs", "failed_job_ids", "created_at"],
-      properties: {
-        id: { bsonType: "string" },
-        name: { bsonType: "string" },
-        total_jobs: { bsonType: "int" },
-        pending_jobs: { bsonType: "int" },
-        failed_jobs: { bsonType: "int" },
-        failed_job_ids: { bsonType: "string" },
-        options: { bsonType: ["string", "null"] },
-        cancelled_at: { bsonType: ["int", "null"] },
-        created_at: { bsonType: "int" },
-        finished_at: { bsonType: ["int", "null"] }
-      }
-    }
-  }
-});
-db.job_batches.createIndex({ "id": 1 }, { unique: true });
-
-
-// -------------------------------------------------------------
-// 6. Collection: brands (Model: Brand)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+2. Collection: brands (Model: Brand)
+-------------------------------------------------------------*/
 db.createCollection('brands', {
   validator: {
     $jsonSchema: {
@@ -200,9 +56,9 @@ db.brands.createIndex({ "ma_thuong_hieu": 1 }, { unique: true });
 db.brands.createIndex({ "ten_thuong_hieu": 1 });
 
 
-// -------------------------------------------------------------
-// 7. Collection: categories (Model: Category)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+3. Collection: categories (Model: Category)
+-------------------------------------------------------------*/
 db.createCollection('categories', {
   validator: {
     $jsonSchema: {
@@ -224,9 +80,9 @@ db.categories.createIndex({ "ma_danh_muc": 1 }, { unique: true });
 db.categories.createIndex({ "ten_danh_muc": 1 });
 
 
-// -------------------------------------------------------------
-// 8. Collection: products (Model: Product)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+4. Collection: products (Model: Product)
+-------------------------------------------------------------*/
 db.createCollection('products', {
   validator: {
     $jsonSchema: {
@@ -262,9 +118,9 @@ db.products.createIndex({ "ma_danh_muc": 1 });
 db.products.createIndex({ "ma_thuong_hieu": 1 });
 
 
-// -------------------------------------------------------------
-// 9. Collection: product_variants (Model: ProductVariant)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+5. Collection: product_variants (Model: ProductVariant)
+-------------------------------------------------------------*/
 db.createCollection('product_variants', {
   validator: {
     $jsonSchema: {
@@ -291,9 +147,9 @@ db.product_variants.createIndex({ "ma_bien_the": 1 }, { unique: true });
 db.product_variants.createIndex({ "ma_san_pham": 1 });
 
 
-// -------------------------------------------------------------
-// 10. Collection: carts (Model: Cart)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+6. Collection: carts (Model: Cart)
+-------------------------------------------------------------*/
 db.createCollection('carts', {
   validator: {
     $jsonSchema: {
@@ -313,9 +169,9 @@ db.carts.createIndex({ "ma_gio_hang": 1 }, { unique: true });
 db.carts.createIndex({ "ma_nguoi_dung": 1 }, { unique: true });
 
 
-// -------------------------------------------------------------
-// 11. Collection: cart_items (Model: CartItem)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+7. Collection: cart_items (Model: CartItem)
+-------------------------------------------------------------*/
 db.createCollection('cart_items', {
   validator: {
     $jsonSchema: {
@@ -336,9 +192,9 @@ db.cart_items.createIndex({ "ma_gio_hang": 1 });
 db.cart_items.createIndex({ "ma_bien_the": 1 });
 
 
-// -------------------------------------------------------------
-// 12. Collection: vouchers (Model: Voucher)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+8. Collection: vouchers (Model: Voucher)
+-------------------------------------------------------------*/
 db.createCollection('vouchers', {
   validator: {
     $jsonSchema: {
@@ -367,9 +223,9 @@ db.createCollection('vouchers', {
 db.vouchers.createIndex({ "ma_voucher": 1 }, { unique: true });
 
 
-// -------------------------------------------------------------
-// 13. Collection: orders (Model: Order)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+9. Collection: orders (Model: Order)
+-------------------------------------------------------------*/
 db.createCollection('orders', {
   validator: {
     $jsonSchema: {
@@ -399,9 +255,9 @@ db.orders.createIndex({ "ma_don_hang": 1 }, { unique: true });
 db.orders.createIndex({ "ma_nguoi_dung": 1 });
 
 
-// -------------------------------------------------------------
-// 14. Collection: order_items (Model: OrderItem)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+10. Collection: order_items (Model: OrderItem)
+-------------------------------------------------------------*/
 db.createCollection('order_items', {
   validator: {
     $jsonSchema: {
@@ -428,9 +284,9 @@ db.order_items.createIndex({ "ma_don_hang": 1 });
 db.order_items.createIndex({ "ma_bien_the": 1 });
 
 
-// -------------------------------------------------------------
-// 15. Collection: flash_sales (Model: FlashSales)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+11. Collection: flash_sales (Model: FlashSales)
+-------------------------------------------------------------*/
 db.createCollection('flash_sales', {
   validator: {
     $jsonSchema: {
@@ -452,9 +308,9 @@ db.createCollection('flash_sales', {
 db.flash_sales.createIndex({ "ma_flash_sales": 1 }, { unique: true });
 
 
-// -------------------------------------------------------------
-// 16. Collection: flash_sale_items (Model: FlashSaleItem)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+12. Collection: flash_sale_items (Model: FlashSaleItem)
+-------------------------------------------------------------*/
 db.createCollection('flash_sale_items', {
   validator: {
     $jsonSchema: {
@@ -480,9 +336,9 @@ db.flash_sale_items.createIndex({ "ma_flash_sales": 1 });
 db.flash_sale_items.createIndex({ "ma_bien_the": 1 });
 
 
-// -------------------------------------------------------------
-// 17. Collection: reviews (Model: Review)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+13. Collection: reviews (Model: Review)
+-------------------------------------------------------------*/
 db.createCollection('reviews', {
   validator: {
     $jsonSchema: {
@@ -516,9 +372,9 @@ db.reviews.createIndex({ "ma_don_hang": 1 });
 db.reviews.createIndex({ "ma_chi_tiet_don_hang": 1 });
 
 
-// -------------------------------------------------------------
-// 18. Collection: review_replies (Model: ReviewReply)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+14. Collection: review_replies (Model: ReviewReply)
+-------------------------------------------------------------*/
 db.createCollection('review_replies', {
   validator: {
     $jsonSchema: {
@@ -543,9 +399,9 @@ db.review_replies.createIndex({ "ma_danh_gia": 1 });
 db.review_replies.createIndex({ "ma_admin": 1 });
 
 
-// -------------------------------------------------------------
-// 19. Collection: user_address (Model: UserAddress)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+15. Collection: user_address (Model: UserAddress)
+-------------------------------------------------------------*/
 db.createCollection('user_address', {
   validator: {
     $jsonSchema: {
@@ -571,9 +427,9 @@ db.user_address.createIndex({ "ma_dia_chi": 1 }, { unique: true });
 db.user_address.createIndex({ "ma_nguoi_dung": 1 });
 
 
-// -------------------------------------------------------------
-// 20. Collection: agent_conversations (Model: AgentConversation)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+16. Collection: agent_conversations (Model: AgentConversation)
+-------------------------------------------------------------*/
 db.createCollection('agent_conversations', {
   validator: {
     $jsonSchema: {
@@ -592,9 +448,9 @@ db.createCollection('agent_conversations', {
 db.agent_conversations.createIndex({ "user_id": 1, "updated_at": -1 });
 
 
-// -------------------------------------------------------------
-// 21. Collection: agent_conversation_messages (Model: AgentConversationMessage)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+17. Collection: agent_conversation_messages (Model: AgentConversationMessage)
+-------------------------------------------------------------*/
 db.createCollection('agent_conversation_messages', {
   validator: {
     $jsonSchema: {
@@ -621,9 +477,9 @@ db.agent_conversation_messages.createIndex({ "conversation_id": 1, "user_id": 1,
 db.agent_conversation_messages.createIndex({ "user_id": 1 });
 
 
-// -------------------------------------------------------------
-// 22. Collection: notifications (Model: Notification)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+18. Collection: notifications (Model: Notification)
+-------------------------------------------------------------*/
 db.createCollection('notifications', {
   validator: {
     $jsonSchema: {
@@ -647,9 +503,9 @@ db.notifications.createIndex({ "ma_thong_bao": 1 }, { unique: true });
 db.notifications.createIndex({ "ma_nguoi_dung": 1 });
 
 
-// -------------------------------------------------------------
-// 23. Collection: banner_images (Model: BannerImage)
-// -------------------------------------------------------------
+/*-------------------------------------------------------------
+19. Collection: banner_images (Model: BannerImage)
+-------------------------------------------------------------*/
 db.createCollection('banner_images', {
   validator: {
     $jsonSchema: {
