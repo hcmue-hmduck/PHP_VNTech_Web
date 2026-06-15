@@ -1,4 +1,4 @@
--- Create Database
+/* Create Database */
 db = db.getSiblingDB('vntech');
 
 /*-------------------------------------------------------------
