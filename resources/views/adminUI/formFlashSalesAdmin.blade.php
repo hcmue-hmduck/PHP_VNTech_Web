@@ -239,8 +239,8 @@
                                 <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block">Trạng thái</label>
                                 <div class="h-11 flex items-center justify-center">
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <input type="hidden" name="products[{{ $index }}][trang_thai]" value="draft">
-                                        <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="active" {{ strtolower($item->trang_thai ?? 'draft') === 'active' ? 'checked' : '' }} class="sr-only peer">
+                                        <input type="hidden" name="products[{{ $index }}][trang_thai]" value="inactive">
+                                        <input type="checkbox" name="products[{{ $index }}][trang_thai]" value="active" {{ strtolower($item->trang_thai ?? 'inactive') === 'active' ? 'checked' : '' }} class="sr-only peer">
                                         <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
                                     </label>
                                 </div>
@@ -493,7 +493,7 @@
                         <label class="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-1.5 truncate block">Trạng thái</label>
                         <div class="h-11 flex items-center justify-center">
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="hidden" name="products[${variantIndex}][trang_thai]" value="draft">
+                                <input type="hidden" name="products[${variantIndex}][trang_thai]" value="inactive">
                                 <input type="checkbox" name="products[${variantIndex}][trang_thai]" value="active" checked class="sr-only peer">
                                 <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-neon-green"></div>
                             </label>

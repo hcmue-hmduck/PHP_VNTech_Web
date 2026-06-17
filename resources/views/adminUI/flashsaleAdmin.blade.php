@@ -4,20 +4,20 @@
 
 @section('content')
 @php
-    // Tính toán số liệu thống kê trực tiếp từ Collection bằng PHP thuần (Blade)
+    // Tính toán số liệu thống kê sử dụng thuộc tính trang_thai_hien_thi
     $flash_sales = $flash_sales ?? collect();
-    $totalCampaigns = $flash_sales->count();
+    $totalCampaigns = $totalCampaigns ?? $flash_sales->count();
     
-    $liveCampaigns = $flash_sales->filter(function($c) {
-        return in_array(strtolower($c->trang_thai ?? ''), ['live', 'active', 'đang hoạt động']);
+    $liveCampaigns = $liveCampaigns ?? $flash_sales->filter(function($c) {
+        return $c->trang_thai_hien_thi === 'live';
     })->count();
 
-    $scheduledCampaigns = $flash_sales->filter(function($c) {
-        return in_array(strtolower($c->trang_thai ?? ''), ['scheduled', 'upcoming', 'sắp diễn ra', 'draft', 'bản nháp']);
+    $scheduledCampaigns = $scheduledCampaigns ?? $flash_sales->filter(function($c) {
+        return $c->trang_thai_hien_thi === 'scheduled';
     })->count();
 
-    $endedCampaigns = $flash_sales->filter(function($c) {
-        return in_array(strtolower($c->trang_thai ?? ''), ['ended', 'expired', 'đã kết thúc', 'finished']);
+    $endedCampaigns = $endedCampaigns ?? $flash_sales->filter(function($c) {
+        return $c->trang_thai_hien_thi === 'ended';
     })->count();
 @endphp
 
@@ -132,10 +132,10 @@
     <div class="space-y-4 mb-8">
         @forelse($flash_sales as $campaign)
             @php
-                $status = strtolower($campaign->trang_thai ?? 'draft');
-                $isLive = $status === 'live' || $status === 'active';
-                $isScheduled = $status === 'scheduled' || $status === 'upcoming' || $status === 'draft';
-                $isEnded = $status === 'ended' || $status === 'expired' || $status === 'finished';
+                $statusHienThi = $campaign->trang_thai_hien_thi;
+                $isLive = $statusHienThi === 'live';
+                $isScheduled = $statusHienThi === 'scheduled';
+                $isEnded = $statusHienThi === 'ended';
                 
                 $start = substr($campaign->bat_dau, 0, 16);
                 $end = substr($campaign->ket_thuc, 0, 16);

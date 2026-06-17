@@ -22,6 +22,34 @@ class FlashSales extends Model
         'bat_dau' => 'datetime',
         'ket_thuc' => 'datetime',
     ];
+
+    protected $appends = [
+        'trang_thai_hien_thi',
+    ];
+
+    public function getTrangThaiHienThiAttribute(): string
+    {
+        $status = strtolower($this->trang_thai ?? 'active');
+        if ($status === 'deleted') {
+            return 'deleted';
+        }
+        if ($status === 'finished') {
+            return 'ended';
+        }
+        
+        $now = now();
+        $start = $this->bat_dau;
+        $end = $this->ket_thuc;
+        
+        if ($start && $now->lt($start)) {
+            return 'scheduled';
+        }
+        if ($end && $now->gt($end)) {
+            return 'ended';
+        }
+        
+        return 'live';
+    }
     
     public function flash_sale_items()
     {
